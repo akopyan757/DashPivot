@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.support.kotlinCompilerOptions
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
@@ -76,6 +77,9 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(projects.shared)
         }
+        commonTest.dependencies {
+
+        }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
@@ -93,6 +97,11 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+
+        compileOptions {
+            sourceCompatibility = JavaVersion.VERSION_18
+            targetCompatibility = JavaVersion.VERSION_18
+        }
     }
     packaging {
         resources {
@@ -104,10 +113,10 @@ android {
             isMinifyEnabled = false
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
+}
+
+kotlin {
+    jvmToolchain(18)
 }
 
 dependencies {
