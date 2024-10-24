@@ -3,7 +3,7 @@ version: '3.8'
 services:
   db:
     image: postgres:15
-    container_name: pivotdash
+    container_name: dashpivot_db
     environment:
       POSTGRES_USER: akopyan_albert
       POSTGRES_PASSWORD: za1avGU8
@@ -13,6 +13,21 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    container_name: dashpivot_server
+    environment:
+      DATABASE_URL: "jdbc:postgresql://db:5432/pivotdash"
+      DATABASE_USER: akopyan_albert
+      DATABASE_PASSWORD: za1avGU8
+    ports:
+      - "8084:8084"
+    depends_on:
+      - db
     restart: always
 
 volumes:

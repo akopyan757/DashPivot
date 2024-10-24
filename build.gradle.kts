@@ -8,3 +8,19 @@ plugins {
     alias(libs.plugins.kotlinJvm) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
 }
+
+
+tasks.register("buildAndRunDockerCompose") {
+    group = "Docker"
+    description = "Builds the project and runs Docker Compose"
+
+    doLast {
+        // Сначала выполняем сборку сервера
+        exec {
+            commandLine("sh", "-c", "./gradlew server:build")
+        }
+        exec {
+            commandLine("sh", "-c", "docker-compose up --build")
+        }
+    }
+}
