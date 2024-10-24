@@ -15,9 +15,14 @@ compose-plugin = "1.6.11"
 junit = "4.13.2"
 kotlin = "2.0.20"
 kotlinx-coroutines = "1.9.0"
+jbcrypt = "0.4"
 ktor = "2.3.12"
 logback = "1.5.8"
 kotlinSerialization = "1.7.3"
+kodeinDi = "7.22.0"
+exposed = "0.55.0"
+postgresql = "42.7.4"
+javaxMail = "1.6.2"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -38,6 +43,15 @@ ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "kto
 ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
 ktor-server-tests = { module = "io.ktor:ktor-server-tests-jvm", version.ref = "ktor" }
 kotlinx-serialization-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "kotlinSerialization" }
+exposed-core = { group = "org.jetbrains.exposed", name = "exposed-core", version.ref = "exposed" }
+exposed-dao = { group = "org.jetbrains.exposed", name = "exposed-dao", version.ref = "exposed" }
+exposed-jdbc = { group = "org.jetbrains.exposed", name = "exposed-jdbc", version.ref = "exposed" }
+exposed-java-time = { group = "org.jetbrains.exposed", name = "exposed-java-time", version.ref = "exposed"  }
+postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgresql" }
+kodein-di = { group = "org.kodein.di", name = "kodein-di", version.ref = "kodeinDi" }
+kodein-di-ktor = { module = "org.kodein.di:kodein-di-framework-ktor-server-jvm", version.ref = "kodeinDi" }
+javax-mail = { group = "com.sun.mail", name = "javax.mail", version.ref = "javaxMail" }
+mindrotJbcrypt = { group = "org.mindrot",  name = "jbcrypt", version.ref = "jbcrypt" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
