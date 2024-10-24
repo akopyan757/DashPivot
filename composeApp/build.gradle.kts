@@ -36,11 +36,12 @@ kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_18)
         }
     }
     
     jvm("desktop")
+    jvmToolchain(18)
     
     listOf(
         iosX64(),
@@ -115,8 +116,10 @@ android {
     }
 }
 
-kotlin {
-    jvmToolchain(18)
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(18))
+    }
 }
 
 dependencies {

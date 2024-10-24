@@ -9,6 +9,8 @@ plugins {
 }
 
 kotlin {
+    jvm("desktop")
+
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser {
@@ -29,20 +31,30 @@ kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_18)
         }
     }
     
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-    
-    jvm()
-    
+
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(18))
+    }
+
+    jvmToolchain(18)
+
     sourceSets {
         commonMain.dependencies {
             // put your Multiplatform dependencies here
         }
+    }
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(18))
     }
 }
 
@@ -55,5 +67,9 @@ android {
     }
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_18
+        targetCompatibility = JavaVersion.VERSION_18
     }
 }

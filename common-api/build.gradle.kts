@@ -5,6 +5,7 @@ plugins {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_18
-    targetCompatibility = JavaVersion.VERSION_18
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(18))
+    }
 }
