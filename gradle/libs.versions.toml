@@ -23,6 +23,8 @@ exposed = "0.55.0"
 postgresql = "42.7.4"
 javaxMail = "1.6.2"
 jetbrains="1.7.0"
+runtime = "1.7.0"
+webCore = "1.7.0"
 [libraries]
 androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "jetbrains" }
 androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "jetbrains" }
@@ -55,6 +57,8 @@ kodein-di = { group = "org.kodein.di", name = "kodein-di", version.ref = "kodein
 kodein-di-ktor = { module = "org.kodein.di:kodein-di-framework-ktor-server-jvm", version.ref = "kodeinDi" }
 javax-mail = { group = "com.sun.mail", name = "javax.mail", version.ref = "javaxMail" }
 mindrotJbcrypt = { group = "org.mindrot",  name = "jbcrypt", version.ref = "jbcrypt" }
+runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "runtime" }
+web-core = { module = "org.jetbrains.compose.web:web-core", version.ref = "webCore" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

@@ -55,16 +55,14 @@ kotlin {
     }
     
     sourceSets {
-        val desktopMain by getting
-        
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
         }
         jsMain.dependencies {
             dependencies {
-                implementation("org.jetbrains.compose.web:web-core:1.7.0") // Поддержка Compose Web
-                implementation("org.jetbrains.compose.runtime:runtime:1.7.0")
+                implementation(libs.web.core)
+                implementation(libs.runtime)
             }
         }
         commonMain.dependencies {
@@ -77,13 +75,16 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(projects.shared)
+            implementation(projects.featureAuth)
         }
         commonTest.dependencies {
 
         }
-        desktopMain.dependencies {
-            implementation(compose.desktop.currentOs)
-            implementation(libs.kotlinx.coroutines.swing)
+        val desktopMain by getting {
+            dependencies {
+                implementation(compose.desktop.currentOs)
+                implementation(libs.kotlinx.coroutines.swing)
+            }
         }
     }
 }

@@ -50,6 +50,7 @@ kotlin {
         languageVersion.set(JavaLanguageVersion.of(18))
     }
 
+    jvm("desktop")
     jvmToolchain(18)
 
     sourceSets {
@@ -84,10 +85,6 @@ android {
     }
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_18
-        targetCompatibility = JavaVersion.VERSION_18
     }
 }
 
