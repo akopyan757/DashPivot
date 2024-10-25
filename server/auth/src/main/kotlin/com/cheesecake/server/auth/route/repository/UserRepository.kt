@@ -3,18 +3,17 @@ package com.cheesecake.server.auth.route.repository
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.model.RegisterError
 import com.cheesecake.common.auth.model.RegisterRequest
-import com.cheesecake.common.auth.repository.IUserRepository
+import com.cheesecake.common.auth.service.UserService
 import com.cheesecake.common.auth.utils.isValidEmail
 import com.cheesecake.common.auth.utils.isValidPassword
 import com.cheesecake.server.auth.route.database.UserSource
-import com.cheesecake.server.auth.route.mail.EmailService
 import com.cheesecake.server.auth.route.mail.IEmailService
 import com.cheesecake.server.auth.route.utils.PasswordHasher
 import com.cheesecake.server.auth.route.utils.VerificationUtils
 
 class UserRepository(
     private val emailService: IEmailService
-): IUserRepository {
+): UserService {
     override suspend fun registerUser(registerRequest: RegisterRequest): ApiResult<String, RegisterError> {
         if (UserSource.isEmailTaken(registerRequest.email)) {
             return ApiResult.Error(RegisterError.EMAIL_TAKEN)

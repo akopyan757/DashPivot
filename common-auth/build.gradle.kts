@@ -1,12 +1,26 @@
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("java-library")
-    alias(libs.plugins.kotlinJvm)
+    alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.serialization)
 }
 
 kotlin {
+    jvm()
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
     jvmToolchain(18)
+
+    sourceSets {
+        commonMain.dependencies {
+            api(projects.commonApi)
+            implementation(libs.kotlinx.serialization.core)
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.kotlin.test)
+            }
+        }
+    }
 }
 
 java {
@@ -14,11 +28,3 @@ java {
         languageVersion.set(JavaLanguageVersion.of(18))
     }
 }
-
-dependencies {
-    api(projects.commonApi)
-    implementation(libs.kotlinx.serialization.core)
-    testImplementation(libs.kotlin.test.junit)
-    testImplementation(libs.kotlin.test)
-}
-

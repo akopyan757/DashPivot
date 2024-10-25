@@ -5,7 +5,7 @@ import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.api.EndPoint
 import com.cheesecake.common.auth.model.RegisterError
 import com.cheesecake.common.auth.model.RegisterRequest
-import com.cheesecake.common.auth.repository.IUserRepository
+import com.cheesecake.common.auth.service.UserService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
@@ -20,7 +20,7 @@ import org.kodein.di.instance
 fun Route.authRoute(di: DI) {
     post(EndPoint.REGISTER.path) {
         val registerRequest = call.receive<RegisterRequest>()
-        val userRepository: IUserRepository by di.instance()
+        val userRepository: UserService by di.instance()
 
         when (val result = userRepository.registerUser(registerRequest)) {
             is ApiResult.Success -> call.respond(HttpStatusCode.Created, result.data)
@@ -29,7 +29,7 @@ fun Route.authRoute(di: DI) {
     }
     post(EndPoint.CONFIRM_EMAIL.path) {
         val token = call.parameters["token"]
-        val userRepository: IUserRepository by di.instance()
+        val userRepository: UserService by di.instance()
 
         when (val result = userRepository.verifyByToken(token)) {
             is ApiResult.Success -> call.respond(HttpStatusCode.Created, result.data)

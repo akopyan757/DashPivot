@@ -8,4 +8,11 @@ enum class RegisterError(override val message: String): ApiError {
     INVALID_PASSWORD("Password does not meet the requirements"),
     TOKEN_MISSING("Token is missing"),
     EXPIRED_TOKEN("Invalid or expired token"),
+    UNKNOWN("Unknown error");
+
+    companion object {
+        fun fromMessage(message: String): RegisterError {
+            return entries.find { it.message == message } ?: UNKNOWN
+        }
+    }
 }
