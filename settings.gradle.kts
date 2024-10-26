@@ -12,6 +12,7 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap")
     }
 }
 
@@ -33,4 +34,5 @@ include(":common-api")
 include(":common-auth")
 include(":server:auth")
 include(":server")
-include(":feature-auth")
+include(":feature-auth:data")
+include(":feature-auth:ui")
