@@ -83,7 +83,7 @@ jobs:
           git remote add heroku https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ env.HEROKU_APP_NAME }}.git
           git fetch --tags
           git checkout -b deploy-branch $VERSION 
-          git push heroku deploy-branch:main
+          git push --force heroku deploy-branch:main
 
   build-android:
     runs-on: ubuntu-latest
