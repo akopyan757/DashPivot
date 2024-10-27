@@ -46,6 +46,7 @@ jobs:
 
       - name: Print Version
         run: |
+          echo ${GITHUB_REF#refs/tags/}"
           echo ${{ env.VERSION }}
 
   build-server:
