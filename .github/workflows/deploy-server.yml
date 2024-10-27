@@ -2,6 +2,9 @@ name: Deploy Server
 
 on:
   push:
+    branches:
+      - main
+      - dev
     tags:
       - 'v*.*.*'
 

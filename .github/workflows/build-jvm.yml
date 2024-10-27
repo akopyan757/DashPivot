@@ -2,6 +2,9 @@ name: Build JVM Application
 
 on:
   push:
+    branches:
+      - main
+      - dev
     tags:
       - 'v*.*.*'
 

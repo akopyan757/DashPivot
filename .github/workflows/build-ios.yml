@@ -2,6 +2,9 @@ name: Build iOS App
 
 on:
   push:
+    branches:
+      - main
+      - dev
     tags:
       - 'v*.*.*'
 
