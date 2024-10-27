@@ -69,8 +69,11 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Clean build directory
+        run: ./gradlew clean
+
       - name: Build Server
-        run: ./gradlew :server:build -x test --parallel --max-workers=4 --build-cache --configure-on-demand
+        run: ./gradlew :server:build -x test --parallel --max-workers=4 --no-build-cache --configure-on-demand
 
       - name: Install Heroku CLI
         run: curl https://cli-assets.heroku.com/install.sh | sh
