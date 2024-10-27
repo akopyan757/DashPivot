@@ -31,4 +31,9 @@ android {
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
     }
+    sourceSets {
+        getByName("main") {
+            assets.srcDir("src/commonMain/resources") // Включаем общие ресурсы как assets
+        }
+    }
 }
