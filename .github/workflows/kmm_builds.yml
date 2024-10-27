@@ -152,12 +152,13 @@ jobs:
         fi
 
     - name: Build iOS App
-      working-directory: iosApp  # Ensure we are in the correct directory
-      timeout-minutes: 20  # Increase timeout for long builds
+      working-directory: iosApp
+      timeout-minutes: 20
       run: |
-        set -o xtrace  # Enable debug mode to see detailed logs
+        set -o xtrace
         xcodebuild clean -scheme iosApp -sdk iphonesimulator -configuration Release
-        xcodebuild -scheme iosApp -sdk iphonesimulator -configuration Release -quiet
+        xcodebuild -scheme iosApp -sdk iphonesimulator -configuration Release \
+          -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.2' -quiet
 
   build-desktop:
     runs-on: ubuntu-latest
