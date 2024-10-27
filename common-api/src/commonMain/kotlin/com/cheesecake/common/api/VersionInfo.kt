@@ -1,7 +1,5 @@
 package com.cheesecake.common.api
 
-val version: String by lazy {
-    readVersionFile() ?: "unknown"
+object VersionInfo {
+    const val PROJECT_VERSION = "default-version" // Дефолтное значение для локальной разработки
 }
-
-expect fun readVersionFile(): String?
