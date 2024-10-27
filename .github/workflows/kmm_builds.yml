@@ -175,10 +175,10 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build Desktop Application
-        run: ./gradlew :desktopApp:build
+        run: ./gradlew :composeApp:build
 
       - name: Upload Desktop Build
         uses: actions/upload-artifact@v3
         with:
           name: desktop-app
-          path: desktopApp/build/libs/*.jar
+          path: composeApp/build/libs/*.jar
