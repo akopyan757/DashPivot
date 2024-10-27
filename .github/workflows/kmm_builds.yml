@@ -34,7 +34,9 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
 
       - name: Set up Version File
-        run: echo ${{ env.VERSION }} > VERSION
+        run: |
+          echo ${{ env.VERSION }}
+          echo ${{ env.VERSION }} > VERSION
 
   build-server:
     runs-on: ubuntu-latest
