@@ -96,6 +96,20 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-server
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Получаем всю историю
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
       - name: Build Android APK
         run: ./gradlew :composeApp:assembleRelease
 
@@ -109,24 +123,42 @@ jobs:
     runs-on: macos-latest
     needs: build-server
     steps:
-      - name: Set up Xcode
-        run: sudo xcode-select --switch /Applications/Xcode_15.4.app
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Build iOS App
-        run: |
-          cd iosApp
-          xcodebuild -scheme iosApp -sdk iphonesimulator -configuration Release
+    - name: Set up Xcode
+      run: sudo xcode-select --switch /Applications/Xcode_15.4.app
 
-      - name: Upload iOS Build
-        uses: actions/upload-artifact@v3
-        with:
-          name: ios-build
-          path: iosApp/build/Release-iphonesimulator/*.app
+    - name: Verify iosApp Directory
+      run: |
+        if [ ! -d "iosApp" ]; then
+          echo "Directory iosApp does not exist."
+          exit 1
+        fi
 
-  build-jvm:
+    - name: Build iOS App
+      working-directory: iosApp  # Ensure we are in the correct directory
+      run: |
+        xcodebuild -scheme iosApp -sdk iphonesimulator -configuration Release
+
+    - name: Upload iOS Build
+      uses: actions/upload-artifact@v3
+      with:
+        name: ios-build
+        path: iosApp/build/Release-iphonesimulator/*.app
+
+  build-desktop:
     runs-on: ubuntu-latest
     needs: build-server
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Получаем всю историю
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
       - name: Build JVM Application
         run: ./gradlew :jvmApp:build
 
