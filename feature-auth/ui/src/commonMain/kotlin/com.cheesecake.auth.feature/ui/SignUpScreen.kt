@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.cheesecake.auth.feature.ui.EmailTextField
 import com.cheesecake.auth.feature.ui.PasswordTextField
+import com.cheesecake.auth.feature.ui.version.VersionText
 import com.cheesecake.auth.feature.viewmodel.SignUpState
 import com.cheesecake.auth.feature.viewmodel.SignUpViewModel
 
@@ -48,6 +49,10 @@ fun SignUpScreen(
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
+        VersionText(
+            modifier = Modifier.wrapContentSize(Alignment.TopEnd)
+        )
+
         Column(
             modifier = Modifier
                 .widthIn(max = 300.dp)

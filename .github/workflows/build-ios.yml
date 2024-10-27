@@ -1,0 +1,28 @@
+name: Build iOS App
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Xcode
+        run: xcode-select --install
+
+      - name: Build iOS App
+        run: xcodebuild -workspace YourApp.xcworkspace -scheme YourScheme -configuration Release -sdk iphoneos -archivePath $PWD/build/YourApp.xcarchive archive
+
+      - name: Export IPA
+        run: xcodebuild -exportArchive -archivePath $PWD/build/YourApp.xcarchive -exportPath $PWD/build -exportOptionsPlist ExportOptions.plist
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v2
+        with:
+          name: ios-ipa
+          path: build/*.ipa
