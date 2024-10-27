@@ -36,6 +36,19 @@ jobs:
           echo "GitHub Reference: ${GITHUB_REF}"
           echo "Version: $VERSION"
 
+      - name: Create VersionInfo.kt
+        run: |
+          mkdir -p common-api/src/commonMain/kotlin/com/cheesecake/common/api
+          echo "package com.cheesecake.common.api" > common-api/src/commonMain/kotlin/com/cheesecake/common/api/VersionInfo.kt
+          echo "" >> common-api/src/commonMain/kotlin/com/cheesecake/common/api/VersionInfo.kt
+          echo "object VersionInfo {" >> common-api/src/commonMain/kotlin/com/cheesecake/common/api/VersionInfo.kt
+          echo "    const val PROJECT_VERSION = \"$VERSION\"" >> common-api/src/commonMain/kotlin/com/cheesecake/common/api/VersionInfo.kt
+          echo "}" >> common-api/src/commonMain/kotlin/com/cheesecake/common/api/VersionInfo.kt
+
+      - name: Print Version from VersionInfo.kt
+        run: |
+          cat common-api/src/commonMain/kotlin/com/cheesecake/common/api/VersionInfo.kt
+
   build-server:
     runs-on: ubuntu-latest
     needs: setup
