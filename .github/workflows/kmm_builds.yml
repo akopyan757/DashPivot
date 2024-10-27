@@ -30,6 +30,14 @@ jobs:
       - name: Build Server
         run: ./gradlew :server:build -x test
 
+      - name: Configure Heroku Remote
+        run: |
+          git remote add heroku https://git.heroku.com/YOUR_HEROKU_APP_NAME.git
+          git config --global user.email "YOUR_EMAIL@example.com"
+          git config --global user.name "YOUR_GITHUB_USERNAME"
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+
       - name: Deploy to Heroku
         run: git push heroku HEAD:main
         env:
@@ -51,10 +59,10 @@ jobs:
         run: ./gradlew :androidApp:assembleRelease
 
       - name: Upload Android APK
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: android-apk
-          path: androidApp/build/outputs/apk/release/*.apk
+          path: composeApp/build/outputs/apk/release/*.apk
 
   build-ios:
     runs-on: macos-latest
@@ -63,7 +71,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up Xcode
-        run: xcode-select --switch /Applications/Xcode_13.4.app  # Укажите версию Xcode, если требуется
+        run: xcode-select --switch /Applications/Xcode_15.4.app  # Укажите версию Xcode, если требуется
 
       - name: Build iOS App
         run: |
@@ -71,7 +79,7 @@ jobs:
           xcodebuild -scheme iosApp -sdk iphonesimulator -configuration Release
 
       - name: Upload iOS Build
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ios-build
           path: iosApp/build/Release-iphonesimulator/*.app
@@ -92,7 +100,7 @@ jobs:
         run: ./gradlew :jvmApp:build
 
       - name: Upload JVM Build
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: jvm-app
           path: jvmApp/build/libs/*.jar
