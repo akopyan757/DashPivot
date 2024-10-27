@@ -66,14 +66,22 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build Server
-        run: ./gradlew :server:build -x test
+        run: ./gradlew :server:build -x test --parallel --max-workers=4 --build-cache --configure-on-demand
 
-      - name: Deploy to Heroku
-        run: |
-          git remote add heroku https://git.heroku.com/${{ env.HEROKU_APP_NAME }}.git
-          git push heroku ${{ env.VERSION }}:main
+      - name: Install Heroku CLI
+        run: curl https://cli-assets.heroku.com/install.sh | sh
+
+      - name: Authenticate with Heroku
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: heroku auth:token
+
+      - name: Deploy to Heroku
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          heroku git:remote -a ${{ env.HEROKU_APP_NAME }}
+          git push heroku main
 
   build-android:
     runs-on: ubuntu-latest
