@@ -2,15 +2,37 @@ package com.cheesecake.dashpivot.database
 
 import org.jetbrains.exposed.sql.Database
 
+@Suppress("AuthLeak")
 fun connectToDatabase() {
-    val dbUrl = System.getenv("DATABASE_URL") ?: "jdbc:postgresql://localhost:5433/pivotdash"
-    val dbUser = System.getenv("DATABASE_USER") ?: "akopyan_albert"
-    val dbPassword = System.getenv("DATABASE_PASSWORD") ?: "za1avGU8"
+    val databaseUrl = System.getenv("DATABASE_URL")
 
-    Database.connect(
-        url = dbUrl,
-        driver = "org.postgresql.Driver",
-        user = dbUser,
-        password = dbPassword
-    )
+    if (databaseUrl != null) {
+        val regex = Regex("postgres://(.*):(.*)@(.*):(\\d+)/(.*)")
+        val matchResult = regex.find(databaseUrl)
+        if (matchResult != null) {
+            val (username, password, hostname, port, databaseName) = matchResult.destructured
+
+            val jdbcUrl = "jdbc:postgresql://$hostname:$port/$databaseName"
+
+            Database.connect(
+                url = jdbcUrl,
+                driver = "org.postgresql.Driver",
+                user = username,
+                password = password
+            )
+        } else {
+            throw IllegalStateException("DATABASE_URL environment variable is not in the expected format.")
+        }
+    } else {
+        val localUrl = "jdbc:postgresql://localhost:5433/pivotdash"
+        val localUser = "akopyan_albert"
+        val localPassword = "za1avGU8"
+
+        Database.connect(
+            url = localUrl,
+            driver = "org.postgresql.Driver",
+            user = localUser,
+            password = localPassword
+        )
+    }
 }

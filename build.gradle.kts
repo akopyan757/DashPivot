@@ -25,3 +25,7 @@ tasks.register("buildAndRunDockerCompose") {
         }
     }
 }
+
+tasks.register("stage") {
+    dependsOn(":server:build")
+}

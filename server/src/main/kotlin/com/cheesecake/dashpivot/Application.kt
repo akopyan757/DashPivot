@@ -8,10 +8,13 @@ import com.cheesecake.server.auth.route.authRoute
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.response.respondText
 import io.ktor.server.routing.*
 
+val PORT = System.getenv("PORT")?.toInt() ?: SERVER_PORT
+
 fun main() {
-    embeddedServer(Netty, port = SERVER_PORT, host = "0.0.0.0", module = Application::module)
+    embeddedServer(Netty, port = PORT, host = "0.0.0.0", module = Application::module)
         .start(wait = true)
 }
 
@@ -22,5 +25,6 @@ fun Application.module() {
 
     routing {
         authRoute(di)
+        get("/") { call.respondText("Hello, world!") }
     }
 }
