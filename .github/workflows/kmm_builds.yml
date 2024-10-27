@@ -127,38 +127,38 @@ jobs:
     runs-on: macos-latest
     needs: build-server
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Set up Xcode
-      run: sudo xcode-select --switch /Applications/Xcode_15.4.app
+      - name: Set up Xcode
+        run: sudo xcode-select --switch /Applications/Xcode_15.4.app
 
-    - name: Verify iosApp Directory
-      run: |
-        if [ ! -d "iosApp" ]; then
-          echo "Directory iosApp does not exist."
-          exit 1
-        fi
+      - name: Verify iosApp Directory
+        run: |
+          if [ ! -d "iosApp" ]; then
+            echo "Directory iosApp does not exist."
+            exit 1
+          fi
 
-    - name: Clean Derived Data
-      run: |
-        rm -rf ~/Library/Developer/Xcode/DerivedData
+      - name: Clean Derived Data
+        run: |
+          rm -rf ~/Library/Developer/Xcode/DerivedData
 
-    - name: Install Dependencies (CocoaPods)
-      working-directory: iosApp
-      run: |
-        if [ -f "Podfile" ]; then
-          pod install
-        fi
+      - name: Install Dependencies (CocoaPods)
+        working-directory: iosApp
+        run: |
+          if [ -f "Podfile" ]; then
+            pod install
+          fi
 
-    - name: Build iOS App
-      working-directory: iosApp
-      timeout-minutes: 20
-      run: |
-        set -o xtrace
-        xcodebuild clean -scheme iosApp -sdk iphonesimulator -configuration Release
-        xcodebuild -scheme iosApp -sdk iphonesimulator -configuration Release \
-          -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.2' -quiet
+      - name: Build iOS App
+        working-directory: iosApp
+        timeout-minutes: 20
+        run: |
+          set -o xtrace
+          xcodebuild clean -scheme iosApp -sdk iphonesimulator -configuration Release
+          xcodebuild -scheme iosApp -sdk iphonesimulator -configuration Release \
+            -destination 'id=915179B0-3075-4C23-81A5-168DD38B5AB5' -quiet
 
   build-desktop:
     runs-on: ubuntu-latest
