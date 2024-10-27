@@ -140,18 +140,24 @@ jobs:
           exit 1
         fi
 
+    - name: Clean Derived Data
+      run: |
+        rm -rf ~/Library/Developer/Xcode/DerivedData
+
+    - name: Install Dependencies (CocoaPods)
+      working-directory: iosApp
+      run: |
+        if [ -f "Podfile" ]; then
+          pod install
+        fi
+
     - name: Build iOS App
       working-directory: iosApp  # Ensure we are in the correct directory
-      timeout-minutes: 15  # Increase timeout in case of long build times
+      timeout-minutes: 20  # Increase timeout for long builds
       run: |
         set -o xtrace  # Enable debug mode to see detailed logs
-        xcodebuild -scheme iosApp -sdk iphonesimulator -configuration Release
-
-    - name: Upload iOS Build
-      uses: actions/upload-artifact@v3
-      with:
-        name: ios-build
-        path: build/Release-iphonesimulator/*.app
+        xcodebuild clean -scheme iosApp -sdk iphonesimulator -configuration Release
+        xcodebuild -scheme iosApp -sdk iphonesimulator -configuration Release -quiet
 
   build-desktop:
     runs-on: ubuntu-latest
