@@ -81,8 +81,8 @@ jobs:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
           git remote add heroku https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ env.HEROKU_APP_NAME }}.git
-          git fetch --tags
-          git checkout -b deploy-branch $VERSION 
+          git fetch --all --tags --unshallow
+          git checkout -b deploy-branch $VERSION
           git push --force heroku deploy-branch:main
 
   build-android:
