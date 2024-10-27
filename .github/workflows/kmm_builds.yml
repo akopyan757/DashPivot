@@ -35,13 +35,6 @@ jobs:
 
       - name: Set up Version File
         run: |
-          echo "Ref type: ${{ github.ref_type }}"
-          echo "VERSION=${GITHUB_REF##*/}"
-          echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
-          if [[ ${{ github.ref_type }} == 'tag' ]]; then
-            echo "VERSION=${GITHUB_REF#refs/tags/}"
-            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-          fi
           echo ${{ env.VERSION }} > VERSION
 
       - name: Print Version
