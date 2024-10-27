@@ -1,5 +1,4 @@
 name: Build and Deploy Project
-
 on:
   push:
     branches:
@@ -11,11 +10,8 @@ on:
     branches:
       - dev
       - main
-    tags:
-      - 'v*.*.*'
 
 env:
-  VERSION: "${GITHUB_REF##*/}" # Версия проекта из тега
   JAVA_VERSION: "17"
   HEROKU_APP_NAME: "dash-pivot-app"
   HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
@@ -35,12 +31,18 @@ jobs:
 
       - name: Set up Version File
         run: |
-          echo ${{ env.VERSION }} > VERSION
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "${GITHUB_REF#refs/tags/}" > VERSION
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          else
+            echo "VERSION=not-a-tag" >> $GITHUB_ENV
+          fi
 
       - name: Print Version
         run: |
-          echo "${GITHUB_REF#refs/tags/}"
-          echo ${{ env.VERSION }}
+          echo "GitHub Reference: ${GITHUB_REF}"
+          echo "Version: ${{ env.VERSION }}"
+          echo "Version from GITHUB_ENV: $VERSION"
 
   build-server:
     runs-on: ubuntu-latest
