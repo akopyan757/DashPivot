@@ -28,6 +28,10 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ env.JAVA_VERSION }}
 
+      - name: Remove existing VersionInfo.kt
+        run: |
+          rm -f common-api/src/commonMain/kotlin/com/cheesecake/common/api/VersionInfo.kt
+
       - name: Set up Version File
         run: |
           echo "${GITHUB_REF#refs/tags/}" > VERSION
@@ -138,14 +142,16 @@ jobs:
 
     - name: Build iOS App
       working-directory: iosApp  # Ensure we are in the correct directory
+      timeout-minutes: 15  # Increase timeout in case of long build times
       run: |
+        set -o xtrace  # Enable debug mode to see detailed logs
         xcodebuild -scheme iosApp -sdk iphonesimulator -configuration Release
 
     - name: Upload iOS Build
       uses: actions/upload-artifact@v3
       with:
         name: ios-build
-        path: iosApp/build/Release-iphonesimulator/*.app
+        path: build/Release-iphonesimulator/*.app
 
   build-desktop:
     runs-on: ubuntu-latest
@@ -154,16 +160,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0  # Получаем всю историю
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Verify Java version
+        run: java -version
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Build JVM Application
-        run: ./gradlew :jvmApp:build
+      - name: Build Desktop Application
+        run: ./gradlew :desktopApp:build
 
-      - name: Upload JVM Build
+      - name: Upload Desktop Build
         uses: actions/upload-artifact@v3
         with:
-          name: jvm-app
-          path: jvmApp/build/libs/*.jar
+          name: desktop-app
+          path: desktopApp/build/libs/*.jar
