@@ -10,8 +10,6 @@ plugins {
     alias(libs.plugins.kotlin.android) apply false
 }
 
-apply(from = rootProject.file("version.gradle.kts"))
-
 tasks.register("buildAndRunDockerCompose") {
     group = "Docker"
     description = "Builds the project and runs Docker Compose"
