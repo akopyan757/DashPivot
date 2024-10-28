@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.cheesecake.dashpivot"
-version = "1.0.0"
+version = "0.1.0"
 application {
     mainClass.set("com.cheesecake.dashpivot.ApplicationKt")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=${extra["io.ktor.development"] ?: "false"}")
@@ -33,4 +33,10 @@ dependencies {
     implementation(libs.ktor.serialization.json)
     testImplementation(libs.ktor.server.tests)
     testImplementation(libs.kotlin.test.junit)
+}
+
+tasks.register("jarWithVersion", Jar::class) {
+    archiveFileName.set("server-${project.version}.jar")
+    from(sourceSets.main.get().output)
+    dependsOn("build")
 }
