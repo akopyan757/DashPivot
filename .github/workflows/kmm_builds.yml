@@ -113,9 +113,10 @@ jobs:
         timeout-minutes: 20
         run: |
           set -o xtrace
+          SIMULATOR_ID=$(xcrun simctl list devices 'iOS 17.2' | grep 'iPhone 15 (' | awk -F '[()]' '{print $2}' | head -n 1)
           xcodebuild clean -scheme iosApp -sdk iphonesimulator -configuration Release
           xcodebuild -scheme iosApp -sdk iphonesimulator -configuration Release \
-            -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.2' -quiet
+            -destination "id=$SIMULATOR_ID" -quiet
 
   build-desktop:
     runs-on: ubuntu-latest
@@ -142,6 +143,9 @@ jobs:
 
       - name: List Desktop Build Files
         run: ls -R composeApp/build/compose/binaries/main
+
+      - name: Find .dmg File
+        run: find composeApp/build/compose/binaries/main -name "*.dmg"
 
       - name: Upload Desktop Build
         uses: actions/upload-artifact@v3
