@@ -12,5 +12,5 @@ internal class MyKoinComponent : KoinComponent {
 
 @Composable
 actual fun SignUpScreen() {
-    SignUpScreen(MyKoinComponent().getViewModel())
+    com.cheesecake.auth.feature.ui.SignUpScreen(MyKoinComponent().getViewModel())
 }

@@ -1,6 +1,5 @@
-package com.cheesecake.auth.feature
+package com.cheesecake.auth.feature.ui
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,8 +22,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.cheesecake.auth.feature.ui.EmailTextField
-import com.cheesecake.auth.feature.ui.PasswordTextField
 import com.cheesecake.auth.feature.ui.version.VersionText
 import com.cheesecake.auth.feature.viewmodel.SignUpState
 import com.cheesecake.auth.feature.viewmodel.SignUpViewModel
@@ -43,21 +40,19 @@ fun SignUpScreen(
     var isConfirmPasswordVisible by remember { mutableStateOf(false) }
     val signUpState by viewModel.signUpState.collectAsState()
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
+            .padding(16.dp)
     ) {
-        VersionText(
-            modifier = Modifier.wrapContentSize(Alignment.TopEnd)
-        )
+        Spacer(modifier = Modifier.weight(1f))
 
         Column(
             modifier = Modifier
                 .widthIn(max = 300.dp)
+                .align(Alignment.CenterHorizontally)
                 .fillMaxWidth()
-                .wrapContentSize(Alignment.Center),
+                .wrapContentSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(text = "Sign Up", style = MaterialTheme.typography.headlineMedium)
@@ -71,7 +66,6 @@ fun SignUpScreen(
             )
 
             Spacer(modifier = Modifier.height(8.dp))
-
 
             PasswordTextField(
                 password = password,
@@ -118,5 +112,13 @@ fun SignUpScreen(
                 )
             }
         }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        VersionText(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 16.dp)
+        )
     }
 }

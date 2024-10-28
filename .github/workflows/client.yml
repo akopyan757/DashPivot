@@ -46,32 +46,12 @@ jobs:
       - name: Set up Xcode
         run: sudo xcode-select --switch /Applications/Xcode_15.4.app
 
-      - name: Clean Derived Data
-        run: rm -rf ~/Library/Developer/Xcode/DerivedData
-
-      - name: Install Dependencies (CocoaPods)
-        working-directory: iosApp
-        run: |
-          if [ -f "Podfile" ]; then
-            pod install
-          fi
-
       - name: Build iOS .app File
         working-directory: iosApp
         timeout-minutes: 20
         run: |
-          xcrun simctl list devices
-          # Замените на конкретный ID симулятора или имя
-          SIMULATOR_NAME="iPhone 15"
-          SIMULATOR_ID=$(xcrun simctl list devices | grep "$SIMULATOR_NAME (" | awk -F '[()]' '{print $2}' | head -n 1)
-          
-          if [ -z "$SIMULATOR_ID" ]; then
-          echo "Simulator ID for $SIMULATOR_NAME not found."
-          exit 1
-          fi
-          
           xcodebuild -scheme iosApp -sdk iphonesimulator -configuration Release \
-            -destination "id=$SIMULATOR_ID" -derivedDataPath build
+            -derivedDataPath build
 
       - name: Archive .app file
         run: |
