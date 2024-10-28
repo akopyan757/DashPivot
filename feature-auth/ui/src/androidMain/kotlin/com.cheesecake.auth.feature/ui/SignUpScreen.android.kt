@@ -1,9 +1,9 @@
-package com.cheesecake.auth.feature
+package com.cheesecake.auth.feature.ui
 
 import androidx.compose.runtime.Composable
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 actual fun SignUpScreen() {
-    com.cheesecake.auth.feature.ui.SignUpScreen(viewModel = koinViewModel())
+    SignUpScreen(viewModel = koinViewModel())
 }
