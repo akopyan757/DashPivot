@@ -60,7 +60,16 @@ jobs:
         working-directory: iosApp
         timeout-minutes: 20
         run: |
-          SIMULATOR_ID=$(xcrun simctl list devices 'iOS 17.2' | grep 'iPhone 15 (' | awk -F '[()]' '{print $2}' | head -n 1)
+          xcrun simctl list devices
+          # Замените на конкретный ID симулятора или имя
+          SIMULATOR_NAME="iPhone 15"
+          SIMULATOR_ID=$(xcrun simctl list devices | grep "$SIMULATOR_NAME (" | awk -F '[()]' '{print $2}' | head -n 1)
+          
+          if [ -z "$SIMULATOR_ID" ]; then
+          echo "Simulator ID for $SIMULATOR_NAME not found."
+          exit 1
+          fi
+          
           xcodebuild -scheme iosApp -sdk iphonesimulator -configuration Release \
             -destination "id=$SIMULATOR_ID" -derivedDataPath build
 
