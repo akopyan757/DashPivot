@@ -10,7 +10,6 @@ plugins {
     alias(libs.plugins.kotlin.android) apply false
 }
 
-
 tasks.register("buildAndRunDockerCompose") {
     group = "Docker"
     description = "Builds the project and runs Docker Compose"

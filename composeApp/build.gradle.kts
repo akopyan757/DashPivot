@@ -1,8 +1,6 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -80,11 +78,25 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
-        versionName = "1.0"
+        versionName = (project.findProperty("projectVersion") as? String) ?: "1.0"
 
         compileOptions {
             sourceCompatibility = JavaVersion.VERSION_17
             targetCompatibility = JavaVersion.VERSION_17
+        }
+        applicationVariants.all { variant ->
+            variant.outputs.all { output ->
+                val outputImpl = output as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+                outputImpl.outputFileName = "dashpivot-${variant.name}.apk"
+                true
+            }
+        }
+    }
+    applicationVariants.forEach { variant ->
+        variant.outputs.forEach { output ->
+            val version = project.extra["projectVersion"] as? String ?: "1.0"
+            val outputImpl = output as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            outputImpl.outputFileName = "dashpivot-${variant.name}-$version.apk"
         }
     }
     packaging {
@@ -92,8 +104,17 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    signingConfigs {
+        create("release") {
+            storeFile = file("dash-pivot-keystore.jks")
+            storePassword = "zaq12345"
+            keyAlias = "dash-pivot-key"
+            keyPassword = "zaq12345"
+        }
+    }
     buildTypes {
         getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
         }
     }

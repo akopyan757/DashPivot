@@ -1,6 +1,7 @@
 package com.cheesecake.dashpivot
 
 import com.cheesecake.common.api.SERVER_PORT
+import com.cheesecake.common.api.VersionInfo
 import com.cheesecake.dashpivot.database.connectToDatabase
 import com.cheesecake.dashpivot.di.serverDI
 import com.cheesecake.dashpivot.json.serverJson
@@ -25,6 +26,6 @@ fun Application.module() {
 
     routing {
         authRoute(di)
-        get("/") { call.respondText("Hello, world!") }
+        get("/") { call.respondText("Hello, server!\nVersion: ${VersionInfo.SERVER_VERSION}") }
     }
 }
