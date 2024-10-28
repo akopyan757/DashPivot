@@ -93,6 +93,10 @@ val prepareVersioning by tasks.registering {
     description = "Reads version, updates VersionInfo.kt, and creates a Git tag."
 
     dependsOn(readVersion, updateVersionInfo, createGitTag)
+
+    doLast {
+        println("prepareVersioning task executed successfully")
+    }
 }
 
 allprojects {
