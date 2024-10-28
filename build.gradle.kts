@@ -28,11 +28,3 @@ tasks.register("buildAndRunDockerCompose") {
 tasks.register("stage") {
     dependsOn(":server:build")
 }
-
-gradle.projectsEvaluated {
-    allprojects {
-        tasks.matching { it.name == "assembleRelease" || it.name == "assembleDebug" || it.name == "package" }.configureEach {
-            dependsOn(":prepareVersioning")
-        }
-    }
-}
