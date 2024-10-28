@@ -140,8 +140,11 @@ jobs:
       - name: Build Desktop Application
         run: ./gradlew :composeApp:package
 
+      - name: List Desktop Build Files
+        run: ls -R composeApp/build/compose/binaries/main
+
       - name: Upload Desktop Build
         uses: actions/upload-artifact@v3
         with:
           name: desktop-build
-          path: composeApp/build/compose/binaries/main/*/*.{dmg,msi,deb}
+          path: composeApp/build/compose/binaries/main/dmg/*.dmg
