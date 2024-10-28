@@ -78,7 +78,7 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
-        versionName = project.extra["projectVersion"] as? String ?: "1.0"
+        versionName = (project.findProperty("projectVersion") as? String) ?: "1.0"
 
         compileOptions {
             sourceCompatibility = JavaVersion.VERSION_17
@@ -130,7 +130,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "com.cheesecake.dashpivot"
-            packageVersion = project.extra["projectVersion"] as String
+            packageVersion = (project.findProperty("projectVersion") as? String)?.removePrefix("v") ?: "1.0.0"
         }
     }
 }
