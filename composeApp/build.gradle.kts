@@ -84,6 +84,13 @@ android {
             sourceCompatibility = JavaVersion.VERSION_17
             targetCompatibility = JavaVersion.VERSION_17
         }
+        applicationVariants.all { variant ->
+            variant.outputs.all { output ->
+                val outputImpl = output as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+                outputImpl.outputFileName = "dashpivot-${variant.name}.apk"
+                true
+            }
+        }
     }
     applicationVariants.forEach { variant ->
         variant.outputs.forEach { output ->

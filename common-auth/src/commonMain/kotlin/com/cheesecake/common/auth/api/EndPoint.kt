@@ -1,8 +1,8 @@
 package com.cheesecake.common.auth.api
 
-import com.cheesecake.common.api.VERSION
+import com.cheesecake.common.api.VersionInfo.SERVER_VERSION
 
 enum class EndPoint(val path: String) {
-    REGISTER("/api/$VERSION/register"),
-    CONFIRM_EMAIL("/$VERSION/confirm-email");
+    REGISTER("/api/$SERVER_VERSION/register"),
+    CONFIRM_EMAIL("/$SERVER_VERSION/confirm-email");
 }
