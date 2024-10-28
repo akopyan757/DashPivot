@@ -51,7 +51,7 @@ jobs:
         timeout-minutes: 20
         run: |
           xcodebuild -scheme iosApp -sdk iphonesimulator -configuration Release \
-            -derivedDataPath build
+          -derivedDataPath build -jobs 4 -quiet -verbose
 
       - name: Archive .app file
         run: |
