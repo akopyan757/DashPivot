@@ -78,11 +78,18 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
-        versionName = "1.0"
+        versionName = project.extra["projectVersion"] as? String ?: "1.0"
 
         compileOptions {
             sourceCompatibility = JavaVersion.VERSION_17
             targetCompatibility = JavaVersion.VERSION_17
+        }
+    }
+    applicationVariants.forEach { variant ->
+        variant.outputs.forEach { output ->
+            val version = project.extra["projectVersion"] as? String ?: "1.0"
+            val outputImpl = output as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            outputImpl.outputFileName = "dashpivot-${variant.name}-$version.apk"
         }
     }
     packaging {
@@ -123,7 +130,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "com.cheesecake.dashpivot"
-            packageVersion = "1.0.0"
+            packageVersion = project.extra["projectVersion"] as String
         }
     }
 }
