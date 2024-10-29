@@ -1,5 +1,6 @@
 package com.cheesecake.auth.data.di
 
+import com.cheesecake.auth.data.network.getPlatformEngine
 import com.cheesecake.auth.data.repository.IUserRepository
 import com.cheesecake.auth.data.repository.UserRepository
 import com.cheesecake.auth.data.service.ApiService
@@ -15,7 +16,7 @@ import org.koin.dsl.module
 
 val authDataModule = module {
     single {
-        HttpClient(CIO) {
+        HttpClient(getPlatformEngine()) {
             install(ContentNegotiation) {
                 json(Json {
                     encodeDefaults = true

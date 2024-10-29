@@ -45,7 +45,7 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.android)
         }
-        iosMain.dependencies {
+        nativeMain.dependencies {
             implementation(libs.ktor.client.cio)
             implementation(libs.ktor.client.ios)
         }
