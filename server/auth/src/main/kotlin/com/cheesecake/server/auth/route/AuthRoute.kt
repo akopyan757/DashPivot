@@ -5,6 +5,7 @@ import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.api.EndPoint
 import com.cheesecake.common.auth.model.RegisterError
 import com.cheesecake.common.auth.model.RegisterRequest
+import com.cheesecake.common.auth.model.VerificationError
 import com.cheesecake.common.auth.service.UserService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
@@ -44,6 +45,9 @@ private suspend fun <E : ApiError> PipelineContext<Unit, ApplicationCall>.handle
         RegisterError.INVALID_PASSWORD -> call.respond(HttpStatusCode.BadRequest, error.message)
         RegisterError.INVALID_EMAIL_FORMAT -> call.respond(HttpStatusCode.BadRequest, error.message)
         RegisterError.TOKEN_MISSING -> call.respond(HttpStatusCode.BadRequest, error.message)
-        RegisterError.EXPIRED_TOKEN -> call.respond(HttpStatusCode.BadRequest, error.message)
+        RegisterError.UNKNOWN -> call.respond(HttpStatusCode.InternalServerError, error.message)
+        VerificationError.EMPTY_TOKEN_ERROR -> call.respond(HttpStatusCode.BadRequest, error.message)
+        VerificationError.EXPIRED_TOKEN -> call.respond(HttpStatusCode.Unauthorized, error.message)
+        VerificationError.UNKNOWN -> call.respond(HttpStatusCode.InternalServerError, error.message)
     }
 }

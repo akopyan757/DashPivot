@@ -20,4 +20,11 @@ class ApiServiceImpl(private val client: HttpClient) : ApiService {
             setBody(request)
         }
     }
+
+    override suspend fun verificationToken(token: String): HttpResponse {
+        return client.post {
+            url("$BASE_URL${EndPoint.CONFIRM_EMAIL.path}?token=$token")
+            contentType(ContentType.Application.Json)
+        }
+    }
 }

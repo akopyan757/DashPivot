@@ -43,7 +43,6 @@ fun VerificationScreen(
     val verificationState by viewModel.verificationState.collectAsState()
 
     LaunchedEffect(token) {
-        println("VerificationScreen: $token")
         viewModel.verifyToken(token)
     }
 
@@ -114,9 +113,10 @@ fun SuccessDialog(
             .fillMaxSize()
             .shadow(4.dp, clip = false)
             .background(Color.Gray.copy(alpha = 0.3f))
-            .clickable {
-                onDismiss()
-            },
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) { onDismiss() },
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -158,7 +158,8 @@ fun ErrorDialog(
             .clickable(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
-            ) { onDismiss() }
+            ) { onDismiss() },
+        contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

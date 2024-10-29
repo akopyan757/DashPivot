@@ -3,6 +3,7 @@ package com.cheesecake.server.auth.route.repository
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.model.RegisterError
 import com.cheesecake.common.auth.model.RegisterRequest
+import com.cheesecake.common.auth.model.VerificationError
 import com.cheesecake.common.auth.service.UserService
 import com.cheesecake.common.auth.utils.isValidEmail
 import com.cheesecake.common.auth.utils.isValidPassword
@@ -38,13 +39,13 @@ class UserRepository(
         return ApiResult.Success("User registered successfully")
     }
 
-    override suspend fun verifyByToken(token: String?): ApiResult<String, RegisterError> {
+    override suspend fun verifyByToken(token: String?): ApiResult<String, VerificationError> {
         if (token.isNullOrBlank()) {
-            return ApiResult.Error(RegisterError.EMAIL_TAKEN)
+            return ApiResult.Error(VerificationError.EMPTY_TOKEN_ERROR)
         }
 
         val user = UserSource.findUserByToken(token)
-            ?: return ApiResult.Error(RegisterError.EXPIRED_TOKEN)
+            ?: return ApiResult.Error(VerificationError.EXPIRED_TOKEN)
 
         UserSource.verifyEmail(user.id)
 

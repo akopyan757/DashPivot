@@ -20,13 +20,9 @@ class UserRepository(
         password: String
     ) = flow {
         emit(userRemoteDataSource.registerUser(RegisterRequest(email, password)))
-        println("registerUser: end")
     }.flowOn(Dispatchers.IO)
 
     override suspend fun verifyUserToken(token: String): Flow<ApiResult<String, VerificationError>> = flow {
-        println("VerificationScreen: UserRepository: start: $token")
-        delay(5000)
-        emit(ApiResult.Success("Account verified!"))
-        println("VerificationScreen: UserRepository: end: $token")
+        emit(userRemoteDataSource.verifyByToken(token))
     }.flowOn(Dispatchers.IO)
 }

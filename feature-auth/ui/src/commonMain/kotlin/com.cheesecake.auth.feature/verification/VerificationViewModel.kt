@@ -16,7 +16,6 @@ class VerificationViewModel(private val repository: IUserRepository) : ViewModel
     fun verifyToken(token: String) {
         _verificationState.value = VerificationState.Loading
         viewModelScope.launch {
-            println("VerificationScreen: viewModel: start: $token")
             repository.verifyUserToken(token).collect { result ->
                 _verificationState.value = when (result) {
                     is ApiResult.Success<*> -> VerificationState.Success

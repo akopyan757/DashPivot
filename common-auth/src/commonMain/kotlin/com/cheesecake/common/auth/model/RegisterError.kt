@@ -11,7 +11,6 @@ enum class RegisterError(override val message: String): ApiError {
     INVALID_PASSWORD(PASSWORD_RULES),
     PASSWORD_MATCH("Passwords do not match"),
     TOKEN_MISSING("Token is missing"),
-    EXPIRED_TOKEN("Invalid or expired token"),
     UNKNOWN("Unknown error");
 
     companion object {

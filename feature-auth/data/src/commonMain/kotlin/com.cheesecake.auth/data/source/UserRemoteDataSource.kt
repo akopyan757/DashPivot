@@ -4,6 +4,7 @@ import com.cheesecake.auth.data.service.ApiService
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.model.RegisterError
 import com.cheesecake.common.auth.model.RegisterRequest
+import com.cheesecake.common.auth.model.VerificationError
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
@@ -25,7 +26,18 @@ class UserRemoteDataSource(private val apiService: ApiService): IUserRemoteDataS
         }
     }
 
-    override suspend fun verifyByToken(token: String?): ApiResult<String, RegisterError> {
-        TODO("Not yet implemented")
+    override suspend fun verifyByToken(token: String?): ApiResult<String, VerificationError> {
+        return try {
+            val response = apiService.verificationToken(token!!)
+            val statusCode = response.status.value
+            if (HttpStatusCode.fromValue(statusCode).isSuccess()) {
+                ApiResult.Success(response.bodyAsText())
+            } else {
+                ApiResult.Error(VerificationError.fromMessage(response.bodyAsText()))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ApiResult.Error(VerificationError.UNKNOWN)
+        }
     }
 }
