@@ -31,7 +31,7 @@ class EmailService: IEmailService {
     }
 
     override fun sendVerificationEmail(email: String, token: String) {
-        val verificationUrl = "https://yourapp.com/verify?token=$token"
+        val verificationUrl = "http://pivotdash.app/verify?token=$token"
         val subject = "Email Verification"
         val body = """
             Please verify your email address by clicking on the link below:
