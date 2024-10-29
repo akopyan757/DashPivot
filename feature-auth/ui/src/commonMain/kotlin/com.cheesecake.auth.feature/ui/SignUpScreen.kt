@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.cheesecake.auth.feature.ui.version.VersionText
 import com.cheesecake.auth.feature.viewmodel.SignUpState
@@ -61,28 +62,40 @@ fun SignUpScreen(
 
             EmailTextField(
                 email = email,
-                onEmailChange = { email = it },
-                label = "Email"
+                onEmailChange = {
+                    email = it
+                    viewModel.onResetEmailError()
+                },
+                label = "Email",
+                errorMessage = (signUpState as? SignUpState.Error)?.emailErrorMessage
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             PasswordTextField(
                 password = password,
-                onPasswordChange = { password = it },
+                onPasswordChange = {
+                    password = it
+                    viewModel.onResetPasswordError()
+                },
                 label = "Create password",
                 isPasswordVisible = isPasswordVisible,
-                onVisibilityChange = { isPasswordVisible = !isPasswordVisible }
+                onVisibilityChange = { isPasswordVisible = !isPasswordVisible },
+                errorMessage = (signUpState as? SignUpState.Error)?.passwordMessage
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             PasswordTextField(
                 password = confirmPassword,
-                onPasswordChange = { confirmPassword = it },
+                onPasswordChange = {
+                    confirmPassword = it
+                    viewModel.onResetConfirmationPasswordError()
+                },
                 label = "Confirm password",
                 isPasswordVisible = isConfirmPasswordVisible,
-                onVisibilityChange = { isConfirmPasswordVisible = !isConfirmPasswordVisible }
+                onVisibilityChange = { isConfirmPasswordVisible = !isConfirmPasswordVisible },
+                errorMessage = (signUpState as? SignUpState.Error)?.confirmPasswordMessage
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -101,14 +114,16 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (signUpState is SignUpState.Error) {
+            if (signUpState is SignUpState.Error && (signUpState as SignUpState.Error).error != null) {
                 Text(
-                    text = (signUpState as SignUpState.Error).error.message,
-                    color = MaterialTheme.colorScheme.error
+                    text = (signUpState as SignUpState.Error).error?.message.orEmpty(),
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Center,
                 )
             } else if (signUpState is SignUpState.Success) {
                 Text(
-                    text = (signUpState as SignUpState.Success).message
+                    text = (signUpState as SignUpState.Success).message,
+                    textAlign = TextAlign.Center,
                 )
             }
         }

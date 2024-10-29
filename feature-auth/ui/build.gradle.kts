@@ -29,7 +29,7 @@ kotlin {
         languageVersion.set(JavaLanguageVersion.of(17))
     }
 
-     jvm()
+    jvm()
     jvmToolchain(17)
 
     sourceSets {
@@ -41,6 +41,9 @@ kotlin {
             implementation(libs.koin.android.compose)
             implementation(libs.koin.core)
             implementation(libs.androidx.lifecycle.viewmodel)
+        }
+        androidUnitTest.dependencies {
+
         }
         commonMain.dependencies {
             implementation(projects.featureAuth.data)
@@ -78,6 +81,35 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     defaultConfig {
+        multiDexEnabled = true
         minSdk = libs.versions.android.minSdk.get().toInt()
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+    packaging {
+        resources {
+            excludes += "META-INF/LICENSE.md"
+            excludes += "META-INF/LICENSE-notice.md"
+            excludes += "META-INF/LICENSE"
+            excludes += "META-INF/NOTICE"
+            excludes += "META-INF/NOTICE.md"
+        }
+    }
+}
+
+dependencies {
+    implementation(libs.junit.jupiter)
+    implementation(libs.androidx.core.testing)
+    implementation(libs.mockk)
+    implementation(libs.androidx.core.testing.v210)
+    implementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.androidx.junit.v112)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.core.testing)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }

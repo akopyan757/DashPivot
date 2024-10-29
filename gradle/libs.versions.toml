@@ -3,65 +3,56 @@ agp = "8.6.1"
 android-compileSdk = "34"
 android-minSdk = "24"
 android-targetSdk = "34"
-androidx-activityCompose = "1.9.2"
-androidx-appcompat = "1.7.0"
-androidx-constraintlayout = "2.1.4"
-androidx-core-ktx = "1.13.1"
+androidx-activityCompose = "1.9.3"
 androidx-espresso-core = "3.6.1"
-androidx-lifecycle = "2.8.2"
-androidx-material = "1.12.0"
-androidx-test-junit = "1.2.1"
-junit = "4.13.2"
-koinAnnotations = "1.2.0"
+androidx-lifecycle = "2.8.3"
+coreTesting = "2.2.0"
+coreTestingVersion = "2.2.0"
+junitJupiter = "5.8.2"
+junitVersion = "1.2.1"
 koinCore = "3.5.3"
 kotlin = "2.0.20"
-kotlinGradlePlugin = "1.9.0-dev-6976"
 kotlinx-coroutines = "1.9.0"
 jbcrypt = "0.4"
 kotlinxSerializationJson = "1.7.3"
 ktor = "2.3.12"
-ktorClient = "2.3.3"
+ktorClient = "2.3.12"
+lifecycleViewmodelKtx = "2.8.6"
 logback = "1.5.8"
 kotlinSerialization = "1.7.3"
 kodeinDi = "7.22.0"
 exposed = "0.55.0"
+mockk = "1.13.2"
 postgresql = "42.7.4"
 javaxMail = "1.6.2"
 jetbrains="1.7.0"
-runtime = "1.7.0"
-skikoJvmRuntimeMacos = "0.8.0"
-webCore = "1.7.0"
+
 [libraries]
+androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
+androidx-core-testing-v210 = { module = "androidx.arch.core:core-testing", version.ref = "coreTestingVersion" }
+androidx-junit-v112 = { module = "androidx.test.ext:junit", version.ref = "junitVersion" }
+androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleViewmodelKtx" }
+androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "jetbrains" }
 androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "jetbrains" }
 jetbrains-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junitJupiter" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinCore" }
 koin-android-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinCore" }
 koin-jvm = { module = "io.insert-koin:koin-core-jvm", version.ref = "koinCore" }
-koin-iosx64 = { module = "io.insert-koin:koin-iosx64", version.ref = "koinCore" }
-koin-iosarm64 = { module = "io.insert-koin:koin-iosarm64", version.ref = "koinCore" }
-koin-iossimulatorarm64 = { module = "io.insert-koin:koin-iossimulatorarm64", version.ref = "koinCore" }
-koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koinAnnotations" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koinCore" }
-koin-ksp = { module = "io.insert-koin:koin-ksp", version.ref = "koinAnnotations" }
-kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinGradlePlugin" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
-androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-junit" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidx-espresso-core" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidx-appcompat" }
-androidx-material = { group = "com.google.android.material", name = "material", version.ref = "androidx-material" }
-androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidx-constraintlayout" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorClient" }
 ktor-client-ios = { module = "io.ktor:ktor-client-ios", version.ref = "ktorClient" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClient" }
-ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktorClient" }
 ktor-client-json = { module = "io.ktor:ktor-client-json", version.ref = "ktorClient" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktorClient" }
 ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktorClient" }
@@ -76,15 +67,15 @@ exposed-core = { group = "org.jetbrains.exposed", name = "exposed-core", version
 exposed-dao = { group = "org.jetbrains.exposed", name = "exposed-dao", version.ref = "exposed" }
 exposed-jdbc = { group = "org.jetbrains.exposed", name = "exposed-jdbc", version.ref = "exposed" }
 exposed-java-time = { group = "org.jetbrains.exposed", name = "exposed-java-time", version.ref = "exposed"  }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgresql" }
 kodein-di = { group = "org.kodein.di", name = "kodein-di", version.ref = "kodeinDi" }
 kodein-di-ktor = { module = "org.kodein.di:kodein-di-framework-ktor-server-jvm", version.ref = "kodeinDi" }
 javax-mail = { group = "com.sun.mail", name = "javax.mail", version.ref = "javaxMail" }
 mindrotJbcrypt = { group = "org.mindrot",  name = "jbcrypt", version.ref = "jbcrypt" }
-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "runtime" }
-skiko-jvm-runtime-macos-arm64 = { module = "org.jetbrains.skiko:skiko-jvm-runtime-macos-arm64", version.ref = "skikoJvmRuntimeMacos" }
-skiko-jvm-runtime-macos-x64 = { module = "org.jetbrains.skiko:skiko-jvm-runtime-macos-x64", version.ref = "skikoJvmRuntimeMacos" }
-web-core = { module = "org.jetbrains.compose.web:web-core", version.ref = "webCore" }
+runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "jetbrains" }
+web-core = { module = "org.jetbrains.compose.web:web-core", version.ref = "jetbrains" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -96,4 +87,3 @@ ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-ksp = { id = "com.google.devtools.ksp", version = "1.5.30-1.0.0" }
