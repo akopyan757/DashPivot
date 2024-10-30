@@ -1,13 +1,22 @@
 import SwiftUI
 import ComposeApp
 import Combine
+import UIKit
 
 @main
 struct iOSApp: App {
     @StateObject private var tokenHolder = TokenHolder()
+    private var mainViewController: UIViewController
+    private var window: UIWindow?
 
     init() {
-        InitKoinKt.InitKoin()
+        mainViewController = MainViewControllerKt.MainViewController(token: nil)
+        let navigationController = UINavigationController(rootViewController: mainViewController)
+        InitKoinKt.InitKoin(viewController: navigationController)
+
+        window = UIWindow(frame: UIScreen.main.bounds)
+        window?.rootViewController = navigationController
+        window?.makeKeyAndVisible()
     }
 
     var body: some Scene {
@@ -24,6 +33,7 @@ struct iOSApp: App {
             let token = url.queryParameters?["token"]
             print("iOSApp: Token received from deep link: \(token ?? "no token")")
             tokenHolder.token = token
+            TokenUpdateKt.tokenUpdate(token: token)
         }
     }
 }

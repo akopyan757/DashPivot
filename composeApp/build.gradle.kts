@@ -9,6 +9,12 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
+repositories {
+    mavenCentral()
+    google()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+}
+
 kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -16,10 +22,10 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_17)
         }
     }
-    
+
     jvm()
     jvmToolchain(17)
-    
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -30,38 +36,48 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation(compose.foundation)
+                implementation(compose.material)
+                implementation(compose.ui)
+                implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
+                implementation(libs.androidx.lifecycle.viewmodel)
+                implementation(libs.androidx.lifecycle.runtime.compose)
+                implementation(projects.featureAuth.data)
+                implementation(projects.featureAuth.ui)
+                implementation(projects.commonUi)
+                implementation(libs.koin.core)
+            }
+        }
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
+            implementation(libs.koin.android.compose)
+            implementation(libs.androidx.navigation.runtime.ktx)
+            implementation(libs.androidx.navigation.compose)
+            implementation(libs.runtime)
         }
-        jsMain.dependencies {
-            dependencies {
-                implementation(libs.web.core)
-                implementation(libs.runtime)
-            }
+        val nativeMain by creating {
+            dependsOn(commonMain)
         }
-        commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodel)
-            implementation(libs.androidx.lifecycle.runtime.compose)
-            implementation(projects.featureAuth.data)
-            implementation(projects.featureAuth.ui)
-            implementation(libs.koin.core)
+        val iosArm64Main by getting {
+            dependsOn(nativeMain)
+        }
+        val iosX64Main by getting {
+            dependsOn(nativeMain)
+        }
+        val iosSimulatorArm64Main by getting {
+            dependsOn(nativeMain)
         }
         commonTest.dependencies {
 
         }
         jvmMain.dependencies {
-            //implementation(libs.skiko.jvm.runtime.macos.arm64)
-            //implementation(libs.skiko.jvm.runtime.macos.x64)
             implementation(libs.koin.jvm)
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)

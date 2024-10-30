@@ -30,6 +30,7 @@ dependencyResolutionManagement {
 }
 
 include(":composeApp")
+include(":common-ui")
 include(":common-api")
 include(":common-auth")
 include(":server:auth")

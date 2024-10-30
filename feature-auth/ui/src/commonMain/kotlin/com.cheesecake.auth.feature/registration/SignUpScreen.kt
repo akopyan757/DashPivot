@@ -27,13 +27,19 @@ import androidx.compose.ui.unit.dp
 import com.cheesecake.auth.feature.common.EmailTextField
 import com.cheesecake.auth.feature.common.PasswordTextField
 import com.cheesecake.auth.feature.common.VersionText
+import com.cheesecake.auth.feature.di.AppKoinComponent
 
 interface SignUpNavigate {
     fun toLogin() {}
 }
 
 @Composable
-expect fun SignUpScreen(signUpNavigate: SignUpNavigate = object : SignUpNavigate {})
+fun SignUpScreen(
+    appKoinComponent: AppKoinComponent,
+    signUpNavigate: SignUpNavigate,
+) {
+    SignUpScreen(appKoinComponent.getSignUpViewModel(), signUpNavigate)
+}
 
 @Composable
 fun SignUpScreen(

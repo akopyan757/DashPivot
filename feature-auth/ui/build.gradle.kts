@@ -41,13 +41,15 @@ kotlin {
             implementation(libs.koin.android.compose)
             implementation(libs.koin.core)
             implementation(libs.androidx.lifecycle.viewmodel)
+            implementation(libs.androidx.navigation.runtime.ktx)
+            implementation(libs.androidx.navigation.compose)
         }
         androidUnitTest.dependencies {
-
         }
         commonMain.dependencies {
             implementation(projects.featureAuth.data)
             implementation(projects.commonAuth)
+            implementation(projects.commonUi)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)

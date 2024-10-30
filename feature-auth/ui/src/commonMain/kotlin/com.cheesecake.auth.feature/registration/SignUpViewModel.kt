@@ -90,7 +90,6 @@ class SignUpViewModel(
                         }
 
                         is ApiResult.Error -> {
-                            println("result: ${result.error}")
                             _signUpState.value = SignUpState.Error(result.error)
                         }
                     }

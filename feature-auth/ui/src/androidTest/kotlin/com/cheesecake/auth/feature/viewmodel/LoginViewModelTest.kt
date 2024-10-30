@@ -46,7 +46,6 @@ class LoginViewModelTest {
 
         viewModel.signUp(email, password, confirmPassword)
 
-        println("State: " + viewModel.signUpState.value)
         assertEquals(SignUpState.Loading, viewModel.signUpState.value)
 
         withTimeout(1000) {
@@ -54,7 +53,7 @@ class LoginViewModelTest {
                 advanceUntilIdle()
             }
         }
-        println("State: " + viewModel.signUpState.value)
+
         assertEquals(SignUpState.Success(expectedData), viewModel.signUpState.value)
     }
 

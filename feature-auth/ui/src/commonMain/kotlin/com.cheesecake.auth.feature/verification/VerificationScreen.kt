@@ -30,9 +30,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cheesecake.auth.feature.di.AppKoinComponent
 
 @Composable
-expect fun VerificationScreen(token: String, onDismiss: () -> Unit)
+fun VerificationScreen(
+    appKoinComponent: AppKoinComponent,
+    token: String,
+    onDismiss: () -> Unit,
+) {
+    VerificationScreen(appKoinComponent.getVerificationViewModel(), token, onDismiss)
+}
 
 @Composable
 fun VerificationScreen(

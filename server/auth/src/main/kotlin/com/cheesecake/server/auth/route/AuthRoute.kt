@@ -41,7 +41,6 @@ fun Route.authRoute(di: DI) {
     }
     post(EndPoint.LOGIN.path) {
         val loginRequest = call.receive<LoginRequest>()
-        println("loginRequest = $loginRequest")
         val userRepository: UserService by di.instance()
 
         when (val result = userRepository.loginUser(loginRequest)) {

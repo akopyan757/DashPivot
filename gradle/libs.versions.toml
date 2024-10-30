@@ -6,6 +6,7 @@ android-targetSdk = "34"
 androidx-activityCompose = "1.9.3"
 androidx-espresso-core = "3.6.1"
 androidx-lifecycle = "2.8.3"
+componentsRouter = "1.4.0"
 coreTesting = "2.2.0"
 coreTestingVersion = "2.2.0"
 javaJwt = "4.2.1"
@@ -24,9 +25,12 @@ kotlinSerialization = "1.7.3"
 kodeinDi = "7.22.0"
 exposed = "0.55.0"
 mockk = "1.13.2"
+navigationCompose = "2.8.3"
 postgresql = "42.7.4"
 javaxMail = "1.6.2"
 jetbrains="1.7.0"
+fragmentKtx = "1.8.4"
+lifecycleRuntimeAndroid = "2.8.5"
 
 [libraries]
 androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
@@ -34,6 +38,7 @@ androidx-core-testing-v210 = { module = "androidx.arch.core:core-testing", versi
 androidx-junit-v112 = { module = "androidx.test.ext:junit", version.ref = "junitVersion" }
 androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleViewmodelKtx" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "jetbrains" }
 androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "jetbrains" }
 java-jwt = { module = "com.auth0:java-jwt", version.ref = "javaJwt" }
@@ -78,6 +83,9 @@ javax-mail = { group = "com.sun.mail", name = "javax.mail", version.ref = "javax
 mindrotJbcrypt = { group = "org.mindrot",  name = "jbcrypt", version.ref = "jbcrypt" }
 runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "jetbrains" }
 web-core = { module = "org.jetbrains.compose.web:web-core", version.ref = "jetbrains" }
+androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationCompose" }
+androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragmentKtx" }
+androidx-lifecycle-runtime-android = { group = "androidx.lifecycle", name = "lifecycle-runtime-android", version.ref = "lifecycleRuntimeAndroid" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

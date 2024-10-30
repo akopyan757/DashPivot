@@ -77,7 +77,6 @@ class LoginViewModel(
                         }
 
                         is ApiResult.Error -> {
-                            println("result: ${result.error}")
                             _loginState.value = LoginState.Error(result.error)
                         }
                     }
