@@ -8,6 +8,7 @@ androidx-espresso-core = "3.6.1"
 androidx-lifecycle = "2.8.3"
 coreTesting = "2.2.0"
 coreTestingVersion = "2.2.0"
+javaJwt = "4.2.1"
 junitJupiter = "5.8.2"
 junitVersion = "1.2.1"
 koinCore = "3.5.3"
@@ -35,6 +36,7 @@ androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-lived
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "jetbrains" }
 androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "jetbrains" }
+java-jwt = { module = "com.auth0:java-jwt", version.ref = "javaJwt" }
 jetbrains-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junitJupiter" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinCore" }

@@ -3,6 +3,7 @@ package com.cheesecake.server.auth.route.database
 import com.cheesecake.common.auth.model.User
 import com.cheesecake.server.auth.route.database.Users.verificationToken
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.javatime.CurrentDateTime
 import org.jetbrains.exposed.sql.selectAll
@@ -43,6 +44,14 @@ object UserSource {
             Users.selectAll().where { Users.email eq email }
                 .first()
                 .mapToUser()
+        }
+    }
+
+    fun findUserByEmail(email: String): User? {
+        return transaction {
+            Users.selectAll().where { Users.email eq email }
+                .singleOrNull()
+                ?.mapToUser()
         }
     }
 

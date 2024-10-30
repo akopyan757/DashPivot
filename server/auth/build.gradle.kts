@@ -14,6 +14,7 @@ java {
 }
 
 dependencies {
+    implementation(libs.java.jwt)
     implementation(libs.exposed.core)
     implementation(libs.exposed.dao)
     implementation(libs.exposed.jdbc)

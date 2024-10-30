@@ -20,7 +20,7 @@ fun connectToDatabase() {
             password = password
         )
     } else {
-        val localUrl = "jdbc:postgresql://localhost:5433/pivotdash"
+        val localUrl = "jdbc:postgresql://localhost:5432/pivotdash"
         val localUser = "akopyan_albert"
         val localPassword = "za1avGU8"
 

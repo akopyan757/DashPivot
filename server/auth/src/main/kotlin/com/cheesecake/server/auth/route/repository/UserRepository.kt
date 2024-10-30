@@ -12,6 +12,7 @@ import com.cheesecake.common.auth.utils.isValidPassword
 import com.cheesecake.server.auth.route.database.UserSource
 import com.cheesecake.server.auth.route.mail.IEmailService
 import com.cheesecake.server.auth.route.utils.PasswordHasher
+import com.cheesecake.server.auth.route.utils.TokenUtils
 import com.cheesecake.server.auth.route.utils.VerificationUtils
 
 class UserRepository(
@@ -55,6 +56,19 @@ class UserRepository(
     }
 
     override suspend fun loginUser(loginRequest: LoginRequest): ApiResult<String, LoginError> {
-        return ApiResult.Success("token")
+        val user = UserSource.findUserByEmail(loginRequest.email)
+            ?: return ApiResult.Error(LoginError.USER_NOT_FOUND)
+
+        if (!PasswordHasher.verifyPassword(loginRequest.password, user.passwordHash)) {
+            return ApiResult.Error(LoginError.INVALID_PASSWORD)
+        }
+
+        if (!user.isVerified) {
+            return ApiResult.Error(LoginError.EMAIL_NOT_VERIFIED)
+        }
+
+        val token = TokenUtils.generateToken(user.id.toString())
+
+        return ApiResult.Success(token)
     }
 }
