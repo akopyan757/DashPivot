@@ -2,6 +2,7 @@ package com.cheesecake.auth.data.service
 
 import com.cheesecake.common.api.BASE_URL
 import com.cheesecake.common.auth.api.EndPoint
+import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterRequest
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
@@ -25,6 +26,14 @@ class ApiServiceImpl(private val client: HttpClient) : ApiService {
         return client.post {
             url("$BASE_URL${EndPoint.CONFIRM_EMAIL.path}?token=$token")
             contentType(ContentType.Application.Json)
+        }
+    }
+
+    override suspend fun loginUser(request: LoginRequest): HttpResponse {
+        return client.post {
+            url("$BASE_URL${EndPoint.LOGIN.path}")
+            contentType(ContentType.Application.Json)
+            setBody(request)
         }
     }
 }

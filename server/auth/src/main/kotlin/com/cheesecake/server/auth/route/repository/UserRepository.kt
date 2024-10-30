@@ -1,6 +1,8 @@
 package com.cheesecake.server.auth.route.repository
 
 import com.cheesecake.common.api.ApiResult
+import com.cheesecake.common.auth.model.login.LoginError
+import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterError
 import com.cheesecake.common.auth.model.registration.RegisterRequest
 import com.cheesecake.common.auth.model.verefication.VerificationError
@@ -50,5 +52,9 @@ class UserRepository(
         UserSource.verifyEmail(user.id)
 
         return ApiResult.Success("Email confirmed successfully!")
+    }
+
+    override suspend fun loginUser(loginRequest: LoginRequest): ApiResult<String, LoginError> {
+        return ApiResult.Success("token")
     }
 }

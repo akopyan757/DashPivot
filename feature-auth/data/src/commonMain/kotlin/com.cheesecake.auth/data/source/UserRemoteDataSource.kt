@@ -2,6 +2,8 @@ package com.cheesecake.auth.data.source
 
 import com.cheesecake.auth.data.service.ApiService
 import com.cheesecake.common.api.ApiResult
+import com.cheesecake.common.auth.model.login.LoginError
+import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterError
 import com.cheesecake.common.auth.model.registration.RegisterRequest
 import com.cheesecake.common.auth.model.verefication.VerificationError
@@ -39,5 +41,10 @@ class UserRemoteDataSource(private val apiService: ApiService): IUserRemoteDataS
             e.printStackTrace()
             ApiResult.Error(VerificationError.UNKNOWN)
         }
+    }
+
+    override suspend fun loginUser(loginRequest: LoginRequest): ApiResult<String, LoginError> {
+        println("loginRequest = $loginRequest")
+        return ApiResult.Success("token")
     }
 }

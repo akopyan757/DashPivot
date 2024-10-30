@@ -3,6 +3,8 @@ package com.cheesecake.server.auth.route
 import com.cheesecake.common.api.ApiError
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.api.EndPoint
+import com.cheesecake.common.auth.model.login.LoginError
+import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterError
 import com.cheesecake.common.auth.model.registration.RegisterRequest
 import com.cheesecake.common.auth.model.verefication.VerificationError
@@ -37,6 +39,16 @@ fun Route.authRoute(di: DI) {
             is ApiResult.Error -> handleError(result)
         }
     }
+    post(EndPoint.LOGIN.path) {
+        val loginRequest = call.receive<LoginRequest>()
+        println("loginRequest = $loginRequest")
+        val userRepository: UserService by di.instance()
+
+        when (val result = userRepository.loginUser(loginRequest)) {
+            is ApiResult.Success -> call.respond(HttpStatusCode.Created, result.data)
+            is ApiResult.Error -> handleError(result)
+        }
+    }
 }
 
 private suspend fun <E : ApiError> PipelineContext<Unit, ApplicationCall>.handleError(result: ApiResult.Error<E>) {
@@ -49,5 +61,9 @@ private suspend fun <E : ApiError> PipelineContext<Unit, ApplicationCall>.handle
         VerificationError.EMPTY_TOKEN_ERROR -> call.respond(HttpStatusCode.BadRequest, error.message)
         VerificationError.EXPIRED_TOKEN -> call.respond(HttpStatusCode.Unauthorized, error.message)
         VerificationError.UNKNOWN -> call.respond(HttpStatusCode.InternalServerError, error.message)
+        LoginError.USER_NOT_FOUND -> call.respond(HttpStatusCode.NotFound, error.message)
+        LoginError.INVALID_PASSWORD -> call.respond(HttpStatusCode.BadRequest, error.message)
+        LoginError.EMAIL_NOT_VERIFIED -> call.respond(HttpStatusCode.Unauthorized, error.message)
+        LoginError.UNKNOWN -> call.respond(HttpStatusCode.InternalServerError, error.message)
     }
 }
