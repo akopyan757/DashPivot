@@ -9,6 +9,6 @@ internal class MyKoinComponent : KoinComponent {
 }
 
 @Composable
-actual fun SignUpScreen() {
-    SignUpScreen(MyKoinComponent().getViewModel())
+actual fun SignUpScreen(signUpNavigate: SignUpNavigate) {
+    SignUpScreen(MyKoinComponent().getViewModel(), signUpNavigate)
 }

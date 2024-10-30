@@ -44,7 +44,17 @@ class UserRemoteDataSource(private val apiService: ApiService): IUserRemoteDataS
     }
 
     override suspend fun loginUser(loginRequest: LoginRequest): ApiResult<String, LoginError> {
-        println("loginRequest = $loginRequest")
-        return ApiResult.Success("token")
+        return try {
+            val response = apiService.loginUser(loginRequest)
+            val statusCode = response.status.value
+            if (HttpStatusCode.fromValue(statusCode).isSuccess()) {
+                ApiResult.Success(response.bodyAsText())
+            } else {
+                ApiResult.Error(LoginError.fromMessage(response.bodyAsText()))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ApiResult.Error(LoginError.UNKNOWN)
+        }
     }
 }

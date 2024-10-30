@@ -1,4 +1,4 @@
-package com.cheesecake.auth.feature.registration
+package com.cheesecake.auth.feature.login
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -28,24 +28,22 @@ import com.cheesecake.auth.feature.common.EmailTextField
 import com.cheesecake.auth.feature.common.PasswordTextField
 import com.cheesecake.auth.feature.common.VersionText
 
-interface SignUpNavigate {
-    fun toLogin() {}
+interface LoginNavigate {
+    fun toRegistration() {}
 }
 
 @Composable
-expect fun SignUpScreen(signUpNavigate: SignUpNavigate = object : SignUpNavigate {})
+expect fun LoginScreen(loginNavigate: LoginNavigate)
 
 @Composable
-fun SignUpScreen(
-    viewModel: SignUpViewModel,
-    signUpNavigate: SignUpNavigate
+fun LoginScreen(
+    viewModel: LoginViewModel,
+    loginNavigate: LoginNavigate,
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
-    var isConfirmPasswordVisible by remember { mutableStateOf(false) }
-    val signUpState by viewModel.signUpState.collectAsState()
+    val loginState by viewModel.loginState.collectAsState()
 
     Column(
         modifier = Modifier
@@ -62,7 +60,7 @@ fun SignUpScreen(
                 .wrapContentSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Sign Up", style = MaterialTheme.typography.headlineMedium)
+            Text(text = "Sign In", style = MaterialTheme.typography.headlineMedium)
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -73,7 +71,7 @@ fun SignUpScreen(
                     viewModel.onResetEmailError()
                 },
                 label = "Email",
-                errorMessage = (signUpState as? SignUpState.Error)?.emailErrorMessage
+                errorMessage = (loginState as? LoginState.Error)?.emailErrorMessage
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -84,51 +82,37 @@ fun SignUpScreen(
                     password = it
                     viewModel.onResetPasswordError()
                 },
-                label = "Create password",
+                label = "Password",
                 isPasswordVisible = isPasswordVisible,
                 onVisibilityChange = { isPasswordVisible = !isPasswordVisible },
-                errorMessage = (signUpState as? SignUpState.Error)?.passwordMessage
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            PasswordTextField(
-                password = confirmPassword,
-                onPasswordChange = {
-                    confirmPassword = it
-                    viewModel.onResetConfirmationPasswordError()
-                },
-                label = "Confirm password",
-                isPasswordVisible = isConfirmPasswordVisible,
-                onVisibilityChange = { isConfirmPasswordVisible = !isConfirmPasswordVisible },
-                errorMessage = (signUpState as? SignUpState.Error)?.confirmPasswordMessage
+                errorMessage = (loginState as? LoginState.Error)?.passwordMessage
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { viewModel.signUp(email, password, confirmPassword) },
+                onClick = { viewModel.login(email, password) },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = signUpState !is SignUpState.Loading
+                enabled = loginState !is LoginState.Loading
             ) {
-                if (signUpState is SignUpState.Loading) {
+                if (loginState is LoginState.Loading) {
                     CircularProgressIndicator(modifier = Modifier.size(24.dp))
                 } else {
-                    Text(text = "Sign Up")
+                    Text(text = "Sign In")
                 }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (signUpState is SignUpState.Error && (signUpState as SignUpState.Error).error != null) {
+            if (loginState is LoginState.Error && (loginState as LoginState.Error).error != null) {
                 Text(
-                    text = (signUpState as SignUpState.Error).error?.message.orEmpty(),
+                    text = (loginState as LoginState.Error).error?.message.orEmpty(),
                     color = MaterialTheme.colorScheme.error,
                     textAlign = TextAlign.Center,
                 )
-            } else if (signUpState is SignUpState.Success) {
+            } else if (loginState is LoginState.Success) {
                 Text(
-                    text = (signUpState as SignUpState.Success).message,
+                    text = (loginState as LoginState.Success).message,
                     textAlign = TextAlign.Center,
                 )
             }
@@ -136,11 +120,11 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "Already have an account?",
+                text = "Don't have an account?",
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(4.dp)
                     .clickable {
-                        signUpNavigate.toLogin()
+                        loginNavigate.toRegistration()
                     }
             )
         }

@@ -2,6 +2,8 @@ package com.cheesecake.auth.data.repository
 
 import com.cheesecake.auth.data.source.IUserRemoteDataSource
 import com.cheesecake.common.api.ApiResult
+import com.cheesecake.common.auth.model.login.LoginError
+import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterRequest
 import com.cheesecake.common.auth.model.verefication.VerificationError
 import kotlinx.coroutines.Dispatchers
@@ -22,5 +24,12 @@ class UserRepository(
 
     override suspend fun verifyUserToken(token: String): Flow<ApiResult<String, VerificationError>> = flow {
         emit(userRemoteDataSource.verifyByToken(token))
+    }.flowOn(Dispatchers.IO)
+
+    override suspend fun loginUser(
+        email: String,
+        password: String
+    ): Flow<ApiResult<String, LoginError>> = flow {
+        emit(userRemoteDataSource.loginUser(LoginRequest(email, password)))
     }.flowOn(Dispatchers.IO)
 }
