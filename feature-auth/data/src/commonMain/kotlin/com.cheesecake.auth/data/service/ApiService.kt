@@ -1,6 +1,6 @@
 package com.cheesecake.auth.data.service
 
-import com.cheesecake.common.auth.model.RegisterRequest
+import com.cheesecake.common.auth.model.registration.RegisterRequest
 import io.ktor.client.statement.HttpResponse
 
 

@@ -2,15 +2,13 @@ package com.cheesecake.auth.data.repository
 
 import com.cheesecake.auth.data.source.IUserRemoteDataSource
 import com.cheesecake.common.api.ApiResult
-import com.cheesecake.common.auth.model.RegisterRequest
-import com.cheesecake.common.auth.model.VerificationError
+import com.cheesecake.common.auth.model.registration.RegisterRequest
+import com.cheesecake.common.auth.model.verefication.VerificationError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.withContext
 
 class UserRepository(
     private val userRemoteDataSource: IUserRemoteDataSource

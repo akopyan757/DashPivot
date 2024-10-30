@@ -1,4 +1,4 @@
-package com.cheesecake.auth.feature.ui
+package com.cheesecake.auth.feature.common
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth

@@ -1,10 +1,10 @@
-package com.cheesecake.auth.feature.viewmodel
+package com.cheesecake.auth.feature.registration
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cheesecake.auth.data.repository.IUserRepository
 import com.cheesecake.common.api.ApiResult
-import com.cheesecake.common.auth.model.RegisterError
+import com.cheesecake.common.auth.model.registration.RegisterError
 import com.cheesecake.common.auth.utils.formatPasswordErrors
 import com.cheesecake.common.auth.utils.isValidEmail
 import com.cheesecake.common.auth.utils.isValidPassword

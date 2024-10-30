@@ -2,7 +2,7 @@ package com.cheesecake.auth.data.service
 
 import com.cheesecake.common.api.BASE_URL
 import com.cheesecake.common.auth.api.EndPoint
-import com.cheesecake.common.auth.model.RegisterRequest
+import com.cheesecake.common.auth.model.registration.RegisterRequest
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody

@@ -1,4 +1,4 @@
-package com.cheesecake.common.auth.model
+package com.cheesecake.common.auth.model.registration
 
 import com.cheesecake.common.api.ApiError
 import com.cheesecake.common.auth.utils.PASSWORD_RULES

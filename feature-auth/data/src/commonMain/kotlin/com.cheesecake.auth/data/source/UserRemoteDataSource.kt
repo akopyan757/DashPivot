@@ -2,9 +2,9 @@ package com.cheesecake.auth.data.source
 
 import com.cheesecake.auth.data.service.ApiService
 import com.cheesecake.common.api.ApiResult
-import com.cheesecake.common.auth.model.RegisterError
-import com.cheesecake.common.auth.model.RegisterRequest
-import com.cheesecake.common.auth.model.VerificationError
+import com.cheesecake.common.auth.model.registration.RegisterError
+import com.cheesecake.common.auth.model.registration.RegisterRequest
+import com.cheesecake.common.auth.model.verefication.VerificationError
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess

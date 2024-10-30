@@ -1,4 +1,4 @@
-package com.cheesecake.auth.feature.ui
+package com.cheesecake.auth.feature.registration
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -23,9 +23,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.cheesecake.auth.feature.ui.version.VersionText
-import com.cheesecake.auth.feature.viewmodel.SignUpState
-import com.cheesecake.auth.feature.viewmodel.SignUpViewModel
+import com.cheesecake.auth.feature.common.EmailTextField
+import com.cheesecake.auth.feature.common.PasswordTextField
+import com.cheesecake.auth.feature.common.VersionText
 
 @Composable
 expect fun SignUpScreen()

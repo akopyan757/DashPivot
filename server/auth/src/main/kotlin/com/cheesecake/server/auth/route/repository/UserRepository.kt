@@ -1,9 +1,9 @@
 package com.cheesecake.server.auth.route.repository
 
 import com.cheesecake.common.api.ApiResult
-import com.cheesecake.common.auth.model.RegisterError
-import com.cheesecake.common.auth.model.RegisterRequest
-import com.cheesecake.common.auth.model.VerificationError
+import com.cheesecake.common.auth.model.registration.RegisterError
+import com.cheesecake.common.auth.model.registration.RegisterRequest
+import com.cheesecake.common.auth.model.verefication.VerificationError
 import com.cheesecake.common.auth.service.UserService
 import com.cheesecake.common.auth.utils.isValidEmail
 import com.cheesecake.common.auth.utils.isValidPassword

@@ -1,4 +1,4 @@
-package com.cheesecake.auth.feature.ui.version
+package com.cheesecake.auth.feature.common
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text

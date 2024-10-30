@@ -1,4 +1,4 @@
-package com.cheesecake.common.auth.model
+package com.cheesecake.common.auth.model.registration
 
 import kotlinx.serialization.Serializable
 

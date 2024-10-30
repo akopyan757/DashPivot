@@ -1,10 +1,8 @@
-package com.cheesecake.auth.feature.ui
+package com.cheesecake.auth.feature.registration
 
 import androidx.compose.runtime.Composable
-import com.cheesecake.auth.feature.viewmodel.SignUpViewModel
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
-
 
 internal class MyKoinComponent : KoinComponent {
     fun getViewModel(): SignUpViewModel = get()

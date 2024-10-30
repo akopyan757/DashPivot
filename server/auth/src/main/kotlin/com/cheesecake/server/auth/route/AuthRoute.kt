@@ -3,9 +3,9 @@ package com.cheesecake.server.auth.route
 import com.cheesecake.common.api.ApiError
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.api.EndPoint
-import com.cheesecake.common.auth.model.RegisterError
-import com.cheesecake.common.auth.model.RegisterRequest
-import com.cheesecake.common.auth.model.VerificationError
+import com.cheesecake.common.auth.model.registration.RegisterError
+import com.cheesecake.common.auth.model.registration.RegisterRequest
+import com.cheesecake.common.auth.model.verefication.VerificationError
 import com.cheesecake.common.auth.service.UserService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall

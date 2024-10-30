@@ -2,8 +2,10 @@ package com.cheesecake.auth.feature.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.cheesecake.auth.data.repository.UserRepository
+import com.cheesecake.auth.feature.registration.SignUpState
+import com.cheesecake.auth.feature.registration.SignUpViewModel
 import com.cheesecake.common.api.ApiResult
-import com.cheesecake.common.auth.model.RegisterError
+import com.cheesecake.common.auth.model.registration.RegisterError
 import io.mockk.coEvery
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals

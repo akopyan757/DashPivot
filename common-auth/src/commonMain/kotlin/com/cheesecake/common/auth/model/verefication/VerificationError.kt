@@ -1,4 +1,4 @@
-package com.cheesecake.common.auth.model
+package com.cheesecake.common.auth.model.verefication
 
 import com.cheesecake.common.api.ApiError
 
