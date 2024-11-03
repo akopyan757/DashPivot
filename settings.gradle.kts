@@ -29,7 +29,7 @@ dependencyResolutionManagement {
     }
 }
 
-include(":composeApp")
+include(":app")
 include(":common-ui")
 include(":common-api")
 include(":server")

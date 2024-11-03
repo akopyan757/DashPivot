@@ -1,7 +1,6 @@
 package com.cheesecake.common.auth.model.login
 
 import com.cheesecake.common.api.ApiError
-import com.cheesecake.common.auth.utils.PASSWORD_RULES
 
 enum class LoginError(override val message: String): ApiError {
     USER_NOT_FOUND("User with this email was not found."),
