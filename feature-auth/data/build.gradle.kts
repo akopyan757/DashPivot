@@ -29,7 +29,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.commonAuth)
+            implementation(projects.featureAuth.common)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.json)
             implementation(libs.ktor.client.logging)

@@ -18,14 +18,14 @@ java {
 }
 
 dependencies {
+    implementation(projects.featureAuth.server)
+    implementation(projects.featureAuth.common)
     implementation(libs.exposed.core)
     implementation(libs.exposed.dao)
     implementation(libs.exposed.jdbc)
     implementation(libs.postgresql)
     implementation(libs.kodein.di)
     implementation(libs.kodein.di.ktor)
-    implementation(projects.server.auth)
-    implementation(projects.commonAuth)
     implementation(libs.logback)
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)

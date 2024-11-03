@@ -26,5 +26,5 @@ dependencies {
     implementation(libs.ktor.server.netty)
     implementation(libs.javax.mail)
     implementation(libs.mindrotJbcrypt)
-    implementation(projects.commonAuth)
+    implementation(projects.featureAuth.common)
 }

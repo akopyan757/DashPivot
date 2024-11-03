@@ -48,7 +48,7 @@ kotlin {
         }
         commonMain.dependencies {
             implementation(projects.featureAuth.data)
-            implementation(projects.commonAuth)
+            implementation(projects.featureAuth.common)
             implementation(projects.commonUi)
             implementation(compose.runtime)
             implementation(compose.foundation)
