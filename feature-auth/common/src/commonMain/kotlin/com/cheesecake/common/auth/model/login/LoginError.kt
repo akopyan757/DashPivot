@@ -1,13 +1,15 @@
 package com.cheesecake.common.auth.model.login
 
 import com.cheesecake.common.api.ApiError
-import com.cheesecake.common.auth.utils.PASSWORD_RULES
 
 enum class LoginError(override val message: String): ApiError {
-    USER_NOT_FOUND("User with this email was not found."),
-    INVALID_PASSWORD("The password entered is incorrect."),
-    EMAIL_NOT_VERIFIED("Email has not been verified. Please verify your email to proceed."),
-    UNKNOWN("An unknown error occurred.");
+    EMPTY_EMAIL_ERROR("Email cannot be empty."),
+    EMPTY_PASSWORD_ERROR("Password cannot be empty."),
+    USER_NOT_FOUND("User not found"),
+    INVALID_PASSWORD("Invalid password"),
+    EMAIL_NOT_VERIFIED("Email not verified"),
+    INVALID_EMAIL_FORMAT("Invalid email format"),
+    UNKNOWN("Unknown error");
 
     companion object {
         fun fromMessage(message: String): LoginError {
