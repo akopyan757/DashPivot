@@ -30,6 +30,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.featureAuth.common)
+            implementation(projects.featureAuth.domain)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.json)
             implementation(libs.ktor.client.logging)

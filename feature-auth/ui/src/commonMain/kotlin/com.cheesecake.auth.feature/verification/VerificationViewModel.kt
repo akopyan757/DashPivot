@@ -2,13 +2,15 @@ package com.cheesecake.auth.feature.verification
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cheesecake.auth.data.repository.IUserRepository
+import com.cheesecake.auth.feature.domain.usecase.VerificationUseCase
 import com.cheesecake.common.api.ApiResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class VerificationViewModel(private val repository: IUserRepository) : ViewModel() {
+class VerificationViewModel(
+    private val verificationUseCase: VerificationUseCase
+) : ViewModel() {
 
     private val _verificationState = MutableStateFlow<VerificationState>(VerificationState.Idle)
     val verificationState: StateFlow<VerificationState> get() = _verificationState
@@ -16,7 +18,7 @@ class VerificationViewModel(private val repository: IUserRepository) : ViewModel
     fun verifyToken(token: String) {
         _verificationState.value = VerificationState.Loading
         viewModelScope.launch {
-            repository.verifyUserToken(token).collect { result ->
+            verificationUseCase(token).collect { result ->
                 _verificationState.value = when (result) {
                     is ApiResult.Success<*> -> VerificationState.Success
                     is ApiResult.Error<*> -> VerificationState.Error(result.error.message)

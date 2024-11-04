@@ -1,4 +1,4 @@
-package com.cheesecake.auth.data.repository
+package com.cheesecake.auth.feature.domain.repository
 
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.model.login.LoginError

@@ -1,6 +1,7 @@
 package com.cheesecake.auth.data.repository
 
 import com.cheesecake.auth.data.source.IUserRemoteDataSource
+import com.cheesecake.auth.feature.domain.repository.IUserRepository
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.model.login.LoginError
 import com.cheesecake.common.auth.model.login.LoginRequest

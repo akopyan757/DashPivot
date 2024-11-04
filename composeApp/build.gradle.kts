@@ -48,6 +48,7 @@ kotlin {
                 implementation(libs.androidx.lifecycle.viewmodel)
                 implementation(libs.androidx.lifecycle.runtime.compose)
                 implementation(projects.featureAuth.data)
+                implementation(projects.featureAuth.domain)
                 implementation(projects.featureAuth.ui)
                 implementation(projects.commonUi)
                 implementation(libs.koin.core)

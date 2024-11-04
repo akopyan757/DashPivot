@@ -2,7 +2,7 @@ package com.cheesecake.auth.feature.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cheesecake.auth.data.repository.IUserRepository
+import com.cheesecake.auth.feature.domain.usecase.LoginUseCase
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.model.login.LoginError
 import com.cheesecake.common.auth.model.registration.RegisterError
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
-    private val userRepository: IUserRepository
+    private val loginUseCase: LoginUseCase
 ): ViewModel() {
 
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
@@ -70,7 +70,7 @@ class LoginViewModel(
             _loginState.value = LoginState.Loading
 
             viewModelScope.launch {
-                userRepository.loginUser(email, password).collect { result ->
+                loginUseCase(email, password).collect { result ->
                     when (result) {
                         is ApiResult.Success -> {
                             _loginState.value = LoginState.Success(result.data)

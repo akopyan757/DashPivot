@@ -2,7 +2,7 @@ package com.cheesecake.auth.feature.registration
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cheesecake.auth.data.repository.IUserRepository
+import com.cheesecake.auth.feature.domain.usecase.RegisterUseCase
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.model.registration.RegisterError
 import com.cheesecake.common.auth.utils.formatPasswordErrors
@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class SignUpViewModel(
-    private val userRepository: IUserRepository
+    private val registerUseCase: RegisterUseCase
 ): ViewModel() {
 
     private val _signUpState = MutableStateFlow<SignUpState>(SignUpState.Idle)
@@ -81,9 +81,8 @@ class SignUpViewModel(
             _signUpState.value = errorState
         } else {
             _signUpState.value = SignUpState.Loading
-
             viewModelScope.launch {
-                userRepository.registerUser(email, password).collect { result ->
+                registerUseCase(email, password).collect { result ->
                     when (result) {
                         is ApiResult.Success -> {
                             _signUpState.value = SignUpState.Success(result.data)
