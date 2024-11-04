@@ -12,6 +12,8 @@ import javax.mail.internet.MimeMessage
 class EmailService: IEmailService {
     private val session: Session
 
+    val senderEmail: String
+
     init {
         val props = System.getProperties().apply {
             put("mail.smtp.host", "smtp.gmail.com")
@@ -20,12 +22,12 @@ class EmailService: IEmailService {
             put("mail.smtp.starttls.enable", "true")
         }
 
-        val username = "akopyan757@gmail.com"
-        val password = "za1avGU8@"
+        senderEmail = System.getenv("EMAIL_USERNAME") ?: "your_email@gmail.com"
+        val password = System.getenv("EMAIL_PASSWORD") ?: "your_app_password"
 
         session = Session.getInstance(props, object : Authenticator() {
             override fun getPasswordAuthentication(): PasswordAuthentication {
-                return PasswordAuthentication(username, password)
+                return PasswordAuthentication(senderEmail, password)
             }
         })
     }
@@ -38,19 +40,19 @@ class EmailService: IEmailService {
             $verificationUrl
         """.trimIndent()
 
-        sendEmail(email, subject, body)
+        sendEmail(senderEmail, email, subject, body)
     }
 
-    private fun sendEmail(to: String, subj: String, body: String) {
+    private fun sendEmail(from: String, to: String, subject: String, body: String) {
         try {
             val message = MimeMessage(session).apply {
-                setFrom(InternetAddress("akopyan757@gmail.com"))
+                setFrom(InternetAddress(from))
                 setRecipients(Message.RecipientType.TO, InternetAddress.parse(to))
-                subject = subj
+                this.subject = subject
                 setText(body)
             }
 
-            //Transport.send(message)
+            Transport.send(message)
             println("Email sent successfully")
             println(body)
         } catch (e: MessagingException) {
