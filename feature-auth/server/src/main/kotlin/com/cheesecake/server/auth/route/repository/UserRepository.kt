@@ -24,7 +24,7 @@ class UserRepository(
         }
 
         if (!isValidEmail(registerRequest.email)) {
-            return ApiResult.Error(RegisterError.INVALID_PASSWORD)
+            return ApiResult.Error(RegisterError.INVALID_EMAIL_FORMAT)
         }
 
         if (!isValidPassword(registerRequest.password)) {
@@ -32,10 +32,11 @@ class UserRepository(
         }
 
         val hashedPassword = PasswordHasher.hashPassword(registerRequest.password)
-
         val verificationToken = VerificationUtils.generateVerificationToken()
 
-        val user = UserSource.createUser(registerRequest.email, hashedPassword, isVerified = false, verificationToken)
+        val user = UserSource.createUser(
+            registerRequest.email, hashedPassword, isVerified = false, verificationToken
+        )
 
         emailService.sendVerificationEmail(user.email, verificationToken)
 

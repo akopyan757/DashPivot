@@ -25,10 +25,19 @@ kotlin {
             api(projects.commonApi)
             implementation(libs.kotlinx.serialization.core)
         }
-        val commonTest by getting {
-            dependencies {
-                implementation(libs.kotlin.test)
-            }
+        androidUnitTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.junit.jupiter)
+            implementation(libs.androidx.core.testing)
+            implementation(libs.mockk)
+            implementation(libs.androidx.core.testing.v210)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.mockk.android)
+            implementation(libs.androidx.junit.v112)
+            implementation(libs.androidx.espresso.core)
+            implementation(libs.androidx.core.testing)
+            implementation(libs.androidx.lifecycle.viewmodel.ktx)
+            implementation(libs.androidx.lifecycle.livedata.ktx)
         }
     }
 }

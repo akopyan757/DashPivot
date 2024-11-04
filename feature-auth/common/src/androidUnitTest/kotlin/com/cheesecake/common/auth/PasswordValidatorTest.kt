@@ -11,7 +11,8 @@ class PasswordValidatorTest {
         "StrongPass1!",
         "AnotherValid1@",
         "Password123!",
-        "MyP@ssword2024"
+        "MyP@ssword2024",
+        "Zaq12345@"
     )
 
     private val invalidPasswords = listOf(

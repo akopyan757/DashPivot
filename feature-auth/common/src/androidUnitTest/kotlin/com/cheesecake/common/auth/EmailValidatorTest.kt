@@ -8,10 +8,11 @@ import kotlin.test.assertTrue
 class EmailValidatorTest {
 
     private val validEmails = listOf(
+        "payoc54301@opposir.com",
         "test@example.com",
         "user.name+tag+sorting@example.com",
         "user@example.co.uk",
-        "user@subdomain.example.com"
+        "user@subdomain.example.com",
     )
 
     private val invalidEmails = listOf(

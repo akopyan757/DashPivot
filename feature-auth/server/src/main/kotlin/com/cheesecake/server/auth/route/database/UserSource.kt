@@ -3,7 +3,6 @@ package com.cheesecake.server.auth.route.database
 import com.cheesecake.common.auth.model.User
 import com.cheesecake.server.auth.route.database.Users.verificationToken
 import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.javatime.CurrentDateTime
 import org.jetbrains.exposed.sql.selectAll
@@ -12,7 +11,7 @@ import org.jetbrains.exposed.sql.update
 
 object UserSource {
 
-    suspend fun isEmailTaken(email: String): Boolean {
+    fun isEmailTaken(email: String): Boolean {
         return transaction {
             Users.selectAll().where { Users.email eq email }.count() > 0
         }
@@ -32,14 +31,19 @@ object UserSource {
         }
     }
 
-    fun createUser(email: String, passwordHash: String, isVerified: Boolean, verificationToken: String): User {
+    fun createUser(
+        email: String,
+        passwordHash: String,
+        isVerified: Boolean,
+        verificationToken: String
+    ): User {
         return transaction {
             Users.insert {
                 it[Users.email] = email
                 it[Users.passwordHash] = passwordHash
                 it[Users.isVerified] = isVerified
                 it[Users.verificationToken] = verificationToken
-                it[Users.createdAt] = CurrentDateTime
+                it[createdAt] = CurrentDateTime
             }
             Users.selectAll().where { Users.email eq email }
                 .first()
