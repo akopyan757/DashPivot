@@ -41,7 +41,11 @@ class UserRepository(
             registerRequest.email, hashedPassword, isVerified = false, hashedVerificationCode
         )
 
-        emailService.sendVerificationEmail(user.email, verificationCode)
+        try {
+            emailService.sendVerificationEmail(user.email, verificationCode)
+        } catch (e: Exception) {
+            return ApiResult.Error(RegisterError.VERIFICATION_LETTER_SENDING_ERROR)
+        }
 
         return ApiResult.Success("User registered successfully")
     }

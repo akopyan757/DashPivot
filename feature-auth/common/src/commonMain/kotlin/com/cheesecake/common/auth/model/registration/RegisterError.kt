@@ -10,6 +10,7 @@ enum class RegisterError(override val message: String): ApiError {
     INVALID_EMAIL_FORMAT("Invalid email format"),
     INVALID_PASSWORD(PASSWORD_RULES),
     PASSWORD_MATCH("Passwords do not match"),
+    VERIFICATION_LETTER_SENDING_ERROR("Error sending verification letter"),
     TOKEN_MISSING("Token is missing"),
     UNKNOWN("Unknown error");
 

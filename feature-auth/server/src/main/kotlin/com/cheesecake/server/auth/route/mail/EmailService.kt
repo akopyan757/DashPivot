@@ -52,7 +52,9 @@ class EmailService: IEmailService {
             }
 
             Transport.send(message)
+            println("EmailService: Message sent successfully\nText = $body")
         } catch (e: MessagingException) {
+            println("EmailService: Error sending email\n${e.message}")
             e.printStackTrace()
         }
     }
