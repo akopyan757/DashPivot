@@ -30,12 +30,21 @@ fun Route.authRoute(di: DI) {
             is ApiResult.Error -> handleError(result)
         }
     }
-    post(EndPoint.CONFIRM_EMAIL.path) {
+    post(EndPoint.CONFIRM_EMAIL_BY_TOKEN.path) {
         val token = call.parameters["token"]
         val userRepository: UserService by di.instance()
 
         when (val result = userRepository.verifyByToken(token)) {
-            is ApiResult.Success -> call.respond(HttpStatusCode.Created, result.data)
+            is ApiResult.Success -> call.respond(HttpStatusCode.OK, result.data)
+            is ApiResult.Error -> handleError(result)
+        }
+    }
+    post(EndPoint.CONFIRM_EMAIL_BY_CODE.path) {
+        val code = call.parameters["code"]
+        val userRepository: UserService by di.instance()
+
+        when (val result = userRepository.verifyEmailByCode(code = code)) {
+            is ApiResult.Success -> call.respond(HttpStatusCode.OK, result.data)
             is ApiResult.Error -> handleError(result)
         }
     }
@@ -44,7 +53,7 @@ fun Route.authRoute(di: DI) {
         val userRepository: UserService by di.instance()
 
         when (val result = userRepository.loginUser(loginRequest)) {
-            is ApiResult.Success -> call.respond(HttpStatusCode.Created, result.data)
+            is ApiResult.Success -> call.respond(HttpStatusCode.OK, result.data)
             is ApiResult.Error -> handleError(result)
         }
     }

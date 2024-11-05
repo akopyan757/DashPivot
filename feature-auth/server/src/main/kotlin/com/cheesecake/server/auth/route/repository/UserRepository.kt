@@ -1,6 +1,7 @@
 package com.cheesecake.server.auth.route.repository
 
 import com.cheesecake.common.api.ApiResult
+import com.cheesecake.common.auth.config.Config
 import com.cheesecake.common.auth.model.login.LoginError
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterError
@@ -32,17 +33,20 @@ class UserRepository(
         }
 
         val hashedPassword = PasswordHasher.hashPassword(registerRequest.password)
-        val verificationToken = VerificationUtils.generateVerificationToken()
+
+        val verificationCode = VerificationUtils.generateVerificationCode(Config.VERIFICATION_CODE_COUNT)
+        val hashedVerificationCode = PasswordHasher.hashPassword(verificationCode)
 
         val user = UserSource.createUser(
-            registerRequest.email, hashedPassword, isVerified = false, verificationToken
+            registerRequest.email, hashedPassword, isVerified = false, hashedVerificationCode
         )
 
-        emailService.sendVerificationEmail(user.email, verificationToken)
+        emailService.sendVerificationEmail(user.email, verificationCode)
 
         return ApiResult.Success("User registered successfully")
     }
 
+    @Deprecated("Use verifyEmailByCode instead")
     override suspend fun verifyByToken(token: String?): ApiResult<String, VerificationError> {
         if (token.isNullOrBlank()) {
             return ApiResult.Error(VerificationError.EMPTY_TOKEN_ERROR)
@@ -55,6 +59,20 @@ class UserRepository(
 
         return ApiResult.Success("Email confirmed successfully!")
     }
+
+    override suspend fun verifyEmailByCode(code: String?): ApiResult<String, VerificationError> {
+        if (code.isNullOrBlank()) {
+            return ApiResult.Error(VerificationError.EMPTY_CODE_ERROR)
+        }
+
+        val user = UserSource.findUserByVerificationCode(code)
+            ?: return ApiResult.Error(VerificationError.EXPIRED_CODE)
+
+        UserSource.verifyEmail(user.id)
+
+        return ApiResult.Success("Email confirmed successfully!")
+    }
+
 
     override suspend fun loginUser(loginRequest: LoginRequest): ApiResult<String, LoginError> {
         val user = UserSource.findUserByEmail(loginRequest.email)

@@ -23,6 +23,12 @@ object UserSource {
         }
     }
 
+    fun findUserByVerificationCode(code: String): User? {
+        return transaction {
+            Users.selectAll().where { verificationToken eq code }.singleOrNull()?.mapToUser()
+        }
+    }
+
     fun verifyEmail(id: Int) {
         transaction {
             Users.update({ Users.id eq id }) {
