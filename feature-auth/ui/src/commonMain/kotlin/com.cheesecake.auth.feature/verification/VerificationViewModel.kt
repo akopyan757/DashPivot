@@ -27,6 +27,10 @@ class VerificationViewModel(
             }
         }
     }
+
+    fun resetToIdle() {
+        _verificationState.value = VerificationState.Idle
+    }
 }
 
 sealed class VerificationState {

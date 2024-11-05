@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
@@ -38,6 +40,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -79,6 +82,7 @@ fun VerificationScreen(
         email = email,
         state = verificationState,
         onCodeCompleted = { viewModel.verifyToken(email, it) },
+        onResetToIdle = { viewModel.resetToIdle() },
         onBackPressed = onBackPressed,
     )
 }
@@ -89,14 +93,19 @@ fun VerificationCodeScreen(
     email: String = "",
     state: VerificationState = VerificationState.Idle,
     onBackPressed: () -> Unit = {},
+    onResetToIdle: () -> Unit = {},
     onCodeCompleted: (String) -> Unit = {},
     startedCode: String = "",
     isDebugMode: Boolean = false,
 ) {
     var code by remember(isDebugMode) { mutableStateOf(if (isDebugMode) startedCode else "") }
     val focusRequester = remember { FocusRequester() }
-    val keyboardController = LocalSoftwareKeyboardController.current
     var isFocused by remember(isDebugMode) { mutableStateOf(isDebugMode && startedCode.isNotEmpty()) }
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+    LaunchedEffect(email) {
+        keyboardController?.show()
+    }
 
     Box {
         IconButton(
@@ -153,7 +162,10 @@ fun VerificationCodeScreen(
                             .clip(RoundedCornerShape(8.dp))
                             .background(Color.LightGray)
                             .border(width = 2.dp, color = borderColor, shape)
-                            .clickable { focusRequester.requestFocus() },
+                            .clickable {
+                                focusRequester.requestFocus()
+                                keyboardController?.show()
+                            },
                         contentAlignment = Alignment.Center
                     ) {
                         val char = if (index < code.length) code[index].toString() else ""
@@ -166,11 +178,16 @@ fun VerificationCodeScreen(
 
             BasicTextField(
                 value = code,
-                onValueChange = {
-                    if (it.length <= VERIFICATION_CODE_COUNT) {
-                        code = it
+                onValueChange = { newCode ->
+
+                    if (newCode.length <= VERIFICATION_CODE_COUNT) {
+                        code = newCode
                     }
-                    if (code.length == VERIFICATION_CODE_COUNT) {
+                    if (newCode.length < VERIFICATION_CODE_COUNT) {
+                        if (state !is VerificationState.Idle) {
+                            onResetToIdle()
+                        }
+                    } else if (newCode.length == VERIFICATION_CODE_COUNT) {
                         onCodeCompleted(code)
                         keyboardController?.hide()
                     }
@@ -185,6 +202,8 @@ fun VerificationCodeScreen(
                     .background(Color.Transparent)
                     .width(1.dp)
                     .height(1.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
                 textStyle = TextStyle(fontSize = 0.sp, color = Color.Transparent)
             )
 

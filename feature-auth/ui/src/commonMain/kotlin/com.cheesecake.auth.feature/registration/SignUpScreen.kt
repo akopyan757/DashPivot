@@ -23,13 +23,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.cheesecake.auth.feature.common.EmailTextField
 import com.cheesecake.auth.feature.common.PasswordTextField
 import com.cheesecake.auth.feature.common.VersionText
 import com.cheesecake.auth.feature.di.AppKoinComponent
-import kotlinx.coroutines.delay
 
 interface SignUpNavigate {
     fun toLogin() {}
@@ -55,6 +55,7 @@ fun SignUpScreen(
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isConfirmPasswordVisible by remember { mutableStateOf(false) }
     val signUpState by viewModel.signUpState.collectAsState()
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(signUpState) {
         if (signUpState is SignUpState.Success) {
@@ -123,7 +124,10 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { viewModel.signUp(email, password, confirmPassword) },
+                onClick = {
+                    viewModel.signUp(email, password, confirmPassword)
+                    keyboardController?.hide()
+                },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = signUpState !is SignUpState.Loading
             ) {

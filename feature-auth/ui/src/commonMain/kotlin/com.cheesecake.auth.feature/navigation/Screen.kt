@@ -1,8 +1,8 @@
 package com.cheesecake.auth.feature.navigation
 
-import com.cheesecake.common.ui.navigator.DialogScreen
 import com.cheesecake.common.ui.navigator.RegularScreen
 import com.cheesecake.common.ui.navigator.Screen
+
 /**
  * Sealed class representing authentication screens.
  *
@@ -28,7 +28,15 @@ sealed class AuthScreen(override val route: String): Screen {
      * @property email The email to verify.
      * @property code The verification code.
      */
-    data class Verification(val email: String = "") : AuthScreen("verification"), RegularScreen
+    data class Verification(val email: String = "") : AuthScreen("verification"), RegularScreen {
+        override val fullRoute: String = "${super<AuthScreen>.fullRoute}/{${EMAIL_KEY}}"
+        override val fullRouteWithParams: String
+            get() = fullRoute.replace("{$EMAIL_KEY}", email)
+
+        companion object {
+            const val EMAIL_KEY = "email"
+        }
+    }
 
     companion object {
         private fun values() = listOf<RegularScreen>(Login, Registration)

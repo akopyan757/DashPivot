@@ -2,12 +2,11 @@ package com.cheesecake.auth.feature.navigation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.cheesecake.auth.feature.di.AndroidKoinComponent
 import com.cheesecake.auth.feature.events.VerifyEmailEvent
 import com.cheesecake.common.ui.events.EventStateHolder
@@ -31,8 +30,11 @@ class AndroidNavigatorHost(
                 composable(AuthScreen.Registration.fullRoute) {
                     getComposable(AuthScreen.Registration, navigator, koinComponent)
                 }
-                composable(AuthScreen.Verification().fullRoute) { backStackEntry ->
-                    val email = backStackEntry.arguments?.getString("email").orEmpty()
+                composable(
+                    route = AuthScreen.Verification().fullRoute,
+                    arguments = listOf(navArgument(AuthScreen.Verification.EMAIL_KEY) { type = NavType.StringType }),
+                ) { backStackEntry ->
+                    val email = backStackEntry.arguments?.getString(AuthScreen.Verification.EMAIL_KEY).orEmpty()
                     getComposable(AuthScreen.Verification(email), navigator, koinComponent)
                 }
             }

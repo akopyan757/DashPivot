@@ -30,7 +30,8 @@ fun getComposable(
                     navigator.navigateTo(AuthScreen.Login)
                 }
                 override fun toVerification(email: String) {
-                    navigator.navigateTo(AuthScreen.Verification(email))
+                    val verificationScreen = AuthScreen.Verification(email)
+                    navigator.navigateTo(verificationScreen)
                 }
             })
         }

@@ -21,7 +21,7 @@ class AndroidNavigator(
         if (currentStoryBoardName != screen.storyBoardName) {
             navController.popBackStack(navController.graph.startDestinationId, true)
         }
-        navController.navigate(screen.fullRoute)
+        navController.navigate(screen.fullRouteWithParams)
         currentStoryBoardName = screen.storyBoardName
     }
 
@@ -30,7 +30,7 @@ class AndroidNavigator(
     }
 
     override fun goBack(to: RegularScreen) {
-        navController.popBackStack(to.fullRoute, false)
+        navController.popBackStack(to.fullRouteWithParams, false)
     }
 
     override fun showToastMessage(message: String) {

@@ -5,6 +5,7 @@ interface Screen {
     val route: String
     val prefix: String
     val fullRoute: String get() = prefix + route
+    val fullRouteWithParams: String get() = fullRoute
 }
 
 /**
