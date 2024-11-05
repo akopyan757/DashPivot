@@ -1,7 +1,6 @@
 package com.cheesecake.auth.feature.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import com.cheesecake.auth.feature.di.AppKoinComponent
 import com.cheesecake.auth.feature.login.LoginNavigate
 import com.cheesecake.auth.feature.login.LoginScreen
@@ -36,9 +35,12 @@ fun getComposable(
             })
         }
         is AuthScreen.Verification -> {
-            VerificationScreen(appKoinComponent, screen.email) {
+            VerificationScreen(appKoinComponent, screen.email, onSuccessFinished = {
                 navigator.goBack(AuthScreen.Login)
-            }
+                navigator.showToastMessage("Verification success")
+            }, onBackPressed = {
+                navigator.goBack()
+            })
         }
         else -> {}
     }

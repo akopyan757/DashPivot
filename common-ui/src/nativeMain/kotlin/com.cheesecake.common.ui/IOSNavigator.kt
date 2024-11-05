@@ -35,7 +35,7 @@ class IOSNavigator(private val navigationController: UINavigationController): Di
         )
     }
 
-    override fun showErrorMessage(message: String) {
+    override fun showToastMessage(message: String) {
         println("showErrorMessage: message: $message")
     }
 }

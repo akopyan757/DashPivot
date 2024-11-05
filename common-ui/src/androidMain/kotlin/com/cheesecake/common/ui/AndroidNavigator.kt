@@ -33,7 +33,7 @@ class AndroidNavigator(
         navController.popBackStack(to.fullRoute, false)
     }
 
-    override fun showErrorMessage(message: String) {
+    override fun showToastMessage(message: String) {
         Toast.makeText(navController.context, message, Toast.LENGTH_SHORT).show()
     }
 }

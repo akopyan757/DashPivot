@@ -42,5 +42,5 @@ interface Navigator {
     /**
      * Show an error message.
      */
-    fun showErrorMessage(message: String) {}
+    fun showToastMessage(message: String) {}
 }

@@ -20,7 +20,7 @@ class DesktopNavigator(startScreen: RegularScreen): DialogNavigator() {
         _currentScreen.value = to
     }
 
-    override fun showErrorMessage(message: String) {
-        super.showErrorMessage(message)
+    override fun showToastMessage(message: String) {
+        super.showToastMessage(message)
     }
 }
