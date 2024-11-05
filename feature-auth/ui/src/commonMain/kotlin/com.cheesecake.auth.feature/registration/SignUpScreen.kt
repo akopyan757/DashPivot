@@ -15,6 +15,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,9 +29,11 @@ import com.cheesecake.auth.feature.common.EmailTextField
 import com.cheesecake.auth.feature.common.PasswordTextField
 import com.cheesecake.auth.feature.common.VersionText
 import com.cheesecake.auth.feature.di.AppKoinComponent
+import kotlinx.coroutines.delay
 
 interface SignUpNavigate {
     fun toLogin() {}
+    fun toVerification(email: String) {}
 }
 
 @Composable
@@ -52,6 +55,13 @@ fun SignUpScreen(
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isConfirmPasswordVisible by remember { mutableStateOf(false) }
     val signUpState by viewModel.signUpState.collectAsState()
+
+    LaunchedEffect(signUpState) {
+        if (signUpState is SignUpState.Success) {
+            viewModel.onResetSuccess()
+            signUpNavigate.toVerification(email)
+        }
+    }
 
     Column(
         modifier = Modifier

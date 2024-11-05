@@ -23,15 +23,6 @@ class AndroidNavigatorHost(
     @Composable
     override fun Screen() {
         val koinComponent = AndroidKoinComponent()
-        val dialogScreen by navigator.currentDialog.collectAsState()
-        val verificationToken by eventStateHolder.appEntryState.collectAsState()
-
-        LaunchedEffect(verificationToken) {
-            verificationToken?.let {
-                navigator.showDialog(AuthScreen.Verification(it.token))
-            }
-        }
-
         Box {
             NavHost(navController = navController, startDestination = AuthScreen.Login.fullRoute) {
                 composable(AuthScreen.Login.fullRoute) {
@@ -40,8 +31,11 @@ class AndroidNavigatorHost(
                 composable(AuthScreen.Registration.fullRoute) {
                     getComposable(AuthScreen.Registration, navigator, koinComponent)
                 }
+                composable(AuthScreen.Verification().fullRoute) { backStackEntry ->
+                    val email = backStackEntry.arguments?.getString("email").orEmpty()
+                    getComposable(AuthScreen.Verification(email), navigator, koinComponent)
+                }
             }
-            dialogScreen?.let { getComposable(it, navigator, koinComponent) }
         }
     }
 }

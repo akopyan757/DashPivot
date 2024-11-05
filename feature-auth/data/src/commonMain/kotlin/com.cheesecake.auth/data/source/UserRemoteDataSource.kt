@@ -28,9 +28,12 @@ class UserRemoteDataSource(private val apiService: ApiService): IUserRemoteDataS
         }
     }
 
-    override suspend fun verifyByToken(token: String?): ApiResult<String, VerificationError> {
+    override suspend fun verifyEmailByCode(
+        email: String,
+        code: String?
+    ): ApiResult<String, VerificationError> {
         return try {
-            val response = apiService.verificationToken(token!!)
+            val response = apiService.verificationCode(email, code!!)
             val statusCode = response.status.value
             if (HttpStatusCode.fromValue(statusCode).isSuccess()) {
                 ApiResult.Success(response.bodyAsText())

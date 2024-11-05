@@ -30,22 +30,14 @@ fun getComposable(
                 override fun toLogin() {
                     navigator.navigateTo(AuthScreen.Login)
                 }
+                override fun toVerification(email: String) {
+                    navigator.navigateTo(AuthScreen.Verification(email))
+                }
             })
         }
         is AuthScreen.Verification -> {
-            if (screen.token != null) {
-                VerificationScreen(
-                    appKoinComponent,
-                    screen.token,
-                ) {
-                    navigator.dismissDialog()
-                    navigator.navigateTo(AuthScreen.Login)
-                }
-            } else {
-                LaunchedEffect(screen) {
-                    navigator.showErrorMessage("Token is missing")
-                    navigator.dismissDialog()
-                }
+            VerificationScreen(appKoinComponent, screen.email) {
+                navigator.goBack(AuthScreen.Login)
             }
         }
         else -> {}

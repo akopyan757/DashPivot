@@ -20,6 +20,11 @@ interface Navigator {
     fun goBack() {}
 
     /**
+     * Navigate back to the previous screen.
+     */
+    fun goBack(to: RegularScreen) {}
+
+    /**
      * The current dialog screen.
      */
     val currentDialog: StateFlow<DialogScreen?>

@@ -31,15 +31,6 @@ fun Route.authRoute(di: DI) {
             is ApiResult.Error -> handleError(result)
         }
     }
-    post(EndPoint.CONFIRM_EMAIL_BY_TOKEN.path) {
-        val token = call.parameters["token"]
-        val userRepository: UserService by di.instance()
-
-        when (val result = userRepository.verifyByToken(token)) {
-            is ApiResult.Success -> call.respond(HttpStatusCode.OK, result.data)
-            is ApiResult.Error -> handleError(result)
-        }
-    }
     post(EndPoint.CONFIRM_EMAIL_BY_CODE.path) {
         val verificationRequest = call.receive<VerificationRequest>()
         val userRepository: UserService by di.instance()
@@ -70,8 +61,6 @@ private suspend fun <E : ApiError> PipelineContext<Unit, ApplicationCall>.handle
         RegisterError.INVALID_EMAIL_FORMAT -> call.respond(HttpStatusCode.BadRequest, error.message)
         RegisterError.TOKEN_MISSING -> call.respond(HttpStatusCode.BadRequest, error.message)
         RegisterError.UNKNOWN -> call.respond(HttpStatusCode.InternalServerError, error.message)
-        VerificationError.EMPTY_TOKEN_ERROR -> call.respond(HttpStatusCode.BadRequest, error.message)
-        VerificationError.EXPIRED_TOKEN -> call.respond(HttpStatusCode.Unauthorized, error.message)
         VerificationError.EMPTY_CODE_ERROR -> call.respond(HttpStatusCode.BadRequest, error.message)
         VerificationError.EXPIRED_CODE -> call.respond(HttpStatusCode.Unauthorized, error.message)
         VerificationError.UNKNOWN -> call.respond(HttpStatusCode.InternalServerError, error.message)

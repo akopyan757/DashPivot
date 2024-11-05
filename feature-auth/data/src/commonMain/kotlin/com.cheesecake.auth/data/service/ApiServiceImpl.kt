@@ -4,6 +4,7 @@ import com.cheesecake.common.api.BASE_URL
 import com.cheesecake.common.auth.api.EndPoint
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterRequest
+import com.cheesecake.common.auth.model.verefication.VerificationRequest
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -22,10 +23,11 @@ class ApiServiceImpl(private val client: HttpClient) : ApiService {
         }
     }
 
-    override suspend fun verificationToken(token: String): HttpResponse {
+    override suspend fun verificationCode(email: String, code: String): HttpResponse {
         return client.post {
-            url("$BASE_URL${EndPoint.CONFIRM_EMAIL.path}?token=$token")
+            url("$BASE_URL${EndPoint.CONFIRM_EMAIL_BY_CODE.path}")
             contentType(ContentType.Application.Json)
+            setBody(VerificationRequest(email, code))
         }
     }
 

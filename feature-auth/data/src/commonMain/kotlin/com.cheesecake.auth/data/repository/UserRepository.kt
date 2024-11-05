@@ -23,8 +23,8 @@ class UserRepository(
         emit(userRemoteDataSource.registerUser(RegisterRequest(email, password)))
     }.flowOn(Dispatchers.IO)
 
-    override suspend fun verifyUserToken(token: String): Flow<ApiResult<String, VerificationError>> = flow {
-        emit(userRemoteDataSource.verifyByToken(token))
+    override suspend fun verifyEmailByCode(email: String, code: String): Flow<ApiResult<String, VerificationError>> = flow {
+        emit(userRemoteDataSource.verifyEmailByCode(email, code))
     }.flowOn(Dispatchers.IO)
 
     override suspend fun loginUser(

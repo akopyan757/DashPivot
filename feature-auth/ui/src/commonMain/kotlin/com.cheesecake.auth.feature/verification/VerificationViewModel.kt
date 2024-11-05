@@ -15,10 +15,10 @@ class VerificationViewModel(
     private val _verificationState = MutableStateFlow<VerificationState>(VerificationState.Idle)
     val verificationState: StateFlow<VerificationState> get() = _verificationState
 
-    fun verifyToken(token: String) {
+    fun verifyToken(email: String, code: String) {
         _verificationState.value = VerificationState.Loading
         viewModelScope.launch {
-            verificationUseCase(token).collect { result ->
+            verificationUseCase(email, code).collect { result ->
                 _verificationState.value = when (result) {
                     is ApiResult.Success<*> -> VerificationState.Success
                     is ApiResult.Error<*> -> VerificationState.Error(result.error.message)

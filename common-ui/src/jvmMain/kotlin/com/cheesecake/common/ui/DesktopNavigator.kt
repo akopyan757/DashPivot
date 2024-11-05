@@ -5,7 +5,7 @@ import com.cheesecake.common.ui.navigator.RegularScreen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class DesktopNavigator(private val startScreen: RegularScreen): DialogNavigator() {
+class DesktopNavigator(startScreen: RegularScreen): DialogNavigator() {
 
     private val _currentScreen = MutableStateFlow(startScreen)
     val currentScreen: StateFlow<RegularScreen> = _currentScreen
@@ -15,6 +15,10 @@ class DesktopNavigator(private val startScreen: RegularScreen): DialogNavigator(
     }
 
     override fun goBack() {}
+
+    override fun goBack(to: RegularScreen) {
+        _currentScreen.value = to
+    }
 
     override fun showErrorMessage(message: String) {
         super.showErrorMessage(message)

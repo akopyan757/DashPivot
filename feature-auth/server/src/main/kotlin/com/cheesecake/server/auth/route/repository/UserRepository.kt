@@ -50,20 +50,6 @@ class UserRepository(
         return ApiResult.Success("User registered successfully")
     }
 
-    @Deprecated("Use verifyEmailByCode instead")
-    override suspend fun verifyByToken(token: String?): ApiResult<String, VerificationError> {
-        if (token.isNullOrBlank()) {
-            return ApiResult.Error(VerificationError.EMPTY_TOKEN_ERROR)
-        }
-
-        val user = UserSource.findUserByToken(token)
-            ?: return ApiResult.Error(VerificationError.EXPIRED_TOKEN)
-
-        UserSource.verifyEmail(user.id)
-
-        return ApiResult.Success("Email confirmed successfully!")
-    }
-
     override suspend fun verifyEmailByCode(email: String, code: String?): ApiResult<String, VerificationError> {
         if (code.isNullOrBlank()) {
             return ApiResult.Error(VerificationError.EMPTY_CODE_ERROR)

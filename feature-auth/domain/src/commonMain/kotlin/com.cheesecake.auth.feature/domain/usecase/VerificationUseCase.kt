@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 class VerificationUseCase(
     private val userRepository: IUserRepository
 ) {
-    suspend operator fun invoke(token: String): Flow<ApiResult<String, VerificationError>> {
-        return userRepository.verifyUserToken(token)
+    suspend operator fun invoke(email: String, code: String): Flow<ApiResult<String, VerificationError>> {
+        return userRepository.verifyEmailByCode(email, code)
     }
 }

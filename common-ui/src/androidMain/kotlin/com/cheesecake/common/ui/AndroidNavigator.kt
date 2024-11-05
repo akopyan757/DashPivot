@@ -29,6 +29,10 @@ class AndroidNavigator(
         navController.popBackStack()
     }
 
+    override fun goBack(to: RegularScreen) {
+        navController.popBackStack(to.fullRoute, false)
+    }
+
     override fun showErrorMessage(message: String) {
         Toast.makeText(navController.context, message, Toast.LENGTH_SHORT).show()
     }

@@ -20,6 +20,12 @@ class SignUpViewModel(
     private val _signUpState = MutableStateFlow<SignUpState>(SignUpState.Idle)
     val signUpState: StateFlow<SignUpState> get() = _signUpState
 
+    fun onResetSuccess() {
+        if (_signUpState.value is SignUpState.Success) {
+            _signUpState.value = SignUpState.Idle
+        }
+    }
+
     fun onResetEmailError() {
         if (_signUpState.value as? SignUpState.Error != null) {
             val errorState = _signUpState.value as SignUpState.Error

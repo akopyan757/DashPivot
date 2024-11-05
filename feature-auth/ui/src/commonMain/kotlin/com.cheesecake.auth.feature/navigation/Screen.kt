@@ -25,9 +25,10 @@ sealed class AuthScreen(override val route: String): Screen {
     /**
      * Data class representing the verification screen.
      *
-     * @property token The verification token.
+     * @property email The email to verify.
+     * @property code The verification code.
      */
-    data class Verification(val token: String? = null) : AuthScreen("verification"), DialogScreen
+    data class Verification(val email: String = "") : AuthScreen("verification"), RegularScreen
 
     companion object {
         private fun values() = listOf<RegularScreen>(Login, Registration)

@@ -54,13 +54,6 @@ class IOSNavigatorHost(
         val nativeKoinComponent = NativeKoinComponent()
         val dialogScreen: DialogScreen? by navigator.currentDialog.collectAsState()
         val regularScreen: RegularScreen by regularScreen.collectAsState()
-        val verificationToken by eventStateHolder.appEntryState.collectAsState()
-
-        LaunchedEffect(verificationToken) {
-            verificationToken?.let {
-                navigator.showDialog(AuthScreen.Verification(it.token))
-            }
-        }
 
         getComposable(regularScreen, navigator, nativeKoinComponent)
         dialogScreen?.let {
