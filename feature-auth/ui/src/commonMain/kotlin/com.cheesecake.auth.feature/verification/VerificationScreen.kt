@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.CircularProgressIndicator
@@ -41,6 +39,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cheesecake.auth.feature.di.AppKoinComponent
 import com.cheesecake.common.auth.config.Config.VERIFICATION_CODE_COUNT
+import com.cheesecake.common.ui.colors.BlueColor
+import com.cheesecake.common.ui.colors.GreenColor
+import com.cheesecake.common.ui.colors.BlueLightColor
 
 @Composable
 fun VerificationScreen(
@@ -67,39 +68,60 @@ fun VerificationScreen(
 
     VerificationCodeScreen(
         modifier = Modifier.fillMaxSize(),
+        email = email,
         state = verificationState,
         onCodeCompleted = { viewModel.verifyToken(email, it) }
     )
 }
 
 @Composable
-private fun VerificationCodeScreen(
+fun VerificationCodeScreen(
     modifier: Modifier = Modifier,
+    email: String = "",
     state: VerificationState = VerificationState.Idle,
     onCodeCompleted: (String) -> Unit = {},
+    startedCode: String = "",
+    isDebugMode: Boolean = false,
 ) {
-    var code by remember { mutableStateOf("") }
+    var code by remember(isDebugMode) { mutableStateOf(if (isDebugMode) startedCode else "") }
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
-    var isFocused by remember { mutableStateOf(false) }
-
+    var isFocused by remember(isDebugMode) { mutableStateOf(isDebugMode && startedCode.isNotEmpty()) }
 
     Column(
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Enter Verification Code", fontSize = 20.sp, color = Color.Black)
+        Text(
+            text = "Enter Verification Code",
+            style = MaterialTheme.typography.headlineMedium,
+            color = Color.Black,
+            textAlign = TextAlign.Center,
+        )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "A $VERIFICATION_CODE_COUNT-digit verification code has been sent to $email. "+
+                   "Please check your email and enter the code in the input field.",
+            modifier = Modifier.padding(horizontal = 24.dp),
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color.Gray,
+            textAlign = TextAlign.Center,
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             repeat(VERIFICATION_CODE_COUNT) { index ->
                 val borderColor = when {
-                    index == code.length && isFocused -> Color.Yellow.copy(alpha = 0.5f)
-                    index < code.length  && isFocused -> Color.Blue.copy(alpha = 0.5f)
+                    state is VerificationState.Error -> MaterialTheme.colorScheme.error
+                    state is VerificationState.Success -> GreenColor
+                    index == code.length && isFocused -> BlueLightColor
+                    index < code.length  && isFocused -> BlueColor
                     else -> Color.LightGray
                 }
                 val shape = RoundedCornerShape(8.dp)
@@ -133,7 +155,11 @@ private fun VerificationCodeScreen(
             },
             modifier = Modifier
                 .focusRequester(focusRequester)
-                .onFocusChanged { isFocused = it.isFocused }
+                .let {
+                    if (!isDebugMode) {
+                        it.onFocusChanged { isFocused = it.isFocused }
+                    } else it
+                }
                 .background(Color.Transparent)
                 .width(1.dp)
                 .height(1.dp),
@@ -147,7 +173,9 @@ private fun VerificationCodeScreen(
         }
 
         if (state is VerificationState.Success) {
-            VerificationSuccess(message = "Verification successful!\nWelcome")
+            VerificationSuccess(
+                message = "Verification successful!\nWelcome"
+            )
         }
 
         if (state is VerificationState.Error) {
@@ -158,36 +186,27 @@ private fun VerificationCodeScreen(
 
 @Composable
 fun VerificationLoading(message: String) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .background(Color.White, shape = RoundedCornerShape(16.dp))
-            .wrapContentWidth()
-            .widthIn(min=250.dp)
-            .padding(24.dp)
-    ) {
-        Text(
-            text = message,
-            textAlign = TextAlign.Center,
-            color = Color.Black,
-            style = MaterialTheme.typography.bodyMedium,
-        )
+    Text(
+        text = message,
+        textAlign = TextAlign.Center,
+        color = Color.Black,
+        style = MaterialTheme.typography.bodyMedium,
+    )
 
-        Spacer(modifier = Modifier.height(16.dp))
+    Spacer(modifier = Modifier.height(8.dp))
 
-        CircularProgressIndicator(
-            color = Color.Gray,
-            strokeWidth = 2.dp,
-            modifier = Modifier.size(24.dp)
-        )
-    }
+    CircularProgressIndicator(
+        color = Color.Gray,
+        strokeWidth = 2.dp,
+        modifier = Modifier.size(24.dp)
+    )
 }
 
 @Composable
 fun VerificationSuccess(message: String, ) {
     Text(
         text = message,
-        color = Color.Gray,
+        color = GreenColor,
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.bodyMedium,
     )
