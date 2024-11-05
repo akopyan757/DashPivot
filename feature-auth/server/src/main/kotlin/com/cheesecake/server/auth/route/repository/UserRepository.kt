@@ -69,7 +69,8 @@ class UserRepository(
             return ApiResult.Error(VerificationError.EMPTY_CODE_ERROR)
         }
 
-        val user = UserSource.findUserByVerificationCode(code)
+        val hashedCode = PasswordHasher.hashPassword(code)
+        val user = UserSource.findUserByVerificationCode(hashedCode)
             ?: return ApiResult.Error(VerificationError.EXPIRED_CODE)
 
         UserSource.verifyEmail(user.id)
