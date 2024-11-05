@@ -8,6 +8,7 @@ import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterError
 import com.cheesecake.common.auth.model.registration.RegisterRequest
 import com.cheesecake.common.auth.model.verefication.VerificationError
+import com.cheesecake.common.auth.model.verefication.VerificationRequest
 import com.cheesecake.common.auth.service.UserService
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
@@ -40,10 +41,13 @@ fun Route.authRoute(di: DI) {
         }
     }
     post(EndPoint.CONFIRM_EMAIL_BY_CODE.path) {
-        val code = call.parameters["code"]
+        val verificationRequest = call.receive<VerificationRequest>()
         val userRepository: UserService by di.instance()
 
-        when (val result = userRepository.verifyEmailByCode(code = code)) {
+        when (val result = userRepository.verifyEmailByCode(
+            email = verificationRequest.email,
+            code = verificationRequest.code)
+        ) {
             is ApiResult.Success -> call.respond(HttpStatusCode.OK, result.data)
             is ApiResult.Error -> handleError(result)
         }
@@ -68,6 +72,8 @@ private suspend fun <E : ApiError> PipelineContext<Unit, ApplicationCall>.handle
         RegisterError.UNKNOWN -> call.respond(HttpStatusCode.InternalServerError, error.message)
         VerificationError.EMPTY_TOKEN_ERROR -> call.respond(HttpStatusCode.BadRequest, error.message)
         VerificationError.EXPIRED_TOKEN -> call.respond(HttpStatusCode.Unauthorized, error.message)
+        VerificationError.EMPTY_CODE_ERROR -> call.respond(HttpStatusCode.BadRequest, error.message)
+        VerificationError.EXPIRED_CODE -> call.respond(HttpStatusCode.Unauthorized, error.message)
         VerificationError.UNKNOWN -> call.respond(HttpStatusCode.InternalServerError, error.message)
         LoginError.USER_NOT_FOUND -> call.respond(HttpStatusCode.NotFound, error.message)
         LoginError.INVALID_PASSWORD -> call.respond(HttpStatusCode.BadRequest, error.message)

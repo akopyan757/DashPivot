@@ -11,8 +11,6 @@ object VerificationUtils {
     fun generateVerificationCode(digitsCount: Int): String {
         val max = 10.0.pow(digitsCount.toDouble()).toInt() - 1
         val min = 10.0.pow((digitsCount - 1).toDouble()).toInt()
-        return (min..max).random().toString().also {
-            println("min: $min, max: $max, code: $it")
-        }
+        return (min..max).random().toString()
     }
 }

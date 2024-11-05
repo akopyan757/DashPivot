@@ -64,14 +64,22 @@ class UserRepository(
         return ApiResult.Success("Email confirmed successfully!")
     }
 
-    override suspend fun verifyEmailByCode(code: String?): ApiResult<String, VerificationError> {
+    override suspend fun verifyEmailByCode(email: String, code: String?): ApiResult<String, VerificationError> {
         if (code.isNullOrBlank()) {
             return ApiResult.Error(VerificationError.EMPTY_CODE_ERROR)
         }
 
-        val hashedCode = PasswordHasher.hashPassword(code)
-        val user = UserSource.findUserByVerificationCode(hashedCode)
-            ?: return ApiResult.Error(VerificationError.EXPIRED_CODE)
+        val user = UserSource.findUserForVerification(email)
+            ?: return ApiResult.Error(VerificationError.USER_NOT_FOUND)
+
+        val userCode = user.verificationHashedCode
+        if (userCode.isNullOrBlank()) {
+            return ApiResult.Error(VerificationError.VERIFICATION_CODE_NOT_FOUND)
+        }
+
+        if (!PasswordHasher.verifyPassword(code, userCode)) {
+            return ApiResult.Error(VerificationError.EXPIRED_CODE)
+        }
 
         UserSource.verifyEmail(user.id)
 

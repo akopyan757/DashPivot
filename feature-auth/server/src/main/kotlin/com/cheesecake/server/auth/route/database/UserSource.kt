@@ -1,6 +1,7 @@
 package com.cheesecake.server.auth.route.database
 
 import com.cheesecake.common.auth.model.User
+import com.cheesecake.common.auth.model.UserVerify
 import com.cheesecake.server.auth.route.database.Users.verificationToken
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insert
@@ -20,12 +21,6 @@ object UserSource {
     fun findUserByToken(token: String): User? {
         return transaction {
             Users.selectAll().where { verificationToken eq token }.singleOrNull()?.mapToUser()
-        }
-    }
-
-    fun findUserByVerificationCode(code: String): User? {
-        return transaction {
-            Users.selectAll().where { verificationToken eq code }.singleOrNull()?.mapToUser()
         }
     }
 
@@ -62,6 +57,20 @@ object UserSource {
             Users.selectAll().where { Users.email eq email }
                 .singleOrNull()
                 ?.mapToUser()
+        }
+    }
+
+    fun findUserForVerification(email: String): UserVerify? {
+        return transaction {
+            Users.selectAll().where { Users.email eq email }
+                .singleOrNull()
+                ?.let {
+                    UserVerify(
+                        id = it[Users.id],
+                        email = it[Users.email],
+                        verificationHashedCode = it[verificationToken]
+                    )
+                }
         }
     }
 

@@ -3,6 +3,8 @@ package com.cheesecake.common.auth.model.verefication
 import com.cheesecake.common.api.ApiError
 
 enum class VerificationError(override val message: String): ApiError {
+    USER_NOT_FOUND("User not found"),
+    VERIFICATION_CODE_NOT_FOUND("Verification code not found"),
     EMPTY_TOKEN_ERROR("Token cannot be empty."),
     EXPIRED_TOKEN("Invalid or expired token"),
     EMPTY_CODE_ERROR("Code cannot be empty."),

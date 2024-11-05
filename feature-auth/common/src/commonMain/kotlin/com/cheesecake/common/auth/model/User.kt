@@ -6,3 +6,9 @@ data class User(
     val passwordHash: String,
     val isVerified: Boolean,
 )
+
+data class UserVerify(
+    val id: Int,
+    val email: String,
+    val verificationHashedCode: String?,
+)
