@@ -20,7 +20,7 @@ class UserRepository(
     private val emailService: IEmailService
 ): UserService {
     override suspend fun registerUser(registerRequest: RegisterRequest): ApiResult<String, RegisterError> {
-        if (UserSource.isEmailTaken(registerRequest.email)) {
+        if (UserSource.isEmailTakenAndVerified(registerRequest.email)) {
             return ApiResult.Error(RegisterError.EMAIL_TAKEN)
         }
 

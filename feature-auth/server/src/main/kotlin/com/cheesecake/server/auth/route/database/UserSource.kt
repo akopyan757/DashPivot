@@ -4,6 +4,7 @@ import com.cheesecake.common.auth.model.User
 import com.cheesecake.common.auth.model.UserVerify
 import com.cheesecake.server.auth.route.database.Users.verificationToken
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.javatime.CurrentDateTime
 import org.jetbrains.exposed.sql.selectAll
@@ -12,15 +13,9 @@ import org.jetbrains.exposed.sql.update
 
 object UserSource {
 
-    fun isEmailTaken(email: String): Boolean {
+    fun isEmailTakenAndVerified(email: String): Boolean {
         return transaction {
-            Users.selectAll().where { Users.email eq email }.count() > 0
-        }
-    }
-
-    fun findUserByToken(token: String): User? {
-        return transaction {
-            Users.selectAll().where { verificationToken eq token }.singleOrNull()?.mapToUser()
+            Users.selectAll().where { (Users.email eq email) and Users.isVerified }.count() > 0
         }
     }
 
@@ -39,15 +34,28 @@ object UserSource {
         verificationToken: String
     ): User {
         return transaction {
-            Users.insert {
-                it[Users.email] = email
-                it[Users.passwordHash] = passwordHash
-                it[Users.isVerified] = isVerified
-                it[Users.verificationToken] = verificationToken
-                it[createdAt] = CurrentDateTime
+            val existingUser = Users.selectAll().where { Users.email eq email }.singleOrNull()
+
+            if (existingUser != null) {
+                if (!existingUser[Users.isVerified]) {
+                    Users.update({ Users.email eq email }) {
+                        it[Users.passwordHash] = passwordHash
+                        it[Users.verificationToken] = verificationToken
+                        it[createdAt] = CurrentDateTime
+                    }
+                }
+            } else {
+                Users.insert {
+                    it[Users.email] = email
+                    it[Users.passwordHash] = passwordHash
+                    it[Users.isVerified] = isVerified
+                    it[Users.verificationToken] = verificationToken
+                    it[createdAt] = CurrentDateTime
+                }
             }
+
             Users.selectAll().where { Users.email eq email }
-                .first()
+                .single()
                 .mapToUser()
         }
     }
