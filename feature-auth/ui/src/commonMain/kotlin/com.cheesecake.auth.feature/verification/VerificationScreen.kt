@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -138,7 +139,7 @@ fun VerificationCodeScreen(
             Text(
                 text = "A $VERIFICATION_CODE_COUNT-digit verification code has been sent to $email. " +
                         "Please check your email and enter the code in the input field.",
-                modifier = Modifier.padding(horizontal = 24.dp),
+                modifier = Modifier.padding(horizontal = 24.dp).widthIn(max = 350.dp),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray,
                 textAlign = TextAlign.Center,
