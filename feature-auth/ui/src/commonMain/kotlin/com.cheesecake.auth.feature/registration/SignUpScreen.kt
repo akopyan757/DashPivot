@@ -49,16 +49,19 @@ fun SignUpScreen(
     viewModel: SignUpViewModel,
     signUpNavigate: SignUpNavigate
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
+    val signUpState by viewModel.signUpUiState.collectAsState()
+    val logicState = signUpState.logicState
+    val formData = signUpState.formData
+
+    var email by remember { mutableStateOf(formData.email) }
+    var password by remember { mutableStateOf(formData.password) }
+    var confirmPassword by remember { mutableStateOf(formData.confirmPassword) }
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isConfirmPasswordVisible by remember { mutableStateOf(false) }
-    val signUpState by viewModel.signUpState.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    LaunchedEffect(signUpState) {
-        if (signUpState is SignUpState.Success) {
+    LaunchedEffect(logicState) {
+        if (logicState is SignUpLogicState.Success) {
             viewModel.onResetSuccess()
             signUpNavigate.toVerification(email)
         }
@@ -90,7 +93,7 @@ fun SignUpScreen(
                     viewModel.onResetEmailError()
                 },
                 label = "Email",
-                errorMessage = (signUpState as? SignUpState.Error)?.emailErrorMessage
+                errorMessage = (logicState as? SignUpLogicState.Error)?.emailErrorMessage
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -104,7 +107,7 @@ fun SignUpScreen(
                 label = "Create password",
                 isPasswordVisible = isPasswordVisible,
                 onVisibilityChange = { isPasswordVisible = !isPasswordVisible },
-                errorMessage = (signUpState as? SignUpState.Error)?.passwordMessage
+                errorMessage = (logicState as? SignUpLogicState.Error)?.passwordMessage
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -118,7 +121,7 @@ fun SignUpScreen(
                 label = "Confirm password",
                 isPasswordVisible = isConfirmPasswordVisible,
                 onVisibilityChange = { isConfirmPasswordVisible = !isConfirmPasswordVisible },
-                errorMessage = (signUpState as? SignUpState.Error)?.confirmPasswordMessage
+                errorMessage = (logicState as? SignUpLogicState.Error)?.confirmPasswordMessage
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -129,9 +132,9 @@ fun SignUpScreen(
                     keyboardController?.hide()
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = signUpState !is SignUpState.Loading
+                enabled = logicState !is SignUpLogicState.Loading
             ) {
-                if (signUpState is SignUpState.Loading) {
+                if (logicState is SignUpLogicState.Loading) {
                     CircularProgressIndicator(modifier = Modifier.size(24.dp))
                 } else {
                     Text(text = "Sign Up")
@@ -140,15 +143,15 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (signUpState is SignUpState.Error && (signUpState as SignUpState.Error).error != null) {
+            if (logicState is SignUpLogicState.Error && logicState.error != null) {
                 Text(
-                    text = (signUpState as SignUpState.Error).error?.message.orEmpty(),
+                    text = logicState.error.message,
                     color = MaterialTheme.colorScheme.error,
                     textAlign = TextAlign.Center,
                 )
-            } else if (signUpState is SignUpState.Success) {
+            } else if (logicState is SignUpLogicState.Success) {
                 Text(
-                    text = (signUpState as SignUpState.Success).message,
+                    text = logicState.message,
                     textAlign = TextAlign.Center,
                 )
             }

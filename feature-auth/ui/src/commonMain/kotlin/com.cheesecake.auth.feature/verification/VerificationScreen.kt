@@ -104,6 +104,8 @@ fun VerificationCodeScreen(
 
     val keyboardController = LocalSoftwareKeyboardController.current
     LaunchedEffect(email) {
+        println("VerificationCodeScreen: show: LaunchedEffect")
+        focusRequester.requestFocus()
         keyboardController?.show()
     }
 
@@ -179,7 +181,6 @@ fun VerificationCodeScreen(
             BasicTextField(
                 value = code,
                 onValueChange = { newCode ->
-
                     if (newCode.length <= VERIFICATION_CODE_COUNT) {
                         code = newCode
                     }
@@ -189,6 +190,7 @@ fun VerificationCodeScreen(
                         }
                     } else if (newCode.length == VERIFICATION_CODE_COUNT) {
                         onCodeCompleted(code)
+                        println("VerificationCodeScreen: hide: onValueChange: newCode.length == VERIFICATION_CODE_COUNT")
                         keyboardController?.hide()
                     }
                 },
@@ -196,14 +198,20 @@ fun VerificationCodeScreen(
                     .focusRequester(focusRequester)
                     .let {
                         if (!isDebugMode) {
-                            it.onFocusChanged { isFocused = it.isFocused }
+                            it.onFocusChanged { focusState ->
+                                isFocused = focusState.isFocused
+                                println("VerificationCodeScreen: isFocused = $isFocused")
+                            }
                         } else it
                     }
                     .background(Color.Transparent)
                     .width(1.dp)
                     .height(1.dp),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+                keyboardActions = KeyboardActions(onDone = {
+                    println("VerificationCodeScreen: hide: keyboardActions = KeyboardActions(onDone)")
+                    keyboardController?.hide()
+                }),
                 textStyle = TextStyle(fontSize = 0.sp, color = Color.Transparent)
             )
 

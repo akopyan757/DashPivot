@@ -17,38 +17,49 @@ class SignUpViewModel(
     private val registerUseCase: RegisterUseCase
 ): ViewModel() {
 
-    private val _signUpState = MutableStateFlow<SignUpState>(SignUpState.Idle)
-    val signUpState: StateFlow<SignUpState> get() = _signUpState
+    private val _signUpState = MutableStateFlow(SignUpState())
+    val signUpUiState: StateFlow<SignUpState> get() = _signUpState
 
     fun onResetSuccess() {
-        if (_signUpState.value is SignUpState.Success) {
-            _signUpState.value = SignUpState.Idle
+        if (_signUpState.value.logicState is SignUpLogicState.Success) {
+            _signUpState.value = _signUpState.value.copy(logicState = SignUpLogicState.Idle)
         }
     }
 
     fun onResetEmailError() {
-        if (_signUpState.value as? SignUpState.Error != null) {
-            val errorState = _signUpState.value as SignUpState.Error
-            _signUpState.value = errorState.copy(emailErrorMessage = null)
+        if (_signUpState.value.logicState is SignUpLogicState.Error) {
+            val errorState = _signUpState.value.logicState as SignUpLogicState.Error
+            _signUpState.value = _signUpState.value.copy(
+                logicState = errorState.copy(emailErrorMessage = null)
+            )
         }
     }
 
     fun onResetPasswordError() {
-        if (_signUpState.value as? SignUpState.Error != null) {
-            val errorState = _signUpState.value as SignUpState.Error
-            _signUpState.value = errorState.copy(passwordMessage = null)
+        if (_signUpState.value.logicState is SignUpLogicState.Error) {
+            val errorState = _signUpState.value.logicState as SignUpLogicState.Error
+            _signUpState.value = _signUpState.value.copy(
+                logicState = errorState.copy(passwordMessage = null)
+            )
         }
     }
 
     fun onResetConfirmationPasswordError() {
-        if (_signUpState.value as? SignUpState.Error != null) {
-            val errorState = _signUpState.value as SignUpState.Error
-            _signUpState.value = errorState.copy(confirmPasswordMessage = null)
+        if (_signUpState.value.logicState as? SignUpLogicState.Error != null) {
+            val errorState = _signUpState.value.logicState as SignUpLogicState.Error
+            _signUpState.value = _signUpState.value.copy(
+                logicState = errorState.copy(confirmPasswordMessage = null)
+            )
         }
     }
 
     fun signUp(email: String, password: String, confirmPassword: String) {
-        var errorState: SignUpState.Error = SignUpState.Error()
+        _signUpState.value = _signUpState.value.copy(
+            formData = SignUpFormData(email, password, confirmPassword)
+        )
+        println("SignUpViewModel: signUp: ${_signUpState.value.formData}")
+
+        var errorState: SignUpLogicState.Error = SignUpLogicState.Error()
 
         if (email.isBlank()) {
             errorState = errorState.copy(
@@ -84,34 +95,50 @@ class SignUpViewModel(
             errorState.confirmPasswordMessage != null
 
         if (hasError) {
-            _signUpState.value = errorState
+            _signUpState.value = _signUpState.value.copy(logicState = errorState)
         } else {
-            _signUpState.value = SignUpState.Loading
+            _signUpState.value = _signUpState.value.copy(logicState = SignUpLogicState.Loading)
             viewModelScope.launch {
                 registerUseCase(email, password).collect { result ->
                     when (result) {
                         is ApiResult.Success -> {
-                            _signUpState.value = SignUpState.Success(result.data)
+                            _signUpState.value = _signUpState.value.copy(logicState =
+                                SignUpLogicState.Success(result.data)
+                            )
                         }
 
                         is ApiResult.Error -> {
-                            _signUpState.value = SignUpState.Error(result.error)
+                            _signUpState.value = _signUpState.value.copy(logicState =
+                                SignUpLogicState.Error(result.error)
+                            )
                         }
                     }
                 }
             }
         }
     }
+
 }
 
-sealed class SignUpState {
-    data object Idle : SignUpState()
-    data object Loading : SignUpState()
-    data class Success(val message: String) : SignUpState()
+data class SignUpState(
+    val formData: SignUpFormData = SignUpFormData(),
+    val logicState: SignUpLogicState = SignUpLogicState.Idle
+)
+
+data class SignUpFormData(
+    val email: String = "",
+    val password: String = "",
+    val confirmPassword: String = ""
+)
+
+sealed class SignUpLogicState {
+    data object Idle : SignUpLogicState()
+    data object Loading : SignUpLogicState()
+    data class Success(val message: String) : SignUpLogicState()
     data class Error(
         val error: RegisterError? = null,
         val emailErrorMessage: String? = null,
         val passwordMessage: String? = null,
         val confirmPasswordMessage: String? = null,
-    ) : SignUpState()
+    ) : SignUpLogicState()
 }

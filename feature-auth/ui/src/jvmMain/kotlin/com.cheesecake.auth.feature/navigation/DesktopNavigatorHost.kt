@@ -21,12 +21,14 @@ class DesktopNavigatorHost : NavigatorHost {
 
     @Composable
     override fun Screen() {
-        val regularScreen: RegularScreen by desktopNavigator.currentScreen.collectAsState()
+        val regularScreen: RegularScreen? by desktopNavigator.currentScreen.collectAsState(null)
         val dialogScreen: DialogScreen? by desktopNavigator.currentDialog.collectAsState()
         val jvmKoinComponent = JvmKoinComponent()
 
         Box(Modifier.fillMaxSize()) {
-            getComposable(regularScreen, navigator, jvmKoinComponent)
+            regularScreen?.let {
+                getComposable(it, navigator, jvmKoinComponent)
+            }
             dialogScreen?.let {
                 getComposable(it, navigator, jvmKoinComponent)
             }

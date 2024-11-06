@@ -33,7 +33,6 @@ class UserRepository(
         }
 
         val hashedPassword = PasswordHasher.hashPassword(registerRequest.password)
-
         val verificationCode = VerificationUtils.generateVerificationCode(Config.VERIFICATION_CODE_COUNT)
         val hashedVerificationCode = PasswordHasher.hashPassword(verificationCode)
 

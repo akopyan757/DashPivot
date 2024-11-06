@@ -2,7 +2,7 @@ package com.cheesecake.auth.feature.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.cheesecake.auth.data.repository.UserRepository
-import com.cheesecake.auth.feature.registration.SignUpState
+import com.cheesecake.auth.feature.registration.SignUpLogicState
 import com.cheesecake.auth.feature.registration.SignUpViewModel
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.model.registration.RegisterError
@@ -46,15 +46,15 @@ class LoginViewModelTest {
 
         viewModel.signUp(email, password, confirmPassword)
 
-        assertEquals(SignUpState.Loading, viewModel.signUpState.value)
+        assertEquals(SignUpLogicState.Loading, viewModel.signUpState.value)
 
         withTimeout(1000) {
-            while (viewModel.signUpState.value != SignUpState.Success(expectedData)) {
+            while (viewModel.signUpState.value != SignUpLogicState.Success(expectedData)) {
                 advanceUntilIdle()
             }
         }
 
-        assertEquals(SignUpState.Success(expectedData), viewModel.signUpState.value)
+        assertEquals(SignUpLogicState.Success(expectedData), viewModel.signUpState.value)
     }
 
     @Test
@@ -67,7 +67,7 @@ class LoginViewModelTest {
 
         val state = viewModel.signUpState.value
         assertTrue(
-            state is SignUpState.Error &&
+            state is SignUpLogicState.Error &&
             state.emailErrorMessage == RegisterError.EMPTY_EMAIL_ERROR.message
         )
     }
@@ -81,7 +81,7 @@ class LoginViewModelTest {
         viewModel.signUp(email, password, confirmPassword)
 
         val state = viewModel.signUpState.value
-        assertTrue(state is SignUpState.Error && state.passwordMessage == RegisterError.EMPTY_PASSWORD_ERROR.message)
+        assertTrue(state is SignUpLogicState.Error && state.passwordMessage == RegisterError.EMPTY_PASSWORD_ERROR.message)
     }
 
     @Test
@@ -95,6 +95,6 @@ class LoginViewModelTest {
 
         // Assert
         val state = viewModel.signUpState.value
-        assertTrue(state is SignUpState.Error && state.confirmPasswordMessage == RegisterError.PASSWORD_MATCH.message)
+        assertTrue(state is SignUpLogicState.Error && state.confirmPasswordMessage == RegisterError.PASSWORD_MATCH.message)
     }
 }
