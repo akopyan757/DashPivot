@@ -10,7 +10,7 @@ import com.cheesecake.auth.feature.registration.SignUpScreen
 @Composable
 fun PreviewSignUpScreen() {
     SignUpScreen(
-        AndroidKoinComponent().getSignUpViewModel(),
+        AndroidKoinComponent.getSignUpViewModel(),
         object : SignUpNavigate {}
     )
 }

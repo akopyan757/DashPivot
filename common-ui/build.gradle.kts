@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.serialization)
 }
 
 kotlin {
@@ -30,13 +31,15 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
             implementation(libs.androidx.navigation.compose)
-            implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
-            implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0")
+            implementation(libs.androidx.lifecycle.viewmodel.ktx)
+            implementation(libs.androidx.lifecycle.runtime.ktx)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material)
+            implementation(libs.kotlinx.serialization.core)
+            implementation(libs.jetbrains.kotlinx.serialization.json)
         }
     }
 }

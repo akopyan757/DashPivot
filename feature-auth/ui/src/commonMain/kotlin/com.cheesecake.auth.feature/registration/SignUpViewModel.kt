@@ -3,18 +3,22 @@ package com.cheesecake.auth.feature.registration
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cheesecake.auth.feature.domain.usecase.RegisterUseCase
+import com.cheesecake.auth.feature.state.RESEND_KEY
+import com.cheesecake.auth.feature.state.VerificationResendTimer
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.model.registration.RegisterError
 import com.cheesecake.common.auth.utils.formatPasswordErrors
 import com.cheesecake.common.auth.utils.isValidEmail
 import com.cheesecake.common.auth.utils.isValidPassword
 import com.cheesecake.common.auth.utils.validatePassword
+import com.cheesecake.common.ui.navigator.state.IStateManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class SignUpViewModel(
-    private val registerUseCase: RegisterUseCase
+    private val registerUseCase: RegisterUseCase,
+    private val stateManager: IStateManager,
 ): ViewModel() {
 
     private val _signUpState = MutableStateFlow(SignUpState())
@@ -91,8 +95,8 @@ class SignUpViewModel(
         }
 
         val hasError = errorState.emailErrorMessage != null ||
-            errorState.passwordMessage != null ||
-            errorState.confirmPasswordMessage != null
+                errorState.passwordMessage != null ||
+                errorState.confirmPasswordMessage != null
 
         if (hasError) {
             _signUpState.value = _signUpState.value.copy(logicState = errorState)
@@ -102,20 +106,26 @@ class SignUpViewModel(
                 registerUseCase(email, password).collect { result ->
                     when (result) {
                         is ApiResult.Success -> {
-                            _signUpState.value = _signUpState.value.copy(logicState =
-                                SignUpLogicState.Success(result.data)
+                            updateResendTimer(email)
+                            _signUpState.value = _signUpState.value.copy(
+                                logicState = SignUpLogicState.Success(result.data)
                             )
                         }
 
                         is ApiResult.Error -> {
-                            _signUpState.value = _signUpState.value.copy(logicState =
-                                SignUpLogicState.Error(result.error)
+                            _signUpState.value = _signUpState.value.copy(
+                                logicState = SignUpLogicState.Error(result.error)
                             )
                         }
                     }
                 }
             }
         }
+    }
+
+    private fun updateResendTimer(email: String) {
+        val state = VerificationResendTimer.init(email)
+        stateManager.setSerializableState(RESEND_KEY, state, VerificationResendTimer::class)
     }
 
 }

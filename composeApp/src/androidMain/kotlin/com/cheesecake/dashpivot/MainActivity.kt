@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
+import com.cheesecake.auth.feature.di.AndroidKoinComponent
 import com.cheesecake.auth.feature.di.screenModule
 import com.cheesecake.auth.feature.events.VerifyEmailEvent
 import com.cheesecake.common.ui.events.EventStateHolder
@@ -21,18 +22,18 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.context.loadKoinModules
 import org.koin.core.qualifier.named
-import org.koin.core.scope.Scope
 
 class MainActivity : ComponentActivity(), KoinComponent {
 
     private val eventStateHolder: EventStateHolder<VerifyEmailEvent> by inject()
-    private lateinit var activityScope: Scope
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val namedSource = named("MainContent")
-        activityScope = getKoin().createScope("MainActivityScope", namedSource)
+        AndroidKoinComponent.setAuthScope(
+            getKoin().createScope("MainActivityScope", namedSource)
+        )
 
         handleVerificationUri()?.also { token ->
             println("AndroidNavigatorHost: handleVerificationUri = $token")
@@ -48,7 +49,7 @@ class MainActivity : ComponentActivity(), KoinComponent {
 
     override fun onDestroy() {
         super.onDestroy()
-        activityScope.close()
+        AndroidKoinComponent.releaseScope()
     }
 
     private fun handleVerificationUri(): String? {

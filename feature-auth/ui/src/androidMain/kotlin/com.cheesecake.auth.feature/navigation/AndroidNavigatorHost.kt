@@ -21,7 +21,7 @@ class AndroidNavigatorHost(
 
     @Composable
     override fun Screen() {
-        val koinComponent = AndroidKoinComponent()
+        val koinComponent = AndroidKoinComponent
         Box {
             NavHost(navController = navController, startDestination = AuthScreen.Login.fullRoute) {
                 composable(AuthScreen.Login.fullRoute) {

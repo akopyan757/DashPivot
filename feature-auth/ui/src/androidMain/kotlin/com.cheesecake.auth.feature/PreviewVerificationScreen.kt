@@ -6,6 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.cheesecake.auth.feature.verification.VerificationCodeScreen
+import com.cheesecake.auth.feature.verification.VerificationFormData
+import com.cheesecake.auth.feature.verification.VerificationLogicState
 import com.cheesecake.auth.feature.verification.VerificationState
 
 private const val DEFAULT_EMAIL = "test@example.com"
@@ -18,7 +20,7 @@ fun PreviewVerificationScreen_Idle() {
         VerificationCodeScreen(
             modifier = Modifier.fillMaxSize(),
             email = DEFAULT_EMAIL,
-            state = VerificationState.Idle,
+            state = VerificationState(),
             onCodeCompleted = {},
             isDebugMode = DEBUG_MODE,
         )
@@ -32,9 +34,23 @@ fun PreviewVerificationScreen_StartedCode() {
         VerificationCodeScreen(
             modifier = Modifier.fillMaxSize(),
             email = DEFAULT_EMAIL,
-            state = VerificationState.Idle,
+            state = VerificationState(),
             onCodeCompleted = {},
             startedCode = "123",
+            isDebugMode = DEBUG_MODE,
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewVerificationScreen_NotAvailableResendCode() {
+    MaterialTheme {
+        VerificationCodeScreen(
+            modifier = Modifier.fillMaxSize(),
+            email = DEFAULT_EMAIL,
+            state = VerificationState(formData = VerificationFormData(60)),
+            onCodeCompleted = {},
             isDebugMode = DEBUG_MODE,
         )
     }
@@ -47,7 +63,7 @@ fun PreviewVerificationScreen_Success() {
         VerificationCodeScreen(
             modifier = Modifier.fillMaxSize(),
             email = DEFAULT_EMAIL,
-            state = VerificationState.Success,
+            state = VerificationState(logicState = VerificationLogicState.Success),
             onCodeCompleted = {},
             isDebugMode = DEBUG_MODE,
         )
@@ -61,7 +77,9 @@ fun PreviewVerificationScreen_Error() {
         VerificationCodeScreen(
             modifier = Modifier.fillMaxSize(),
             email = DEFAULT_EMAIL,
-            state = VerificationState.Error("Error message"),
+            state = VerificationState(logicState =
+                VerificationLogicState.Error("Error message")
+            ),
             onCodeCompleted = {},
             isDebugMode = DEBUG_MODE,
         )
@@ -75,7 +93,7 @@ fun PreviewVerificationScreen_Loading() {
         VerificationCodeScreen(
             modifier = Modifier.fillMaxSize(),
             email = DEFAULT_EMAIL,
-            state = VerificationState.Loading,
+            state =  VerificationState(logicState = VerificationLogicState.Loading),
             onCodeCompleted = {},
             isDebugMode = DEBUG_MODE,
         )

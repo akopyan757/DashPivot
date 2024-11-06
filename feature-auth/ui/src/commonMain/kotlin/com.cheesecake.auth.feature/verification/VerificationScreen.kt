@@ -20,6 +20,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +52,7 @@ import com.cheesecake.common.auth.config.Config.VERIFICATION_CODE_COUNT
 import com.cheesecake.common.ui.colors.BlueColor
 import com.cheesecake.common.ui.colors.BlueLightColor
 import com.cheesecake.common.ui.colors.GreenColor
+import kotlinx.coroutines.delay
 
 @Composable
 fun VerificationScreen(
@@ -71,9 +74,14 @@ fun VerificationScreen(
     onBackPressed: () -> Unit = {}
 ) {
     val verificationState by viewModel.verificationState.collectAsState()
+    val logicState = verificationState.logicState
 
-    LaunchedEffect(verificationState) {
-        if (verificationState is VerificationState.Success) {
+    LaunchedEffect(email) {
+        viewModel.resetToIdleWithTimer(email)
+    }
+
+    LaunchedEffect(logicState) {
+        if (logicState is VerificationLogicState.Success) {
             onSuccessFinished()
         }
     }
@@ -92,7 +100,7 @@ fun VerificationScreen(
 fun VerificationCodeScreen(
     modifier: Modifier = Modifier,
     email: String = "",
-    state: VerificationState = VerificationState.Idle,
+    state: VerificationState = VerificationState(),
     onBackPressed: () -> Unit = {},
     onResetToIdle: () -> Unit = {},
     onCodeCompleted: (String) -> Unit = {},
@@ -102,10 +110,25 @@ fun VerificationCodeScreen(
     var code by remember(isDebugMode) { mutableStateOf(if (isDebugMode) startedCode else "") }
     val focusRequester = remember { FocusRequester() }
     var isFocused by remember(isDebugMode) { mutableStateOf(isDebugMode && startedCode.isNotEmpty()) }
-
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    val logicState = state.logicState
+    val isVerificationLoading = logicState is VerificationLogicState.Loading
+    val isVerificationSuccess = logicState is VerificationLogicState.Success
+
+    var currentTimer by remember(state.formData.restTime) { mutableStateOf(state.formData.restTime) }
+    val isResendAvailable by derivedStateOf { currentTimer < 0 && !isVerificationSuccess }
+
+    LaunchedEffect(state.formData.restTime) {
+        println("VerificationCodeScreen: restTimer = ${state.formData.restTime}")
+        while (!isResendAvailable) {
+            delay(1000)
+            currentTimer--
+            println("VerificationCodeScreen: timer=$currentTimer, isResendAvailable=$isResendAvailable")
+        }
+    }
+
     LaunchedEffect(email) {
-        println("VerificationCodeScreen: show: LaunchedEffect")
         focusRequester.requestFocus()
         keyboardController?.show()
     }
@@ -152,8 +175,8 @@ fun VerificationCodeScreen(
             ) {
                 repeat(VERIFICATION_CODE_COUNT) { index ->
                     val borderColor = when {
-                        state is VerificationState.Error -> MaterialTheme.colorScheme.error
-                        state is VerificationState.Success -> GreenColor
+                        logicState is VerificationLogicState.Error -> MaterialTheme.colorScheme.error
+                        logicState is VerificationLogicState.Success -> GreenColor
                         index == code.length && isFocused -> BlueLightColor
                         index < code.length && isFocused -> BlueColor
                         else -> Color.LightGray
@@ -186,7 +209,7 @@ fun VerificationCodeScreen(
                         code = newCode
                     }
                     if (newCode.length < VERIFICATION_CODE_COUNT) {
-                        if (state !is VerificationState.Idle) {
+                        if (logicState !is VerificationLogicState.Idle) {
                             onResetToIdle()
                         }
                     } else if (newCode.length == VERIFICATION_CODE_COUNT) {
@@ -216,21 +239,48 @@ fun VerificationCodeScreen(
                 textStyle = TextStyle(fontSize = 0.sp, color = Color.Transparent)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (state is VerificationState.Loading) {
+            if (isVerificationLoading) {
                 VerificationLoading(message = "Verifying, please wait...")
             }
 
-            if (state is VerificationState.Success) {
+            if (isVerificationSuccess) {
                 VerificationSuccess(
                     message = "Verification successful!\nWelcome"
                 )
             }
 
-            if (state is VerificationState.Error) {
-                VerificationError(message = state.message)
+            if (logicState is VerificationLogicState.Error) {
+                VerificationError(message = logicState.message)
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                enabled = isResendAvailable && !isVerificationLoading,
+                onClick = {
+                    focusRequester.requestFocus()
+                    keyboardController?.show()
+                },
+            ) {
+                if (isResendAvailable) {
+                    Text(
+                        text = "Resend New Code",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White,
+                    )
+                } else {
+                    val text = when {
+                        isVerificationSuccess -> "Verification successful"
+                        else -> "Resend New Code in $currentTimer seconds"
+                    }
+                    Text(
+                        text = text,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray,
+                    )
+                }
+            }
+
         }
     }
 }
