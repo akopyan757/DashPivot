@@ -1,5 +1,6 @@
 package com.cheesecake.common.ui.navigator.state
 
+import kotlinx.serialization.KSerializer
 import kotlin.reflect.KClass
 
 class DefaultStateManager : IStateManager {
@@ -19,7 +20,20 @@ class DefaultStateManager : IStateManager {
         return sharedSerializableStates[key] as? T
     }
 
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : Any> getSerializableState(key: String, kSerializer: KSerializer<T>): T? {
+        return sharedSerializableStates[key] as? T
+    }
+
     override fun <T : Any> setSerializableState(key: String, value: T, kClass: KClass<T>) {
+        sharedSerializableStates[key] = value
+    }
+
+    override fun <T : Any> setSerializableState(
+        key: String,
+        value: T,
+        kSerializer: KSerializer<T>
+    ) {
         sharedSerializableStates[key] = value
     }
 }

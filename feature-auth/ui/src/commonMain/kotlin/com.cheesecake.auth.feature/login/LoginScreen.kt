@@ -43,10 +43,11 @@ fun LoginScreen(
     viewModel: LoginViewModel,
     loginNavigate: LoginNavigate,
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var isPasswordVisible by remember { mutableStateOf(false) }
-    val loginState by viewModel.loginState.collectAsState()
+    val state by viewModel.loginState.collectAsState()
+    var email by remember { mutableStateOf(state.formData.email) }
+    var password by remember { mutableStateOf(state.formData.password) }
+    var isPasswordVisible by remember { mutableStateOf(state.formData.passwordVisible) }
+    val loginState = state.logicState
 
     Column(
         modifier = Modifier
@@ -71,10 +72,10 @@ fun LoginScreen(
                 email = email,
                 onEmailChange = {
                     email = it
-                    viewModel.onResetEmailError()
+                    viewModel.onEmailChanged(email)
                 },
                 label = "Email",
-                errorMessage = (loginState as? LoginState.Error)?.emailErrorMessage
+                errorMessage = (loginState as? LoginLogicState.Error)?.emailErrorMessage
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -83,12 +84,15 @@ fun LoginScreen(
                 password = password,
                 onPasswordChange = {
                     password = it
-                    viewModel.onResetPasswordError()
+                    viewModel.onPasswordChanged(password)
                 },
                 label = "Password",
                 isPasswordVisible = isPasswordVisible,
-                onVisibilityChange = { isPasswordVisible = !isPasswordVisible },
-                errorMessage = (loginState as? LoginState.Error)?.passwordMessage
+                onVisibilityChange = {
+                    isPasswordVisible = !isPasswordVisible
+                    viewModel.changePasswordVisibleChanged(isPasswordVisible)
+                },
+                errorMessage = (loginState as? LoginLogicState.Error)?.passwordMessage
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -96,9 +100,9 @@ fun LoginScreen(
             Button(
                 onClick = { viewModel.login(email, password) },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = loginState !is LoginState.Loading
+                enabled = loginState !is LoginLogicState.Loading
             ) {
-                if (loginState is LoginState.Loading) {
+                if (loginState is LoginLogicState.Loading) {
                     CircularProgressIndicator(modifier = Modifier.size(24.dp))
                 } else {
                     Text(text = "Sign In")
@@ -107,15 +111,15 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (loginState is LoginState.Error && (loginState as LoginState.Error).error != null) {
+            if (loginState is LoginLogicState.Error && loginState.error != null) {
                 Text(
-                    text = (loginState as LoginState.Error).error?.message.orEmpty(),
+                    text = loginState.error.message,
                     color = MaterialTheme.colorScheme.error,
                     textAlign = TextAlign.Center,
                 )
-            } else if (loginState is LoginState.Success) {
+            } else if (loginState is LoginLogicState.Success) {
                 Text(
-                    text = (loginState as LoginState.Success).message,
+                    text = loginState.message,
                     textAlign = TextAlign.Center,
                 )
             }

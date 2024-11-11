@@ -27,9 +27,22 @@ class AndroidStateManager(
         return json.decodeFromString(serializer, jsonString) as? T
     }
 
+    override fun <T : Any> getSerializableState(key: String, kSerializer: KSerializer<T>): T? {
+        val jsonString = savedStateHandle.get<String>(key) ?: return null
+        return json.decodeFromString(kSerializer, jsonString) as? T
+    }
+
     override fun <T : Any> setSerializableState(key: String, value: T, kClass: KClass<T>) {
         val serializer = classSerializers.serializers[kClass] as? KSerializer<T> ?: return
         val jsonString = json.encodeToString(serializer, value)
         savedStateHandle[key] = jsonString
+    }
+
+    override fun <T : Any> setSerializableState(
+        key: String,
+        value: T,
+        kSerializer: KSerializer<T>
+    ) {
+        savedStateHandle[key] = json.encodeToString(kSerializer, value)
     }
 }

@@ -56,8 +56,8 @@ fun SignUpScreen(
     var email by remember { mutableStateOf(formData.email) }
     var password by remember { mutableStateOf(formData.password) }
     var confirmPassword by remember { mutableStateOf(formData.confirmPassword) }
-    var isPasswordVisible by remember { mutableStateOf(false) }
-    var isConfirmPasswordVisible by remember { mutableStateOf(false) }
+    var isPasswordVisible by remember { mutableStateOf(formData.passwordVisible) }
+    var isConfirmPasswordVisible by remember { mutableStateOf(formData.confirmPasswordVisible) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(logicState) {
@@ -92,7 +92,7 @@ fun SignUpScreen(
                 email = email,
                 onEmailChange = {
                     email = it
-                    viewModel.onResetEmailError()
+                    viewModel.updateEmail(it)
                 },
                 label = "Email",
                 errorMessage = (logicState as? SignUpLogicState.Error)?.emailErrorMessage
@@ -104,11 +104,14 @@ fun SignUpScreen(
                 password = password,
                 onPasswordChange = {
                     password = it
-                    viewModel.onResetPasswordError()
+                    viewModel.updatePassword(password)
                 },
                 label = "Create password",
                 isPasswordVisible = isPasswordVisible,
-                onVisibilityChange = { isPasswordVisible = !isPasswordVisible },
+                onVisibilityChange = {
+                    isPasswordVisible = !isPasswordVisible
+                    viewModel.updatePasswordVisible(isPasswordVisible)
+                },
                 errorMessage = (logicState as? SignUpLogicState.Error)?.passwordMessage
             )
 
@@ -118,11 +121,14 @@ fun SignUpScreen(
                 password = confirmPassword,
                 onPasswordChange = {
                     confirmPassword = it
-                    viewModel.onResetConfirmationPasswordError()
+                    viewModel.updateConfirmationPassword(it)
                 },
                 label = "Confirm password",
                 isPasswordVisible = isConfirmPasswordVisible,
-                onVisibilityChange = { isConfirmPasswordVisible = !isConfirmPasswordVisible },
+                onVisibilityChange = {
+                    isConfirmPasswordVisible = !isConfirmPasswordVisible
+                    viewModel.updateConfirmPasswordVisible(isConfirmPasswordVisible)
+                },
                 errorMessage = (logicState as? SignUpLogicState.Error)?.confirmPasswordMessage
             )
 
