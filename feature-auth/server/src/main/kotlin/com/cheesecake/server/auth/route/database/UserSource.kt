@@ -26,10 +26,9 @@ object UserSource {
     }
 
     fun isVerificationCodeAvailable(email: String): Boolean {
-        val lastVerificationRecord = findUserForVerification(email)
-        lastVerificationRecord?.let {
+       findUserForVerification(email)?.let { userVerify ->
             val now = LocalDateTime.now()
-            val lastSentTime = it.createdAt?.let { dateTime ->
+            val lastSentTime = userVerify.createdAt?.let { dateTime ->
                 LocalDateTime.parse(dateTime, dateFormatter)
             }
             return lastSentTime?.isBefore(
@@ -108,8 +107,12 @@ object UserSource {
 
     fun findUserForVerification(email: String): UserVerify? {
         return transaction {
+            val columns = listOf(
+                Users.id, Users.email, VerificationCodes.code, VerificationCodes.createdAt
+            )
             (Users leftJoin VerificationCodes)
-                .selectAll().where { Users.email eq email }
+                .select(columns)
+                .where { Users.email eq email }
                 .singleOrNull()
                 ?.let {
                     UserVerify(
