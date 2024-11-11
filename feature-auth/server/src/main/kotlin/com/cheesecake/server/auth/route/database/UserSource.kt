@@ -9,6 +9,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.insertReturning
 import org.jetbrains.exposed.sql.javatime.CurrentDateTime
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -75,16 +76,16 @@ object UserSource {
                     }
                 }
             } else {
-                Users.insert {
+                val id = Users.insertReturning(listOf(Users.id)) {
                     it[Users.email] = email
                     it[Users.passwordHash] = passwordHash
                     it[Users.isVerified] = isVerified
                     it[createdAt] = CurrentDateTime
-                }
+                }.map { it[Users.id] }.singleOrNull()
 
-                if (!isVerified) {
+                if (!isVerified && id != null) {
                     VerificationCodes.insert {
-                        it[userId] = userId
+                        it[userId] = id
                         it[code] = verificationToken
                         it[createdAt] = CurrentDateTime
                     }
