@@ -1,9 +1,7 @@
 package com.cheesecake.auth.feature.di
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.cheesecake.auth.feature.events.VerifyEmailEvent
 import com.cheesecake.auth.feature.login.LoginViewModel
 import com.cheesecake.auth.feature.navigation.AndroidNavigatorHost
 import com.cheesecake.auth.feature.navigation.AuthSerializers
@@ -18,14 +16,11 @@ import com.cheesecake.common.ui.navigator.state.IKClassSerializers
 import com.cheesecake.common.ui.navigator.state.IStateManager
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.component.KoinComponent
-import org.koin.core.context.GlobalContext
 import org.koin.core.context.GlobalContext.get
 import org.koin.core.module.Module
-import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
-import kotlin.math.sin
 
 
 fun screenModule(navController: NavHostController): Module = module {
@@ -39,7 +34,7 @@ fun screenModule(navController: NavHostController): Module = module {
         }
         scoped<IStateManager> { AndroidStateManager(get(), get()) }
         viewModel { SignUpViewModel(get(), get()) }
-        viewModel { LoginViewModel(get()) }
+        viewModel { LoginViewModel(get(), get()) }
         viewModel { VerificationViewModel(get(), get()) }
     }
 

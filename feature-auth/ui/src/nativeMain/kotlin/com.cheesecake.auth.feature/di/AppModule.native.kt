@@ -18,7 +18,7 @@ fun appModule(navigationController: UINavigationController): Module = module {
     single<IStateManager> { DefaultStateManager() }
     single { DefaultStateManager() }
     single { SignUpViewModel(get(), get()) }
-    single { LoginViewModel(get()) }
+    single { LoginViewModel(get(), get()) }
     single { VerificationViewModel(get(), get()) }
     single<NavigatorHost> { IOSNavigatorHost(navigationController, get()) }
     single { EventStateHolder() }
