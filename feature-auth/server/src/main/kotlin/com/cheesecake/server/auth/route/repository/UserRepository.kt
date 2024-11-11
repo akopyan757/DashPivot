@@ -32,6 +32,10 @@ class UserRepository(
             return ApiResult.Error(RegisterError.INVALID_PASSWORD)
         }
 
+        if (!UserSource.isVerificationCodeAvailable(registerRequest.email)) {
+            return ApiResult.Error(RegisterError.TOO_MANY_REQUESTS)
+        }
+
         val hashedPassword = PasswordHasher.hashPassword(registerRequest.password)
         val verificationCode = VerificationUtils.generateVerificationCode(Config.VERIFICATION_CODE_COUNT)
         val hashedVerificationCode = PasswordHasher.hashPassword(verificationCode)
