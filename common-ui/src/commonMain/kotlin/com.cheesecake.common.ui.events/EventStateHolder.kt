@@ -1,14 +1,30 @@
 package com.cheesecake.common.ui.events
 
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
-class EventStateHolder<T : EventState> {
+class EventStateHolder {
 
-    private val _eventState = MutableStateFlow<T?>(null)
-    val appEntryState = _eventState.asStateFlow()
+    private val _state = MutableStateFlow<Map<String, String>>(emptyMap())
+    val state: StateFlow<Map<String, String>> = _state
 
-    suspend fun emitEvent(event: T) {
-        _eventState.emit(event)
+    fun put(key: String, value: String) {
+        println("EventStateHolder: put: key = $key, value=$value")
+        _state.value += (key to value)
+    }
+
+    // Метод для получения значения по ключу
+    fun get(key: String): String? {
+        return _state.value[key].also {
+            println("EventStateHolder: get: key = $key, value=$it")
+        }
+    }
+
+    // Метод для удаления значения по ключу
+    fun getAndRemove(key: String): String? {
+        return get(key)?.also {
+            _state.value -= key
+            println("EventStateHolder: remove: key = $key")
+        }
     }
 }

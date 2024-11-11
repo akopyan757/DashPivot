@@ -5,7 +5,8 @@ interface Screen {
     val route: String
     val prefix: String
     val fullRoute: String get() = prefix + route
-    val fullRouteWithParams: String get() = fullRoute
+    val keys: Array<String> get() = emptyArray<String>()
+    val arguments: Map<String, String> get() = emptyMap()
 }
 
 /**

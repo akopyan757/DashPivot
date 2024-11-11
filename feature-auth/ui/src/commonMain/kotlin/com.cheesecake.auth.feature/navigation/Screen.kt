@@ -28,18 +28,35 @@ sealed class AuthScreen(override val route: String): Screen {
      * @property email The email to verify.
      * @property code The verification code.
      */
-    data class Verification(val email: String = "") : AuthScreen("verification"), RegularScreen {
-        override val fullRoute: String = "${super<AuthScreen>.fullRoute}/{${EMAIL_KEY}}"
-        override val fullRouteWithParams: String
-            get() = fullRoute.replace("{$EMAIL_KEY}", email)
+    class Verification(block: (key: String) -> String? = { null }) : AuthScreen("verification"), RegularScreen {
+
+        val email: String
+            get() = _arguments[EMAIL_KEY].orEmpty()
+
+        private val _arguments =  hashMapOf<String, String>().apply {
+            keys.forEach { put(it, "") }
+        }
+        override val arguments: Map<String, String> get() = _arguments
+        override val keys: Array<String> = _keys
+
+        init {
+            keys.forEach { key ->
+                block(key)?.let { value ->
+                    _arguments[key] = value
+                }
+            }
+        }
+
+        constructor(email: String) : this({ email })
 
         companion object {
-            const val EMAIL_KEY = "email"
+            private const val EMAIL_KEY = "email"
+            private val _keys = arrayOf(EMAIL_KEY)
         }
     }
 
     companion object {
-        private fun values() = listOf<RegularScreen>(Login, Registration)
+        private fun values() = listOf<RegularScreen>(Login, Registration, Verification())
 
         fun regularScreenOfRoute(route: String): RegularScreen? {
             return values().firstOrNull { it.fullRoute == route }

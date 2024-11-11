@@ -2,7 +2,6 @@ package com.cheesecake.dashpivot
 
 import android.app.Application
 import com.cheesecake.auth.data.di.authDataModule
-import com.cheesecake.auth.feature.di.authAppModule
 import com.cheesecake.auth.feature.domain.di.authDomainModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -13,7 +12,7 @@ class AndroidApp: Application() {
         super.onCreate()
         startKoin {
             androidContext(this@AndroidApp)
-            modules(authDataModule, authDomainModule, authAppModule)
+            modules(authDataModule, authDomainModule)
         }
     }
 }

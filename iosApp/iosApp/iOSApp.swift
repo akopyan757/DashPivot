@@ -22,18 +22,6 @@ struct iOSApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView(tokenHolder: tokenHolder)
-                .onOpenURL { url in
-                    handleDeepLink(url: url)
-                }
-        }
-    }
-
-    private func handleDeepLink(url: URL) {
-        if url.scheme == "dashpivot" && url.host == "verify" {
-            let token = url.queryParameters?["token"]
-            print("iOSApp: Token received from deep link: \(token ?? "no token")")
-            tokenHolder.token = token
-            TokenUpdateKt.tokenUpdate(token: token)
         }
     }
 }

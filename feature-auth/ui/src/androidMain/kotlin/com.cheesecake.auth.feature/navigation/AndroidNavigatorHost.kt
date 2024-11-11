@@ -3,20 +3,17 @@ package com.cheesecake.auth.feature.navigation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import com.cheesecake.auth.feature.di.AndroidKoinComponent
-import com.cheesecake.auth.feature.events.VerifyEmailEvent
-import com.cheesecake.common.ui.events.EventStateHolder
 import com.cheesecake.common.ui.navigator.Navigator
 import com.cheesecake.common.ui.navigator.NavigatorHost
+import com.cheesecake.common.ui.navigator.state.fullRouteWithKeys
+import com.cheesecake.common.ui.navigator.state.navNamedArguments
 
 class AndroidNavigatorHost(
     private val navController: NavHostController,
     override val navigator: Navigator,
-    private val eventStateHolder: EventStateHolder<VerifyEmailEvent>,
 ) : NavigatorHost {
 
     @Composable
@@ -24,18 +21,22 @@ class AndroidNavigatorHost(
         val koinComponent = AndroidKoinComponent
         Box {
             NavHost(navController = navController, startDestination = AuthScreen.Login.fullRoute) {
-                composable(AuthScreen.Login.fullRoute) {
+                println("NavHost: " + AuthScreen.Login.fullRouteWithKeys)
+                composable(AuthScreen.Login.fullRouteWithKeys) {
                     getComposable(AuthScreen.Login, navigator, koinComponent)
                 }
-                composable(AuthScreen.Registration.fullRoute) {
+                println("NavHost: " + AuthScreen.Registration.fullRouteWithKeys)
+                composable(AuthScreen.Registration.fullRouteWithKeys) {
                     getComposable(AuthScreen.Registration, navigator, koinComponent)
                 }
+                println("NavHost: " + AuthScreen.Verification().fullRouteWithKeys)
                 composable(
-                    route = AuthScreen.Verification().fullRoute,
-                    arguments = listOf(navArgument(AuthScreen.Verification.EMAIL_KEY) { type = NavType.StringType }),
+                    route = AuthScreen.Verification().fullRouteWithKeys,
+                    arguments = AuthScreen.Verification().navNamedArguments,
                 ) { backStackEntry ->
-                    val email = backStackEntry.arguments?.getString(AuthScreen.Verification.EMAIL_KEY).orEmpty()
-                    getComposable(AuthScreen.Verification(email), navigator, koinComponent)
+                    getComposable(AuthScreen.Verification { key ->
+                        backStackEntry.arguments?.getString(key).orEmpty()
+                    }, navigator, koinComponent)
                 }
             }
         }

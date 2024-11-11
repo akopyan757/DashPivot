@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.navigation.NavHostController
 import com.cheesecake.common.ui.navigator.DialogNavigator
 import com.cheesecake.common.ui.navigator.RegularScreen
+import com.cheesecake.common.ui.navigator.state.fullRouteWithArgs
 
 class AndroidNavigator(
     private val navController: NavHostController,
@@ -15,8 +16,7 @@ class AndroidNavigator(
         if (currentStoryBoardName != screen.storyBoardName) {
             navController.popBackStack(navController.graph.startDestinationId, true)
         }
-        navController.navigate(screen.fullRouteWithParams)
-        currentStoryBoardName = screen.storyBoardName
+        navController.navigate(screen.fullRouteWithArgs)
     }
 
     override fun goBack() {
@@ -24,7 +24,7 @@ class AndroidNavigator(
     }
 
     override fun goBack(to: RegularScreen) {
-        navController.popBackStack(to.fullRouteWithParams, false)
+        navController.popBackStack(to.fullRouteWithArgs, false)
     }
 
     override fun showToastMessage(message: String) {

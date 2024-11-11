@@ -63,7 +63,9 @@ fun SignUpScreen(
     LaunchedEffect(logicState) {
         if (logicState is SignUpLogicState.Success) {
             viewModel.onResetSuccess()
-            signUpNavigate.toVerification(email)
+            if (email.isNotBlank()) {
+                signUpNavigate.toVerification(email)
+            }
         }
     }
 

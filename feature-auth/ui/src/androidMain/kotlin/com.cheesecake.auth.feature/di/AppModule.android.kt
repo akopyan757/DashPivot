@@ -25,16 +25,14 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
+import kotlin.math.sin
 
-val authAppModule = module {
-    single { EventStateHolder<VerifyEmailEvent>() }
-}
 
 fun screenModule(navController: NavHostController): Module = module {
     scope(named("MainContent")) {
         scoped { navController }
         scoped<Navigator> { AndroidNavigator(get()) }
-        scoped<NavigatorHost> { AndroidNavigatorHost(get(), get(), get()) }
+        scoped<NavigatorHost> { AndroidNavigatorHost(get(), get()) }
         scoped<SavedStateHandle> {
             get<NavHostController>().currentBackStackEntry?.savedStateHandle ?:
                 throw IllegalStateException("No current back stack entry")
@@ -45,6 +43,7 @@ fun screenModule(navController: NavHostController): Module = module {
         viewModel { VerificationViewModel(get(), get()) }
     }
 
+    single<EventStateHolder> { EventStateHolder() }
     single<IKClassSerializers> { AuthSerializers() }
 }
 
@@ -65,6 +64,6 @@ object AndroidKoinComponent : AppKoinComponent, KoinComponent {
     override fun getVerificationViewModel(): VerificationViewModel = getAuthScope().get()
     override fun getSignUpViewModel(): SignUpViewModel = getAuthScope().get()
     override fun getLoginViewModel(): LoginViewModel = getAuthScope().get()
-    override fun getEventStateHolder(): EventStateHolder<VerifyEmailEvent> = getAuthScope().get()
+    override fun getEventStateHolder(): EventStateHolder = get().get()
     override fun getStateManager(): IStateManager = getAuthScope().get()
 }
