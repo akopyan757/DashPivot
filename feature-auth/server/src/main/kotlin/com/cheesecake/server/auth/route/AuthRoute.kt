@@ -61,6 +61,7 @@ private suspend fun <E : ApiError> PipelineContext<Unit, ApplicationCall>.handle
         RegisterError.INVALID_EMAIL_FORMAT -> call.respond(HttpStatusCode.BadRequest, error.message)
         RegisterError.TOKEN_MISSING -> call.respond(HttpStatusCode.BadRequest, error.message)
         RegisterError.UNKNOWN -> call.respond(HttpStatusCode.InternalServerError, error.message)
+        RegisterError.TOO_MANY_REQUESTS -> call.respond(HttpStatusCode.TooManyRequests, error.message)
         VerificationError.EMPTY_CODE_ERROR -> call.respond(HttpStatusCode.BadRequest, error.message)
         VerificationError.EXPIRED_CODE -> call.respond(HttpStatusCode.Unauthorized, error.message)
         VerificationError.UNKNOWN -> call.respond(HttpStatusCode.InternalServerError, error.message)
