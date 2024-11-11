@@ -65,9 +65,9 @@ object UserSource {
                         it[createdAt] = CurrentDateTime
                     }
 
-                    if (isVerified) {
-                        VerificationCodes.deleteWhere { userId eq existingUser[Users.id] }
-                    } else {
+                    VerificationCodes.deleteWhere { userId eq existingUser[Users.id] }
+
+                    if (!isVerified) {
                         VerificationCodes.insert {
                             it[userId] = existingUser[Users.id]
                             it[code] = verificationToken
