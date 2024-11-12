@@ -1,14 +1,13 @@
 package com.cheesecake.server.auth.route.utils
 
-import java.util.UUID
 import kotlin.math.pow
 
-object VerificationUtils {
-    fun generateVerificationToken(): String {
-        return UUID.randomUUID().toString()
-    }
+interface IVerifyCodeGenerator {
+    fun generateVerificationCode(digitsCount: Int): String
+}
 
-    fun generateVerificationCode(digitsCount: Int): String {
+internal class VerifyCodeGenerator: IVerifyCodeGenerator {
+    override fun generateVerificationCode(digitsCount: Int): String {
         val max = 10.0.pow(digitsCount.toDouble()).toInt() - 1
         val min = 10.0.pow((digitsCount - 1).toDouble()).toInt()
         return (min..max).random().toString()

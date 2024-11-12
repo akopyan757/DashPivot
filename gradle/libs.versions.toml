@@ -6,9 +6,9 @@ android-targetSdk = "34"
 androidx-activityCompose = "1.9.3"
 androidx-espresso-core = "3.6.1"
 androidx-lifecycle = "2.8.3"
-componentsRouter = "1.4.0"
 coreTesting = "2.2.0"
 coreTestingVersion = "2.2.0"
+h2 = "2.1.214"
 javaJwt = "4.2.1"
 junitJupiter = "5.8.2"
 junitVersion = "1.2.1"
@@ -25,13 +25,15 @@ logback = "1.5.8"
 kotlinSerialization = "1.7.3"
 kodeinDi = "7.22.0"
 exposed = "0.55.0"
-mockk = "1.13.2"
+mockk = "1.13.4"
 navigationCompose = "2.8.3"
 postgresql = "42.7.4"
 javaxMail = "1.6.2"
 jetbrains="1.7.0"
 fragmentKtx = "1.8.4"
 lifecycleRuntimeAndroid = "2.8.5"
+slf4jNop = "2.0.7"
+sqliteJdbc = "3.36.0.3"
 
 [libraries]
 androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
@@ -79,12 +81,15 @@ exposed-jdbc = { group = "org.jetbrains.exposed", name = "exposed-jdbc", version
 exposed-java-time = { group = "org.jetbrains.exposed", name = "exposed-java-time", version.ref = "exposed"  }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
+org-jetbrains-kotlin-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test" }
 postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgresql" }
 kodein-di = { group = "org.kodein.di", name = "kodein-di", version.ref = "kodeinDi" }
 kodein-di-ktor = { module = "org.kodein.di:kodein-di-framework-ktor-server-jvm", version.ref = "kodeinDi" }
 javax-mail = { group = "com.sun.mail", name = "javax.mail", version.ref = "javaxMail" }
 mindrotJbcrypt = { group = "org.mindrot",  name = "jbcrypt", version.ref = "jbcrypt" }
 runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "jetbrains" }
+slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "slf4jNop" }
+sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqliteJdbc" }
 web-core = { module = "org.jetbrains.compose.web:web-core", version.ref = "jetbrains" }
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationCompose" }
 androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragmentKtx" }

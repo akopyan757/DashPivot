@@ -1,10 +1,19 @@
 plugins {
     id("java-library")
+    id("org.jetbrains.kotlinx.kover") version "0.6.1"
     alias(libs.plugins.kotlinJvm)
 }
 
 kotlin {
     jvmToolchain(17)
+}
+
+kover {
+    filters {
+        classes {
+            includes += "com.cheesecake.server.auth.route.*" // Укажите свой пакет
+        }
+    }
 }
 
 java {
@@ -27,4 +36,11 @@ dependencies {
     implementation(libs.javax.mail)
     implementation(libs.mindrotJbcrypt)
     implementation(projects.featureAuth.common)
+    testImplementation(libs.slf4j.nop)
+    testImplementation(libs.mockk)
+    testImplementation(libs.ktor.server.tests)
+    testImplementation(libs.kotlin.test.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.org.jetbrains.kotlin.kotlin.test)
+    testImplementation(libs.sqlite.jdbc)
 }

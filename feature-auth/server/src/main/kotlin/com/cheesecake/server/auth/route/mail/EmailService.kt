@@ -9,7 +9,7 @@ import javax.mail.Transport
 import javax.mail.internet.InternetAddress
 import javax.mail.internet.MimeMessage
 
-class EmailService: IEmailService {
+internal class EmailService: IEmailService {
     private val session: Session
 
     val senderEmail: String
@@ -32,18 +32,18 @@ class EmailService: IEmailService {
         })
     }
 
-    override fun sendVerificationEmail(email: String, code: String) {
+    override fun sendVerificationEmail(email: String, code: String): Boolean {
         val subject = "Email Verification"
         val body = """
              Please verify your email address by entering the following verification code:
              $code
         """.trimIndent()
 
-        sendEmail(senderEmail, email, subject, body)
+        return sendEmail(senderEmail, email, subject, body)
     }
 
-    private fun sendEmail(from: String, to: String, subject: String, body: String) {
-        try {
+    private fun sendEmail(from: String, to: String, subject: String, body: String): Boolean {
+        return try {
             val message = MimeMessage(session).apply {
                 setFrom(InternetAddress(from))
                 setRecipients(Message.RecipientType.TO, InternetAddress.parse(to))
@@ -53,9 +53,11 @@ class EmailService: IEmailService {
 
             Transport.send(message)
             println("EmailService: Message sent successfully\nText = $body")
+            true
         } catch (e: MessagingException) {
             println("EmailService: Error sending email\n${e.message}")
             e.printStackTrace()
+            false
         }
     }
 }

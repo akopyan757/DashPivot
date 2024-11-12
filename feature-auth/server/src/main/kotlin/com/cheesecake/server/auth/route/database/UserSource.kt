@@ -17,15 +17,33 @@ import org.jetbrains.exposed.sql.update
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
-object UserSource {
+interface IUserSource {
+    fun isEmailTakenAndVerified(email: String): Boolean
+    fun canSendVerificationCode(email: String): Boolean
 
-    fun isEmailTakenAndVerified(email: String): Boolean {
+    fun verifyEmail(id: Int)
+    fun createUser(
+        email: String,
+        passwordHash: String,
+        isVerified: Boolean,
+        verificationToken: String,
+        createdDateTime: LocalDateTime? = null, // Current
+    ): User
+
+    fun findUserByEmail(email: String): User?
+    fun findUserForVerification(email: String): UserVerify?
+}
+
+class UserSource: IUserSource {
+    override fun isEmailTakenAndVerified(email: String): Boolean {
         return transaction {
-            Users.selectAll().where { (Users.email eq email) and Users.isVerified }.count() > 0
+            Users.select(
+                listOf(Users.email, Users.isVerified)
+            ).where { (Users.email eq email) and Users.isVerified }.count() > 0
         }
     }
 
-    fun isVerificationCodeAvailable(email: String): Boolean {
+    override fun canSendVerificationCode(email: String): Boolean {
        findUserForVerification(email)?.let { userVerify ->
             val now = LocalDateTime.now()
             val lastSentTime = userVerify.createdAt?.let { dateTime ->
@@ -38,7 +56,7 @@ object UserSource {
         return true
     }
 
-    fun verifyEmail(id: Int) {
+    override fun verifyEmail(id: Int) {
         transaction {
             Users.update({ Users.id eq id }) {
                 it[isVerified] = true
@@ -47,11 +65,12 @@ object UserSource {
         }
     }
 
-    fun createUser(
+    override fun createUser(
         email: String,
         passwordHash: String,
         isVerified: Boolean,
-        verificationToken: String
+        verificationToken: String,
+        createdDateTime: LocalDateTime?,
     ): User {
         return transaction {
             val existingUser = Users.selectAll().where { Users.email eq email }.singleOrNull()
@@ -61,7 +80,6 @@ object UserSource {
                     Users.update({ Users.email eq email }) {
                         it[Users.passwordHash] = passwordHash
                         it[Users.isVerified] = isVerified
-                        it[createdAt] = CurrentDateTime
                     }
 
                     VerificationCodes.deleteWhere { userId eq existingUser[Users.id] }
@@ -70,7 +88,11 @@ object UserSource {
                         VerificationCodes.insert {
                             it[userId] = existingUser[Users.id]
                             it[code] = verificationToken
-                            it[createdAt] = CurrentDateTime
+                            if (createdDateTime != null) {
+                                it[createdAt] = createdDateTime
+                            } else {
+                                it[createdAt] = CurrentDateTime
+                            }
                         }
                     }
                 }
@@ -79,14 +101,22 @@ object UserSource {
                     it[Users.email] = email
                     it[Users.passwordHash] = passwordHash
                     it[Users.isVerified] = isVerified
-                    it[createdAt] = CurrentDateTime
+                    if (createdDateTime != null) {
+                        it[createdAt] = createdDateTime
+                    } else {
+                        it[createdAt] = CurrentDateTime
+                    }
                 }.map { it[Users.id] }.singleOrNull()
 
                 if (!isVerified && id != null) {
                     VerificationCodes.insert {
                         it[userId] = id
                         it[code] = verificationToken
-                        it[createdAt] = CurrentDateTime
+                        if (createdDateTime != null) {
+                            it[createdAt] = createdDateTime
+                        } else {
+                            it[createdAt] = CurrentDateTime
+                        }
                     }
                 }
             }
@@ -97,7 +127,7 @@ object UserSource {
         }
     }
 
-    fun findUserByEmail(email: String): User? {
+    override fun findUserByEmail(email: String): User? {
         return transaction {
             Users.selectAll().where { Users.email eq email }
                 .singleOrNull()
@@ -105,7 +135,7 @@ object UserSource {
         }
     }
 
-    fun findUserForVerification(email: String): UserVerify? {
+    override fun findUserForVerification(email: String): UserVerify? {
         return transaction {
             val columns = listOf(
                 Users.id, Users.email, VerificationCodes.code, VerificationCodes.createdAt

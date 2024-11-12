@@ -10,17 +10,21 @@ import com.cheesecake.common.auth.model.verefication.VerificationError
 import com.cheesecake.common.auth.service.UserService
 import com.cheesecake.common.auth.utils.isValidEmail
 import com.cheesecake.common.auth.utils.isValidPassword
-import com.cheesecake.server.auth.route.database.UserSource
+import com.cheesecake.server.auth.route.database.IUserSource
 import com.cheesecake.server.auth.route.mail.IEmailService
-import com.cheesecake.server.auth.route.utils.PasswordHasher
-import com.cheesecake.server.auth.route.utils.TokenUtils
-import com.cheesecake.server.auth.route.utils.VerificationUtils
+import com.cheesecake.server.auth.route.utils.IPasswordHasher
+import com.cheesecake.server.auth.route.utils.ITokenGenerator
+import com.cheesecake.server.auth.route.utils.IVerifyCodeGenerator
 
-class UserRepository(
-    private val emailService: IEmailService
+internal class UserRepository(
+    private val emailService: IEmailService,
+    private val passwordHasher: IPasswordHasher,
+    private val verifyCodeGenerator: IVerifyCodeGenerator,
+    private val tokenGenerator: ITokenGenerator,
+    private val userSource: IUserSource,
 ): UserService {
     override suspend fun registerUser(registerRequest: RegisterRequest): ApiResult<String, RegisterError> {
-        if (UserSource.isEmailTakenAndVerified(registerRequest.email)) {
+        if (userSource.isEmailTakenAndVerified(registerRequest.email)) {
             return ApiResult.Error(RegisterError.EMAIL_TAKEN)
         }
 
@@ -32,21 +36,19 @@ class UserRepository(
             return ApiResult.Error(RegisterError.INVALID_PASSWORD)
         }
 
-        if (!UserSource.isVerificationCodeAvailable(registerRequest.email)) {
+        if (!userSource.canSendVerificationCode(registerRequest.email)) {
             return ApiResult.Error(RegisterError.TOO_MANY_REQUESTS)
         }
 
-        val hashedPassword = PasswordHasher.hashPassword(registerRequest.password)
-        val verificationCode = VerificationUtils.generateVerificationCode(Config.VERIFICATION_CODE_COUNT)
-        val hashedVerificationCode = PasswordHasher.hashPassword(verificationCode)
+        val hashedPassword = passwordHasher.hashPassword(registerRequest.password)
+        val verificationCode = verifyCodeGenerator.generateVerificationCode(Config.VERIFICATION_CODE_COUNT)
+        val hashedVerificationCode = passwordHasher.hashPassword(verificationCode)
 
-        val user = UserSource.createUser(
+        userSource.createUser(
             registerRequest.email, hashedPassword, isVerified = false, hashedVerificationCode
         )
 
-        try {
-            emailService.sendVerificationEmail(user.email, verificationCode)
-        } catch (e: Exception) {
+        if (!emailService.sendVerificationEmail(registerRequest.email, verificationCode)) {
             return ApiResult.Error(RegisterError.VERIFICATION_LETTER_SENDING_ERROR)
         }
 
@@ -58,7 +60,7 @@ class UserRepository(
             return ApiResult.Error(VerificationError.EMPTY_CODE_ERROR)
         }
 
-        val user = UserSource.findUserForVerification(email)
+        val user = userSource.findUserForVerification(email)
             ?: return ApiResult.Error(VerificationError.USER_NOT_FOUND)
 
         val userCode = user.verificationHashedCode
@@ -66,21 +68,21 @@ class UserRepository(
             return ApiResult.Error(VerificationError.VERIFICATION_CODE_NOT_FOUND)
         }
 
-        if (!PasswordHasher.verifyPassword(code, userCode)) {
+        if (!passwordHasher.verifyPassword(code, userCode)) {
             return ApiResult.Error(VerificationError.EXPIRED_CODE)
         }
 
-        UserSource.verifyEmail(user.id)
+        userSource.verifyEmail(user.id)
 
         return ApiResult.Success("Email confirmed successfully!")
     }
 
 
     override suspend fun loginUser(loginRequest: LoginRequest): ApiResult<String, LoginError> {
-        val user = UserSource.findUserByEmail(loginRequest.email)
+        val user = userSource.findUserByEmail(loginRequest.email)
             ?: return ApiResult.Error(LoginError.USER_NOT_FOUND)
 
-        if (!PasswordHasher.verifyPassword(loginRequest.password, user.passwordHash)) {
+        if (!passwordHasher.verifyPassword(loginRequest.password, user.passwordHash)) {
             return ApiResult.Error(LoginError.INVALID_PASSWORD)
         }
 
@@ -88,7 +90,7 @@ class UserRepository(
             return ApiResult.Error(LoginError.EMAIL_NOT_VERIFIED)
         }
 
-        val token = TokenUtils.generateToken(user.id.toString())
+        val token = tokenGenerator.generateToken(user.id.toString())
 
         return ApiResult.Success(token)
     }
