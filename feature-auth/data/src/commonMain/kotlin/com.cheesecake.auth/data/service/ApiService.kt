@@ -8,5 +8,6 @@ import io.ktor.client.statement.HttpResponse
 interface ApiService {
     suspend fun registerUser(request: RegisterRequest): HttpResponse
     suspend fun verificationCode(email: String, code: String): HttpResponse
+    suspend fun resendCode(email: String): HttpResponse
     suspend fun loginUser(request: LoginRequest): HttpResponse
 }

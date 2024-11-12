@@ -1,5 +1,6 @@
 package com.cheesecake.auth.feature.state
 
+import com.cheesecake.common.auth.config.Config
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.plus
@@ -25,7 +26,7 @@ data class VerificationResendTimer(
 
         fun init(email: String): VerificationResendTimer {
             val currentTime = Clock.System.now()
-            val resendAvailableAt = currentTime.plus(1, DateTimeUnit.MINUTE)
+            val resendAvailableAt = currentTime.plus(Config.VERIFICATION_CODE_SENDING_DELAY_SEC, DateTimeUnit.SECOND)
             return VerificationResendTimer(email, resendAvailableAt.toEpochMilliseconds())
         }
     }

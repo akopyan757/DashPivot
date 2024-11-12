@@ -15,8 +15,8 @@ import org.koin.dsl.module
 val appModule = module {
     single { DefaultStateManager() }
     single { SignUpViewModel(get(), get()) }
-    single { LoginViewModel(get()) }
-    single { VerificationViewModel(get(), get()) }
+    single { LoginViewModel(get(), get()) }
+    single { VerificationViewModel(get(), get(), get()) }
     single<NavigatorHost> { DesktopNavigatorHost() }
     single { EventStateHolder() }
     single<IStateManager> { DefaultStateManager() }

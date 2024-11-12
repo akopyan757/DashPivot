@@ -35,7 +35,7 @@ fun screenModule(navController: NavHostController): Module = module {
         scoped<IStateManager> { AndroidStateManager(get(), get()) }
         viewModel { SignUpViewModel(get(), get()) }
         viewModel { LoginViewModel(get(), get()) }
-        viewModel { VerificationViewModel(get(), get()) }
+        viewModel { VerificationViewModel(get(), get(), get()) }
     }
 
     single<EventStateHolder> { EventStateHolder() }

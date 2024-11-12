@@ -92,6 +92,7 @@ fun VerificationScreen(
         state = verificationState,
         onCodeCompleted = { viewModel.verifyToken(email, it) },
         onResetToIdle = { viewModel.resetToIdle() },
+        onResendCode = { viewModel.resendCode(email) },
         onBackPressed = onBackPressed,
     )
 }
@@ -104,6 +105,7 @@ fun VerificationCodeScreen(
     onBackPressed: () -> Unit = {},
     onResetToIdle: () -> Unit = {},
     onCodeCompleted: (String) -> Unit = {},
+    onResendCode: () -> Unit = {},
     startedCode: String = "",
     isDebugMode: Boolean = false,
 ) {
@@ -116,15 +118,15 @@ fun VerificationCodeScreen(
     val isVerificationLoading = logicState is VerificationLogicState.Loading
     val isVerificationSuccess = logicState is VerificationLogicState.Success
 
-    var currentTimer by remember(state.formData.restTime) { mutableStateOf(state.formData.restTime) }
-    val isResendAvailable by derivedStateOf { currentTimer < 0 && !isVerificationSuccess }
+    var currentTimer by remember(state.formData) { mutableStateOf(state.formData.restTime) }
+    val isResendAvailable by derivedStateOf {
+        currentTimer < 0 && !isVerificationSuccess && !state.formData.isResendLoading
+    }
 
     LaunchedEffect(state.formData.restTime) {
-        println("VerificationCodeScreen: restTimer = ${state.formData.restTime}")
         while (!isResendAvailable) {
             delay(1000)
             currentTimer--
-            println("VerificationCodeScreen: timer=$currentTimer, isResendAvailable=$isResendAvailable")
         }
     }
 
@@ -258,8 +260,8 @@ fun VerificationCodeScreen(
             Button(
                 enabled = isResendAvailable && !isVerificationLoading,
                 onClick = {
-                    focusRequester.requestFocus()
-                    keyboardController?.show()
+                    onResendCode()
+                    keyboardController?.hide()
                 },
             ) {
                 if (isResendAvailable) {
@@ -271,6 +273,7 @@ fun VerificationCodeScreen(
                 } else {
                     val text = when {
                         isVerificationSuccess -> "Verification successful"
+                        state.formData.isResendLoading -> "Resending code, please wait..."
                         else -> "Resend New Code in $currentTimer seconds"
                     }
                     Text(

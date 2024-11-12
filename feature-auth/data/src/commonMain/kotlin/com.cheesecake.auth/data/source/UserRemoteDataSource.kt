@@ -6,6 +6,7 @@ import com.cheesecake.common.auth.model.login.LoginError
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterError
 import com.cheesecake.common.auth.model.registration.RegisterRequest
+import com.cheesecake.common.auth.model.resendCode.ResendCodeError
 import com.cheesecake.common.auth.model.verefication.VerificationError
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
@@ -43,6 +44,21 @@ class UserRemoteDataSource(private val apiService: ApiService): IUserRemoteDataS
         } catch (e: Exception) {
             e.printStackTrace()
             ApiResult.Error(VerificationError.UNKNOWN)
+        }
+    }
+
+    override suspend fun resendCode(email: String): ApiResult<String, ResendCodeError> {
+        return try {
+            val response = apiService.resendCode(email)
+            val statusCode = response.status.value
+            if (HttpStatusCode.fromValue(statusCode).isSuccess()) {
+                ApiResult.Success(response.bodyAsText())
+            } else {
+                ApiResult.Error(ResendCodeError.fromMessage(response.bodyAsText()))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ApiResult.Error(ResendCodeError.UNKNOWN)
         }
     }
 

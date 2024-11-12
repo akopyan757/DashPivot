@@ -8,4 +8,11 @@ enum class ResendCodeError(override val message: String): ApiError {
     EMAIL_ALREADY_VERIFIED("Email already verified"),
     TOO_MANY_REQUESTS("Please wait ${Config.VERIFICATION_CODE_SENDING_DELAY_SEC.toInt()} seconds since the last registration request."),
     EMAIL_SENDING_FAILED("Email sending failed"),
+    UNKNOWN("Unknown error");
+
+    companion object {
+        fun fromMessage(message: String): ResendCodeError {
+            return ResendCodeError.entries.find { it.message == message } ?: UNKNOWN
+        }
+    }
 }
