@@ -110,7 +110,7 @@ class RegistrationIntegrationTests {
                 email = TestConstants.TEST_EMAIL,
                 passwordHash = TestConstants.HASHED_PASSWORD,
                 isVerified = true,
-                verificationToken = "hashedVerificationCode",
+                hashedVerificationCode = "hashedVerificationCode",
             )
         }
 

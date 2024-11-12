@@ -7,6 +7,8 @@ import com.cheesecake.common.auth.model.login.LoginError
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterError
 import com.cheesecake.common.auth.model.registration.RegisterRequest
+import com.cheesecake.common.auth.model.resendCode.ResendCodeError
+import com.cheesecake.common.auth.model.resendCode.ResendCodeRequest
 import com.cheesecake.common.auth.model.verefication.VerificationError
 import com.cheesecake.common.auth.model.verefication.VerificationRequest
 import com.cheesecake.common.auth.service.UserService
@@ -43,6 +45,15 @@ fun Route.authRoute(di: DI) {
             is ApiResult.Error -> handleError(result)
         }
     }
+    post(EndPoint.RESEND_CODE.path) {
+        val resendCodeRequest = call.receive<ResendCodeRequest>()
+        val userRepository: UserService by di.instance()
+
+        when (val result = userRepository.resendCode(resendCodeRequest.email)) {
+            is ApiResult.Success -> call.respond(HttpStatusCode.OK, result.data)
+            is ApiResult.Error -> handleError(result)
+        }
+    }
     post(EndPoint.LOGIN.path) {
         val loginRequest = call.receive<LoginRequest>()
         val userRepository: UserService by di.instance()
@@ -69,5 +80,9 @@ private suspend fun <E : ApiError> PipelineContext<Unit, ApplicationCall>.handle
         LoginError.INVALID_PASSWORD -> call.respond(HttpStatusCode.BadRequest, error.message)
         LoginError.EMAIL_NOT_VERIFIED -> call.respond(HttpStatusCode.Unauthorized, error.message)
         LoginError.UNKNOWN -> call.respond(HttpStatusCode.InternalServerError, error.message)
+        ResendCodeError.USER_NOT_FOUND -> call.respond(HttpStatusCode.NotFound, error.message)
+        ResendCodeError.EMAIL_ALREADY_VERIFIED -> call.respond(HttpStatusCode.Conflict, error.message)
+        ResendCodeError.TOO_MANY_REQUESTS -> call.respond(HttpStatusCode.TooManyRequests, error.message)
+        ResendCodeError.EMAIL_SENDING_FAILED -> call.respond(HttpStatusCode.InternalServerError, error.message)
     }
 }

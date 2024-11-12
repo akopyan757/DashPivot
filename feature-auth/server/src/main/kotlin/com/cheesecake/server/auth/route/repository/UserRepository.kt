@@ -6,6 +6,7 @@ import com.cheesecake.common.auth.model.login.LoginError
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterError
 import com.cheesecake.common.auth.model.registration.RegisterRequest
+import com.cheesecake.common.auth.model.resendCode.ResendCodeError
 import com.cheesecake.common.auth.model.verefication.VerificationError
 import com.cheesecake.common.auth.service.UserService
 import com.cheesecake.common.auth.utils.isValidEmail
@@ -15,6 +16,7 @@ import com.cheesecake.server.auth.route.mail.IEmailService
 import com.cheesecake.server.auth.route.utils.IPasswordHasher
 import com.cheesecake.server.auth.route.utils.ITokenGenerator
 import com.cheesecake.server.auth.route.utils.IVerifyCodeGenerator
+import org.jetbrains.exposed.sql.transactions.transaction
 
 internal class UserRepository(
     private val emailService: IEmailService,
@@ -77,6 +79,33 @@ internal class UserRepository(
         return ApiResult.Success("Email confirmed successfully!")
     }
 
+
+    override suspend fun resendCode(email: String): ApiResult<String, ResendCodeError> {
+        val user = userSource.findUserByEmail(email) ?: run {
+            return ApiResult.Error(ResendCodeError.USER_NOT_FOUND)
+        }
+
+        if (userSource.isEmailTakenAndVerified(email)) {
+            return ApiResult.Error(ResendCodeError.EMAIL_ALREADY_VERIFIED)
+        }
+
+        if (!userSource.canSendVerificationCode(email)) {
+            return ApiResult.Error(ResendCodeError.TOO_MANY_REQUESTS)
+        }
+
+        val verificationCode = verifyCodeGenerator.generateVerificationCode(Config.VERIFICATION_CODE_COUNT)
+        val hashedVerificationCode = passwordHasher.hashPassword(verificationCode)
+
+        return transaction {
+            userSource.updateVerificationCode(user.id, hashedVerificationCode)
+
+            if (!emailService.sendVerificationEmail(email, verificationCode)) {
+                ApiResult.Error(ResendCodeError.EMAIL_SENDING_FAILED)
+            } else {
+                ApiResult.Success("Verification code sent successfully")
+            }
+        }
+    }
 
     override suspend fun loginUser(loginRequest: LoginRequest): ApiResult<String, LoginError> {
         val user = userSource.findUserByEmail(loginRequest.email)

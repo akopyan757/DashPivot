@@ -40,7 +40,7 @@ class LoginIntegrationTests {
                 email = TestConstants.TEST_EMAIL,
                 passwordHash = TestConstants.HASHED_PASSWORD,
                 isVerified = true,
-                verificationToken = "",
+                hashedVerificationCode = "",
                 createdDateTime = TestConstants.TEST_CREATED_AT
             )
         }
@@ -103,7 +103,7 @@ class LoginIntegrationTests {
                 email = TestConstants.TEST_EMAIL_NOT_VERIFIED,
                 passwordHash = TestConstants.HASHED_PASSWORD,
                 isVerified = false,
-                verificationToken = "",
+                hashedVerificationCode = "",
                 createdDateTime = TestConstants.TEST_CREATED_AT
             )
         }

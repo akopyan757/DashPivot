@@ -21,12 +21,14 @@ interface IUserSource {
     fun isEmailTakenAndVerified(email: String): Boolean
     fun canSendVerificationCode(email: String): Boolean
 
+    fun updateVerificationCode(id: Int, hashedVerificationCode: String)
+
     fun verifyEmail(id: Int)
     fun createUser(
         email: String,
         passwordHash: String,
         isVerified: Boolean,
-        verificationToken: String,
+        hashedVerificationCode: String,
         createdDateTime: LocalDateTime? = null, // Current
     ): User
 
@@ -56,6 +58,15 @@ class UserSource: IUserSource {
         return true
     }
 
+    override fun updateVerificationCode(id: Int, hashedVerificationCode: String) {
+        transaction {
+            VerificationCodes.update({ Users.id eq id }) {
+                it[createdAt] = CurrentDateTime
+                it[code] = hashedVerificationCode
+            }
+        }
+    }
+
     override fun verifyEmail(id: Int) {
         transaction {
             Users.update({ Users.id eq id }) {
@@ -69,7 +80,7 @@ class UserSource: IUserSource {
         email: String,
         passwordHash: String,
         isVerified: Boolean,
-        verificationToken: String,
+        hashedVerificationCode: String,
         createdDateTime: LocalDateTime?,
     ): User {
         return transaction {
@@ -87,7 +98,7 @@ class UserSource: IUserSource {
                     if (!isVerified) {
                         VerificationCodes.insert {
                             it[userId] = existingUser[Users.id]
-                            it[code] = verificationToken
+                            it[code] = hashedVerificationCode
                             if (createdDateTime != null) {
                                 it[createdAt] = createdDateTime
                             } else {
@@ -111,7 +122,7 @@ class UserSource: IUserSource {
                 if (!isVerified && id != null) {
                     VerificationCodes.insert {
                         it[userId] = id
-                        it[code] = verificationToken
+                        it[code] = hashedVerificationCode
                         if (createdDateTime != null) {
                             it[createdAt] = createdDateTime
                         } else {
