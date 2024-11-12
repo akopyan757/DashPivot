@@ -60,7 +60,7 @@ class UserSource: IUserSource {
 
     override fun updateVerificationCode(id: Int, hashedVerificationCode: String) {
         transaction {
-            VerificationCodes.update({ Users.id eq id }) {
+            VerificationCodes.update({ VerificationCodes.userId eq id }) {
                 it[createdAt] = CurrentDateTime
                 it[code] = hashedVerificationCode
             }

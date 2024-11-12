@@ -96,15 +96,13 @@ internal class UserRepository(
         val verificationCode = verifyCodeGenerator.generateVerificationCode(Config.VERIFICATION_CODE_COUNT)
         val hashedVerificationCode = passwordHasher.hashPassword(verificationCode)
 
-        return transaction {
-            userSource.updateVerificationCode(user.id, hashedVerificationCode)
+        userSource.updateVerificationCode(user.id, hashedVerificationCode)
 
-            if (!emailService.sendVerificationEmail(email, verificationCode)) {
-                ApiResult.Error(ResendCodeError.EMAIL_SENDING_FAILED)
-            } else {
-                ApiResult.Success("Verification code sent successfully")
-            }
+        if (!emailService.sendVerificationEmail(email, verificationCode)) {
+            return ApiResult.Error(ResendCodeError.EMAIL_SENDING_FAILED)
         }
+
+        return ApiResult.Success("Verification code sent successfully")
     }
 
     override suspend fun loginUser(loginRequest: LoginRequest): ApiResult<String, LoginError> {
