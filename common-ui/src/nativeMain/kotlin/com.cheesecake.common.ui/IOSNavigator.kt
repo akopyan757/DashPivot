@@ -1,8 +1,12 @@
 package com.cheesecake.common.ui
 
 import com.cheesecake.common.ui.events.EventStateHolder
-import com.cheesecake.common.ui.navigator.DialogNavigator
+import com.cheesecake.common.ui.navigator.DialogScreen
+import com.cheesecake.common.ui.navigator.Navigator
 import com.cheesecake.common.ui.navigator.RegularScreen
+import com.cheesecake.common.ui.toast.ToastMessage
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import platform.UIKit.UINavigationController
 import platform.UIKit.UIStoryboard
 import platform.UIKit.UIViewController
@@ -11,7 +15,13 @@ import platform.UIKit.restorationIdentifier
 class IOSNavigator(
     private val navigationController: UINavigationController,
     private val eventStateHolder: EventStateHolder,
-): DialogNavigator() {
+): Navigator {
+
+    private val _currentDialog = MutableStateFlow<DialogScreen?>(null)
+    override val currentDialog: StateFlow<DialogScreen?> = _currentDialog
+
+    private val _toastMessage = MutableStateFlow<ToastMessage>(ToastMessage.Idle)
+    override val toastMessage: StateFlow<ToastMessage> = _toastMessage
 
     override fun navigateTo(screen: RegularScreen) {
         val storyboard = UIStoryboard.storyboardWithName(name = screen.storyBoardName, bundle = null)
@@ -41,7 +51,13 @@ class IOSNavigator(
         )
     }
 
-    override fun showToastMessage(message: String) {
-        println("showErrorMessage: message: $message")
+
+
+    override fun showToastMessage(toast: ToastMessage) {
+        _toastMessage.value = toast
+    }
+
+    override fun dismissToastMessage() {
+        _toastMessage.value = ToastMessage.Idle
     }
 }

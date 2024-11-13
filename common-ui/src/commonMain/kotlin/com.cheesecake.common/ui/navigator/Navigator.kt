@@ -1,11 +1,11 @@
 package com.cheesecake.common.ui.navigator
 
-import kotlinx.coroutines.flow.StateFlow
+import Toast
 
 /**
  * Interface representing a navigator for screen navigation.
  */
-interface Navigator {
+interface Navigator: Dialog, Toast {
 
     /**
      * Navigate to the specified regular screen.
@@ -23,24 +23,4 @@ interface Navigator {
      * Navigate back to the previous screen.
      */
     fun goBack(to: RegularScreen) {}
-
-    /**
-     * The current dialog screen.
-     */
-    val currentDialog: StateFlow<DialogScreen?>
-
-    /**
-     * Show a dialog screen.
-     */
-    fun showDialog(screen: DialogScreen) {}
-
-    /**
-     * Dismiss the dialog screen.
-     */
-    fun dismissDialog() {}
-
-    /**
-     * Show an error message.
-     */
-    fun showToastMessage(message: String) {}
 }

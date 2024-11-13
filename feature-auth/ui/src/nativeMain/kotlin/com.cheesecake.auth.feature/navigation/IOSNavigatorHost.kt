@@ -1,13 +1,15 @@
 package com.cheesecake.auth.feature.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import com.cheesecake.auth.feature.di.NativeKoinComponent
 import com.cheesecake.common.ui.IOSNavigator
 import com.cheesecake.common.ui.events.EventStateHolder
 import com.cheesecake.common.ui.navigator.DialogScreen
-import com.cheesecake.common.ui.navigator.Navigator
 import com.cheesecake.common.ui.navigator.NavigatorHost
 import com.cheesecake.common.ui.navigator.RegularScreen
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +28,7 @@ class IOSNavigatorHost(
     private val _regularScreen = MutableStateFlow<RegularScreen>(AuthScreen.Login)
     private val regularScreen: StateFlow<RegularScreen> = _regularScreen
 
-    override val navigator: Navigator = IOSNavigator(navigationController, eventStateHolder)
+    override val navigator = IOSNavigator(navigationController, eventStateHolder)
 
     private val navigationDelegate = object : NSObject(), UINavigationControllerDelegateProtocol {
 
@@ -40,11 +42,7 @@ class IOSNavigatorHost(
                 AuthScreen.regularScreenOfRoute(route)?.let { screen ->
                     _regularScreen.value = if (screen is AuthScreen.Verification) {
                         AuthScreen.Verification { key ->
-                            eventStateHolder.getAndRemove(key).also {
-                                println("IOSNavigatorHost: navigationController: getAndRemove: $it")
-                            }
-                        }.also {
-                            println("IOSNavigatorHost: navigationController: verify screen: $it")
+                            eventStateHolder.getAndRemove(key)
                         }
                     } else {
                         screen
@@ -64,11 +62,11 @@ class IOSNavigatorHost(
         val dialogScreen: DialogScreen? by navigator.currentDialog.collectAsState()
         val regularScreen: RegularScreen by regularScreen.collectAsState()
 
-        println("RegularScreen = $regularScreen")
-
-        getComposable(regularScreen, navigator, nativeKoinComponent)
-        dialogScreen?.let {
-            getComposable(it, navigator, nativeKoinComponent)
+        Box(modifier = Modifier.fillMaxSize()) {
+            getComposable(regularScreen, navigator, nativeKoinComponent)
+            dialogScreen?.let {
+                getComposable(it, navigator, nativeKoinComponent)
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ import com.cheesecake.auth.feature.registration.SignUpScreen
 import com.cheesecake.auth.feature.verification.VerificationScreen
 import com.cheesecake.common.ui.navigator.Navigator
 import com.cheesecake.common.ui.navigator.Screen
+import com.cheesecake.common.ui.toast.ToastMessage
 
 @Composable
 fun getComposable(
@@ -39,7 +40,7 @@ fun getComposable(
         is AuthScreen.Verification -> {
             VerificationScreen(appKoinComponent, screen.email, onSuccessFinished = {
                 navigator.goBack(AuthScreen.Login)
-                navigator.showToastMessage("Verification success")
+                navigator.showToastMessage(ToastMessage.Info("Verification success"))
             }, onBackPressed = {
                 navigator.goBack()
             })

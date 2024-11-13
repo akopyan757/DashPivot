@@ -1,14 +1,23 @@
 package com.cheesecake.common.ui
 
-import android.widget.Toast
 import androidx.navigation.NavHostController
-import com.cheesecake.common.ui.navigator.DialogNavigator
+import com.cheesecake.common.ui.navigator.DialogScreen
+import com.cheesecake.common.ui.navigator.Navigator
 import com.cheesecake.common.ui.navigator.RegularScreen
 import com.cheesecake.common.ui.navigator.state.fullRouteWithArgs
+import com.cheesecake.common.ui.toast.ToastMessage
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class AndroidNavigator(
     private val navController: NavHostController,
-) : DialogNavigator() {
+) : Navigator {
+
+    private val _currentDialog = MutableStateFlow<DialogScreen?>(null)
+    override val currentDialog: StateFlow<DialogScreen?> = _currentDialog
+
+    private val _toastMessage = MutableStateFlow<ToastMessage>(ToastMessage.Idle)
+    override val toastMessage: StateFlow<ToastMessage> = _toastMessage
 
     private var currentStoryBoardName: String? = null
 
@@ -27,7 +36,11 @@ class AndroidNavigator(
         navController.popBackStack(to.fullRouteWithArgs, false)
     }
 
-    override fun showToastMessage(message: String) {
-        Toast.makeText(navController.context, message, Toast.LENGTH_SHORT).show()
+    override fun showToastMessage(toast: ToastMessage) {
+        _toastMessage.value = toast
+    }
+
+    override fun dismissToastMessage() {
+        _toastMessage.value = ToastMessage.Idle
     }
 }

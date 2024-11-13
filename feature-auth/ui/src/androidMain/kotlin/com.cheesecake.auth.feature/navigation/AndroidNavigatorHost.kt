@@ -21,15 +21,12 @@ class AndroidNavigatorHost(
         val koinComponent = AndroidKoinComponent
         Box {
             NavHost(navController = navController, startDestination = AuthScreen.Login.fullRoute) {
-                println("NavHost: " + AuthScreen.Login.fullRouteWithKeys)
                 composable(AuthScreen.Login.fullRouteWithKeys) {
                     getComposable(AuthScreen.Login, navigator, koinComponent)
                 }
-                println("NavHost: " + AuthScreen.Registration.fullRouteWithKeys)
                 composable(AuthScreen.Registration.fullRouteWithKeys) {
                     getComposable(AuthScreen.Registration, navigator, koinComponent)
                 }
-                println("NavHost: " + AuthScreen.Verification().fullRouteWithKeys)
                 composable(
                     route = AuthScreen.Verification().fullRouteWithKeys,
                     arguments = AuthScreen.Verification().navNamedArguments,
