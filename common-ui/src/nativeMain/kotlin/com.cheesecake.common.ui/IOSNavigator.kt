@@ -44,8 +44,11 @@ class IOSNavigator(
             .firstOrNull { it.restorationIdentifier == to.fullRoute }
         if (prevViewController == null) {
             println("Storyboard: goBack: prevViewController not found")
+            navigationController.popToRootViewControllerAnimated(false)
+            navigateTo(to)
             return
         }
+        println("Storyboard: goBack: $prevViewController")
         navigationController.popToViewController(
             prevViewController, true
         )

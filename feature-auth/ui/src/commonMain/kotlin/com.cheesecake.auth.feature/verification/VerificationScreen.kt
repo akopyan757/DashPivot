@@ -83,6 +83,7 @@ fun VerificationScreen(
     LaunchedEffect(logicState) {
         if (logicState is VerificationLogicState.Success) {
             onSuccessFinished()
+            viewModel.resetToIdle()
         }
     }
 
