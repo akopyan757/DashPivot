@@ -29,7 +29,9 @@ class UIStateManagerImpl<T>(
 
     private fun createMutableState(key: String, serializer: KSerializer<T>): MutableStateFlow<T> {
         val lastCacheState = stateManager.getSerializableState(key, serializer)
+        println("lastCacheState: $lastCacheState")
         val initState = lastCacheState ?: createDefaultObject(serializer)
+        println("initState: $initState")
         val state = MutableStateFlow(initState)
         return state
     }

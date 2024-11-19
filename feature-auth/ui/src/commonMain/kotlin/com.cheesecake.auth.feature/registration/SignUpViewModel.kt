@@ -11,91 +11,74 @@ import com.cheesecake.common.auth.utils.formatPasswordErrors
 import com.cheesecake.common.auth.utils.isValidEmail
 import com.cheesecake.common.auth.utils.isValidPassword
 import com.cheesecake.common.auth.utils.validatePassword
+import com.cheesecake.common.ui.state.UIState
+import com.cheesecake.common.ui.state.UIStateManager
 import com.cheesecake.common.ui.state.cache.StateCache
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 class SignUpViewModel(
     private val registerUseCase: RegisterUseCase,
-    private val stateManager: StateCache,
+    private val stateCache: StateCache,
+    private val stateManager: UIStateManager<SignUpState>,
 ): ViewModel() {
 
-    private val _signUpState = MutableStateFlow(
-        stateManager.getSerializableState(SignUpState.KEY, SignUpState.serializer())
-            ?: SignUpState()
-    )
-    val signUpUiState: StateFlow<SignUpState> get() = _signUpState
+    val signUpUiState: StateFlow<SignUpState> = stateManager.state
 
-    init {
-        viewModelScope.launch {
-            _signUpState.collect {
-                stateManager.setSerializableState(SignUpState.KEY, it, SignUpState.serializer())
+    fun onResetSuccess() {
+        stateManager.update {
+            if (logicState is SignUpLogicState.Success) {
+                copy(logicState = SignUpLogicState.Idle)
+            } else {
+                this
             }
         }
     }
 
-    fun onResetSuccess() {
-        if (_signUpState.value.logicState is SignUpLogicState.Success) {
-            _signUpState.value = _signUpState.value.copy(logicState = SignUpLogicState.Idle)
+    fun updateEmail(email: String) {
+        stateManager.update {
+            val errorState = logicState as? SignUpLogicState.Error
+            copy(
+                formData = formData.copy(email = email),
+                logicState = errorState?.copy(emailErrorMessage = null) ?: logicState
+            )
         }
     }
 
-    fun updateEmail(email: String) {
-        val logicState = _signUpState.value.logicState
-        val errorState = logicState as? SignUpLogicState.Error
-        val newLogicState = errorState?.copy(passwordMessage = null) ?: logicState
-
-        _signUpState.value = _signUpState.value.copy(
-            formData = _signUpState.value.formData.copy(email = email),
-            logicState = newLogicState
-        )
-    }
-
     fun updatePassword(password: String) {
-        val logicState = _signUpState.value.logicState
-        val errorState = logicState as? SignUpLogicState.Error
-        val newLogicState = errorState?.copy(passwordMessage = null) ?: logicState
-
-        _signUpState.value = _signUpState.value.copy(
-            formData = _signUpState.value.formData.copy(password = password),
-            logicState = newLogicState
-        )
+        stateManager.update {
+            val errorState = logicState as? SignUpLogicState.Error
+            copy(
+                formData = formData.copy(password = password),
+                logicState = errorState?.copy(passwordMessage = null) ?: logicState
+            )
+        }
     }
 
     fun updateConfirmationPassword(confirmPassword: String) {
-        val logicState = _signUpState.value.logicState
-        val errorState = logicState as? SignUpLogicState.Error
-        val newLogicState = errorState?.copy(confirmPasswordMessage = null) ?: logicState
-
-        _signUpState.value = _signUpState.value.copy(
-            formData = _signUpState.value.formData.copy(confirmPassword = confirmPassword),
-            logicState = newLogicState
-        )
+        stateManager.update {
+            val errorState = logicState as? SignUpLogicState.Error
+            copy(
+                formData = formData.copy(confirmPassword = confirmPassword),
+                logicState = errorState?.copy(confirmPasswordMessage = null) ?: logicState
+            )
+        }
     }
 
     fun updatePasswordVisible(isPasswordVisible: Boolean) {
-        _signUpState.value = _signUpState.value.copy(
-            formData = _signUpState.value.formData.copy(passwordVisible = isPasswordVisible)
-        )
+        stateManager.update {
+            copy(formData = formData.copy(passwordVisible = isPasswordVisible))
+        }
     }
 
     fun updateConfirmPasswordVisible(isConfirmPasswordVisible: Boolean) {
-        _signUpState.value = _signUpState.value.copy(
-            formData = _signUpState.value.formData.copy(
-                confirmPasswordVisible = isConfirmPasswordVisible
-            )
-        )
+        stateManager.update {
+            copy(formData = formData.copy(confirmPasswordVisible = isConfirmPasswordVisible))
+        }
     }
 
     fun signUp(email: String, password: String, confirmPassword: String) {
-        _signUpState.value = _signUpState.value.copy(
-            formData = _signUpState.value.formData.copy(
-                email = email, password = password, confirmPassword = confirmPassword
-            )
-        )
-
         var errorState: SignUpLogicState.Error = SignUpLogicState.Error()
 
         if (email.isBlank()) {
@@ -132,23 +115,23 @@ class SignUpViewModel(
                 errorState.confirmPasswordMessage != null
 
         if (hasError) {
-            _signUpState.value = _signUpState.value.copy(logicState = errorState)
+            stateManager.update { copy(logicState = errorState) }
         } else {
-            _signUpState.value = _signUpState.value.copy(logicState = SignUpLogicState.Loading)
+            stateManager.update { copy(logicState = SignUpLogicState.Loading) }
             viewModelScope.launch {
                 registerUseCase(email, password).collect { result ->
                     when (result) {
                         is ApiResult.Success -> {
                             updateResendTimer(email)
-                            _signUpState.value = _signUpState.value.copy(
-                                logicState = SignUpLogicState.Success(result.data)
-                            )
+                            stateManager.update {
+                                copy(logicState = SignUpLogicState.Success(result.data))
+                            }
                         }
 
                         is ApiResult.Error -> {
-                            _signUpState.value = _signUpState.value.copy(
-                                logicState = SignUpLogicState.Error(result.error)
-                            )
+                            stateManager.update {
+                                copy(logicState = SignUpLogicState.Error(result.error))
+                            }
                         }
                     }
                 }
@@ -158,7 +141,7 @@ class SignUpViewModel(
 
     private fun updateResendTimer(email: String) {
         val state = VerificationResendTimer.init(email)
-        stateManager.setSerializableState(RESEND_KEY, state, VerificationResendTimer.serializer())
+        stateCache.setSerializableState(RESEND_KEY, state, VerificationResendTimer.serializer())
     }
 }
 
@@ -166,7 +149,7 @@ class SignUpViewModel(
 data class SignUpState(
     val formData: SignUpFormData = SignUpFormData(),
     val logicState: SignUpLogicState = SignUpLogicState.Idle
-) {
+): UIState {
     companion object {
         val KEY = SignUpState::class.simpleName.orEmpty()
     }

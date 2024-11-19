@@ -43,7 +43,7 @@ fun LoginScreen(
     viewModel: LoginViewModel,
     loginNavigate: LoginNavigate,
 ) {
-    val state by viewModel.loginState.collectAsState()
+    val state: LoginState by viewModel.loginState.collectAsState()
     var email by remember { mutableStateOf(state.formData.email) }
     var password by remember { mutableStateOf(state.formData.password) }
     var isPasswordVisible by remember { mutableStateOf(state.formData.passwordVisible) }

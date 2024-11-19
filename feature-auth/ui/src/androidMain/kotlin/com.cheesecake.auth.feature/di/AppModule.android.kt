@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import com.cheesecake.auth.feature.login.LoginState
 import com.cheesecake.auth.feature.login.LoginViewModel
 import com.cheesecake.auth.feature.navigation.AndroidNavigatorHost
+import com.cheesecake.auth.feature.registration.SignUpState
 import com.cheesecake.auth.feature.registration.SignUpViewModel
 import com.cheesecake.auth.feature.verification.VerificationViewModel
 import com.cheesecake.common.ui.AndroidNavigator
@@ -12,6 +13,7 @@ import com.cheesecake.common.ui.events.EventStateHolder
 import com.cheesecake.common.ui.navigator.Navigator
 import com.cheesecake.common.ui.navigator.NavigatorHost
 import com.cheesecake.common.ui.navigator.state.AndroidStateCache
+import com.cheesecake.common.ui.state.UIStateManager
 import com.cheesecake.common.ui.state.cache.StateCache
 import com.cheesecake.common.ui.state.UIStateManagerImpl
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -35,10 +37,17 @@ fun screenModule(navController: NavHostController): Module = module {
         scoped<StateCache> {
             AndroidStateCache(get())
         }
-        viewModel { SignUpViewModel(get(), get()) }
+        scoped<UIStateManager<SignUpState>>(named(SignUpState.KEY)) {
+            UIStateManagerImpl(get(), SignUpState.KEY, SignUpState.serializer())
+        }
+        scoped<UIStateManager<LoginState>>(named(LoginState.KEY)) {
+            UIStateManagerImpl(get(), LoginState.KEY, LoginState.serializer())
+        }
         viewModel {
-            val stateStrategy = UIStateManagerImpl(get(), LoginState.KEY, LoginState.serializer())
-            LoginViewModel(get(), stateStrategy)
+            SignUpViewModel(get(), get(), get(named(SignUpState.KEY)))
+        }
+        viewModel {
+            LoginViewModel(get(), get(named(LoginState.KEY)))
         }
         viewModel { VerificationViewModel(get(), get(), get()) }
     }
