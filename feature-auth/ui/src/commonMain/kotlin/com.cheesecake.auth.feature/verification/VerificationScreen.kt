@@ -93,7 +93,10 @@ fun VerificationScreen(
         onCodeCompleted = { viewModel.verifyToken(email, it) },
         onResetToIdle = { viewModel.resetToIdle() },
         onResendCode = { viewModel.resendCode(email) },
-        onBackPressed = onBackPressed,
+        onBackPressed = {
+            onBackPressed()
+            viewModel.resetToIdle()
+        },
     )
 }
 

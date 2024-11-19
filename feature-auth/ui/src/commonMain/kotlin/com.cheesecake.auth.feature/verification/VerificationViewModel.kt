@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cheesecake.auth.feature.domain.usecase.ResendCodeUseCase
 import com.cheesecake.auth.feature.domain.usecase.VerificationUseCase
+import com.cheesecake.auth.feature.login.LoginState
+import com.cheesecake.auth.feature.registration.SignUpState
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.config.Config
 import com.cheesecake.common.ui.state.UIState
@@ -16,6 +18,8 @@ class VerificationViewModel(
     private val verificationUseCase: VerificationUseCase,
     private val resendCodeUseCase: ResendCodeUseCase,
     private val stateManager: UIStateManager<VerificationState>,
+    private val loginStateManager: UIStateManager<LoginState>,
+    private val signUpState: UIStateManager<SignUpState>,
 ) : ViewModel() {
 
     val verificationState: StateFlow<VerificationState> get() = stateManager.state
@@ -26,7 +30,11 @@ class VerificationViewModel(
             verificationUseCase(email, code).collect { result ->
                 stateManager.update {
                     when (result) {
-                        is ApiResult.Success<*> -> copy(logicState = VerificationLogicState.Success)
+                        is ApiResult.Success<*> -> {
+                            loginStateManager.clear()
+                            signUpState.clear()
+                            copy(logicState = VerificationLogicState.Success)
+                        }
                         is ApiResult.Error<*> -> copy(
                             logicState = VerificationLogicState.Error(result.error.message)
                         )

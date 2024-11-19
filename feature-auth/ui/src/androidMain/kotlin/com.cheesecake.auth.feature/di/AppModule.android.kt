@@ -50,7 +50,14 @@ fun screenModule(navController: NavHostController): Module = module {
         }
         viewModel { SignUpViewModel(get(), get(named(SignUpState.KEY))) }
         viewModel { LoginViewModel(get(), get(named(LoginState.KEY))) }
-        viewModel { VerificationViewModel(get(), get(), get(named(VerificationState.KEY))) }
+        viewModel {
+            VerificationViewModel(
+                get(), get(),
+                get(named(VerificationState.KEY)),
+                get(named(LoginState.KEY)),
+                get(named(SignUpState.KEY))
+            )
+        }
     }
 
     single<EventStateHolder> { EventStateHolder() }
