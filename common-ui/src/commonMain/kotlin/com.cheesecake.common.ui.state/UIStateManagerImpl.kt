@@ -1,13 +1,13 @@
 package com.cheesecake.common.ui.state
 
-import com.cheesecake.common.ui.navigator.state.IStateManager
+import com.cheesecake.common.ui.state.cache.StateCache
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 
 class UIStateManagerImpl<T>(
-    private val stateManager: IStateManager,
+    private val stateManager: StateCache,
     private val stateKey: String,
     private val serializer: KSerializer<T>,
 ): UIStateManager<T> where T: UIState {

@@ -1,14 +1,13 @@
 package com.cheesecake.common.ui.navigator.state
 
 import androidx.lifecycle.SavedStateHandle
+import com.cheesecake.common.ui.state.cache.StateCache
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
-import kotlin.reflect.KClass
 
-class AndroidStateManager(
+class AndroidStateCache(
     private val savedStateHandle: SavedStateHandle,
-    private val classSerializers: IKClassSerializers,
-) : IStateManager {
+) : StateCache {
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -20,22 +19,9 @@ class AndroidStateManager(
         savedStateHandle[key] = value
     }
 
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : Any> getSerializableState(key: String, kClass: KClass<T>): T? {
-        val jsonString = savedStateHandle.get<String>(key) ?: return null
-        val serializer = classSerializers.serializers[kClass] ?: return null
-        return json.decodeFromString(serializer, jsonString) as? T
-    }
-
     override fun <T : Any> getSerializableState(key: String, kSerializer: KSerializer<T>): T? {
         val jsonString = savedStateHandle.get<String>(key) ?: return null
         return json.decodeFromString(kSerializer, jsonString) as? T
-    }
-
-    override fun <T : Any> setSerializableState(key: String, value: T, kClass: KClass<T>) {
-        val serializer = classSerializers.serializers[kClass] as? KSerializer<T> ?: return
-        val jsonString = json.encodeToString(serializer, value)
-        savedStateHandle[key] = jsonString
     }
 
     override fun <T : Any> setSerializableState(

@@ -5,16 +5,14 @@ import androidx.navigation.NavHostController
 import com.cheesecake.auth.feature.login.LoginState
 import com.cheesecake.auth.feature.login.LoginViewModel
 import com.cheesecake.auth.feature.navigation.AndroidNavigatorHost
-import com.cheesecake.auth.feature.navigation.AuthSerializers
 import com.cheesecake.auth.feature.registration.SignUpViewModel
 import com.cheesecake.auth.feature.verification.VerificationViewModel
 import com.cheesecake.common.ui.AndroidNavigator
 import com.cheesecake.common.ui.events.EventStateHolder
 import com.cheesecake.common.ui.navigator.Navigator
 import com.cheesecake.common.ui.navigator.NavigatorHost
-import com.cheesecake.common.ui.navigator.state.AndroidStateManager
-import com.cheesecake.common.ui.navigator.state.IKClassSerializers
-import com.cheesecake.common.ui.navigator.state.IStateManager
+import com.cheesecake.common.ui.navigator.state.AndroidStateCache
+import com.cheesecake.common.ui.state.cache.StateCache
 import com.cheesecake.common.ui.state.UIStateManagerImpl
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.component.KoinComponent
@@ -34,7 +32,9 @@ fun screenModule(navController: NavHostController): Module = module {
             get<NavHostController>().currentBackStackEntry?.savedStateHandle ?:
                 throw IllegalStateException("No current back stack entry")
         }
-        scoped<IStateManager> { AndroidStateManager(get(), get()) }
+        scoped<StateCache> {
+            AndroidStateCache(get())
+        }
         viewModel { SignUpViewModel(get(), get()) }
         viewModel {
             val stateStrategy = UIStateManagerImpl(get(), LoginState.KEY, LoginState.serializer())
@@ -44,7 +44,6 @@ fun screenModule(navController: NavHostController): Module = module {
     }
 
     single<EventStateHolder> { EventStateHolder() }
-    single<IKClassSerializers> { AuthSerializers() }
 }
 
 object AndroidKoinComponent : AppKoinComponent, KoinComponent {
@@ -65,5 +64,5 @@ object AndroidKoinComponent : AppKoinComponent, KoinComponent {
     override fun getSignUpViewModel(): SignUpViewModel = getAuthScope().get()
     override fun getLoginViewModel(): LoginViewModel = getAuthScope().get()
     override fun getEventStateHolder(): EventStateHolder = get().get()
-    override fun getStateManager(): IStateManager = getAuthScope().get()
+    override fun getStateManager(): StateCache = getAuthScope().get()
 }

@@ -7,7 +7,7 @@ import com.cheesecake.auth.feature.domain.usecase.VerificationUseCase
 import com.cheesecake.auth.feature.state.RESEND_KEY
 import com.cheesecake.auth.feature.state.VerificationResendTimer
 import com.cheesecake.common.api.ApiResult
-import com.cheesecake.common.ui.navigator.state.IStateManager
+import com.cheesecake.common.ui.state.cache.StateCache
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 class VerificationViewModel(
     private val verificationUseCase: VerificationUseCase,
     private val resendCodeUseCase: ResendCodeUseCase,
-    private val stateManager: IStateManager,
+    private val stateManager: StateCache,
 ) : ViewModel() {
 
     private val _verificationState = MutableStateFlow(VerificationState())
@@ -69,7 +69,7 @@ class VerificationViewModel(
     }
 
     fun resetToIdleWithTimer(email: String) {
-        val resendTimer = stateManager.getSerializableState(RESEND_KEY, VerificationResendTimer::class)
+        val resendTimer = stateManager.getSerializableState(RESEND_KEY, VerificationResendTimer.serializer())
         if (resendTimer?.email == email && !resendTimer.canResend()) {
             val restSeconds = resendTimer.calculateRestSeconds()
             _verificationState.value = _verificationState.value.copy(
@@ -83,7 +83,7 @@ class VerificationViewModel(
 
     private fun updateResendTimer(email: String) {
         val state = VerificationResendTimer.init(email)
-        stateManager.setSerializableState(RESEND_KEY, state, VerificationResendTimer::class)
+        stateManager.setSerializableState(RESEND_KEY, state, VerificationResendTimer.serializer())
     }
 }
 

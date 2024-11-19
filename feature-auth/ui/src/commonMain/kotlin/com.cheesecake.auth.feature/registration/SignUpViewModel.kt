@@ -11,7 +11,7 @@ import com.cheesecake.common.auth.utils.formatPasswordErrors
 import com.cheesecake.common.auth.utils.isValidEmail
 import com.cheesecake.common.auth.utils.isValidPassword
 import com.cheesecake.common.auth.utils.validatePassword
-import com.cheesecake.common.ui.navigator.state.IStateManager
+import com.cheesecake.common.ui.state.cache.StateCache
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -19,7 +19,7 @@ import kotlinx.serialization.Serializable
 
 class SignUpViewModel(
     private val registerUseCase: RegisterUseCase,
-    private val stateManager: IStateManager,
+    private val stateManager: StateCache,
 ): ViewModel() {
 
     private val _signUpState = MutableStateFlow(
@@ -158,9 +158,8 @@ class SignUpViewModel(
 
     private fun updateResendTimer(email: String) {
         val state = VerificationResendTimer.init(email)
-        stateManager.setSerializableState(RESEND_KEY, state, VerificationResendTimer::class)
+        stateManager.setSerializableState(RESEND_KEY, state, VerificationResendTimer.serializer())
     }
-
 }
 
 @Serializable
