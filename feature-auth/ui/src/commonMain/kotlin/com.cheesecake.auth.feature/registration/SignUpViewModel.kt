@@ -3,8 +3,6 @@ package com.cheesecake.auth.feature.registration
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cheesecake.auth.feature.domain.usecase.RegisterUseCase
-import com.cheesecake.auth.feature.state.RESEND_KEY
-import com.cheesecake.auth.feature.state.VerificationResendTimer
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.model.registration.RegisterError
 import com.cheesecake.common.auth.utils.formatPasswordErrors
@@ -13,14 +11,12 @@ import com.cheesecake.common.auth.utils.isValidPassword
 import com.cheesecake.common.auth.utils.validatePassword
 import com.cheesecake.common.ui.state.UIState
 import com.cheesecake.common.ui.state.UIStateManager
-import com.cheesecake.common.ui.state.cache.StateCache
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 class SignUpViewModel(
     private val registerUseCase: RegisterUseCase,
-    private val stateCache: StateCache,
     private val stateManager: UIStateManager<SignUpState>,
 ): ViewModel() {
 
@@ -122,7 +118,6 @@ class SignUpViewModel(
                 registerUseCase(email, password).collect { result ->
                     when (result) {
                         is ApiResult.Success -> {
-                            updateResendTimer(email)
                             stateManager.update {
                                 copy(logicState = SignUpLogicState.Success(result.data))
                             }
@@ -137,11 +132,6 @@ class SignUpViewModel(
                 }
             }
         }
-    }
-
-    private fun updateResendTimer(email: String) {
-        val state = VerificationResendTimer.init(email)
-        stateCache.setSerializableState(RESEND_KEY, state, VerificationResendTimer.serializer())
     }
 }
 

@@ -77,7 +77,7 @@ fun VerificationScreen(
     val logicState = verificationState.logicState
 
     LaunchedEffect(email) {
-        viewModel.resetToIdleWithTimer(email)
+        viewModel.resetTimer()
     }
 
     LaunchedEffect(logicState) {

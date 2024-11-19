@@ -4,54 +4,46 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cheesecake.auth.feature.domain.usecase.ResendCodeUseCase
 import com.cheesecake.auth.feature.domain.usecase.VerificationUseCase
-import com.cheesecake.auth.feature.state.RESEND_KEY
-import com.cheesecake.auth.feature.state.VerificationResendTimer
 import com.cheesecake.common.api.ApiResult
-import com.cheesecake.common.ui.state.cache.StateCache
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.cheesecake.common.auth.config.Config
+import com.cheesecake.common.ui.state.UIState
+import com.cheesecake.common.ui.state.UIStateManager
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
 class VerificationViewModel(
     private val verificationUseCase: VerificationUseCase,
     private val resendCodeUseCase: ResendCodeUseCase,
-    private val stateManager: StateCache,
+    private val stateManager: UIStateManager<VerificationState>,
 ) : ViewModel() {
 
-    private val _verificationState = MutableStateFlow(VerificationState())
-    val verificationState: StateFlow<VerificationState> get() = _verificationState
+    val verificationState: StateFlow<VerificationState> get() = stateManager.state
 
     fun verifyToken(email: String, code: String) {
-        _verificationState.value = _verificationState.value.copy(
-            logicState = VerificationLogicState.Loading
-        )
+        stateManager.update { copy(logicState = VerificationLogicState.Loading) }
         viewModelScope.launch {
             verificationUseCase(email, code).collect { result ->
-                _verificationState.value = when (result) {
-                    is ApiResult.Success<*> -> _verificationState.value.copy(
-                        logicState = VerificationLogicState.Success
-                    )
-                    is ApiResult.Error<*> ->_verificationState.value.copy(
-                        logicState = VerificationLogicState.Error(result.error.message)
-                    )
-                    else -> _verificationState.value.copy(
-                        logicState = VerificationLogicState.Idle
-                    )
+                stateManager.update {
+                    when (result) {
+                        is ApiResult.Success<*> -> copy(logicState = VerificationLogicState.Success)
+                        is ApiResult.Error<*> -> copy(
+                            logicState = VerificationLogicState.Error(result.error.message)
+                        )
+                        else -> copy(logicState = VerificationLogicState.Idle)
+                    }
                 }
             }
         }
     }
 
     fun resendCode(email: String) {
-        _verificationState.value = _verificationState.value.copy(
-            formData = VerificationFormData(isResendLoading = true)
-        )
+        stateManager.update { copy(formData = VerificationFormData(isResendLoading = true)) }
         viewModelScope.launch {
             resendCodeUseCase(email).collect { result ->
                 when (result) {
                     is ApiResult.Success<String> -> {
-                        updateResendTimer(email)
-                        resetToIdleWithTimer(email)
+                        resetTimer()
                     }
 
                     is ApiResult.Error -> {
@@ -63,40 +55,37 @@ class VerificationViewModel(
     }
 
     fun resetToIdle() {
-        _verificationState.value = _verificationState.value.copy(
-            logicState = VerificationLogicState.Idle
-        )
+        stateManager.update { copy(logicState = VerificationLogicState.Idle) }
     }
 
-    fun resetToIdleWithTimer(email: String) {
-        val resendTimer = stateManager.getSerializableState(RESEND_KEY, VerificationResendTimer.serializer())
-        if (resendTimer?.email == email && !resendTimer.canResend()) {
-            val restSeconds = resendTimer.calculateRestSeconds()
-            _verificationState.value = _verificationState.value.copy(
-                formData = VerificationFormData(
-                    restTime = restSeconds,
-                    isResendLoading = false
-                ),
+    fun resetTimer() {
+        stateManager.update {
+            val formData = VerificationFormData(
+                restTime = Config.VERIFICATION_CODE_SENDING_DELAY_SEC.toInt(),
+                isResendLoading = false
             )
+            copy(formData = formData)
         }
-    }
-
-    private fun updateResendTimer(email: String) {
-        val state = VerificationResendTimer.init(email)
-        stateManager.setSerializableState(RESEND_KEY, state, VerificationResendTimer.serializer())
     }
 }
 
+@Serializable
 data class VerificationState(
     val formData: VerificationFormData = VerificationFormData(),
     val logicState: VerificationLogicState = VerificationLogicState.Idle,
-)
+): UIState {
+    companion object {
+        val KEY: String = VerificationState::class.simpleName.orEmpty()
+    }
+}
 
+@Serializable
 data class VerificationFormData(
     val restTime: Int = -1,
     val isResendLoading: Boolean = false,
 )
 
+@Serializable
 sealed class VerificationLogicState {
     data object Idle : VerificationLogicState()
     data object Loading : VerificationLogicState()

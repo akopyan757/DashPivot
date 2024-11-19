@@ -7,6 +7,7 @@ import com.cheesecake.auth.feature.login.LoginViewModel
 import com.cheesecake.auth.feature.navigation.AndroidNavigatorHost
 import com.cheesecake.auth.feature.registration.SignUpState
 import com.cheesecake.auth.feature.registration.SignUpViewModel
+import com.cheesecake.auth.feature.verification.VerificationState
 import com.cheesecake.auth.feature.verification.VerificationViewModel
 import com.cheesecake.common.ui.AndroidNavigator
 import com.cheesecake.common.ui.events.EventStateHolder
@@ -16,6 +17,7 @@ import com.cheesecake.common.ui.navigator.state.AndroidStateCache
 import com.cheesecake.common.ui.state.UIStateManager
 import com.cheesecake.common.ui.state.cache.StateCache
 import com.cheesecake.common.ui.state.UIStateManagerImpl
+import com.cheesecake.common.ui.state.UIStateManagerWithoutCacheImpl
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.component.KoinComponent
 import org.koin.core.context.GlobalContext.get
@@ -43,13 +45,12 @@ fun screenModule(navController: NavHostController): Module = module {
         scoped<UIStateManager<LoginState>>(named(LoginState.KEY)) {
             UIStateManagerImpl(get(), LoginState.KEY, LoginState.serializer())
         }
-        viewModel {
-            SignUpViewModel(get(), get(), get(named(SignUpState.KEY)))
+        scoped<UIStateManager<VerificationState>>(named(VerificationState.KEY)) {
+            UIStateManagerWithoutCacheImpl(VerificationState.serializer())
         }
-        viewModel {
-            LoginViewModel(get(), get(named(LoginState.KEY)))
-        }
-        viewModel { VerificationViewModel(get(), get(), get()) }
+        viewModel { SignUpViewModel(get(), get(named(SignUpState.KEY))) }
+        viewModel { LoginViewModel(get(), get(named(LoginState.KEY))) }
+        viewModel { VerificationViewModel(get(), get(), get(named(VerificationState.KEY))) }
     }
 
     single<EventStateHolder> { EventStateHolder() }
