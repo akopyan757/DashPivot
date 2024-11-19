@@ -1,5 +1,6 @@
 package com.cheesecake.auth.feature.di
 
+import com.cheesecake.auth.feature.login.LoginState
 import com.cheesecake.auth.feature.login.LoginViewModel
 import com.cheesecake.auth.feature.navigation.IOSNavigatorHost
 import com.cheesecake.auth.feature.registration.SignUpViewModel
@@ -8,6 +9,7 @@ import com.cheesecake.common.ui.events.EventStateHolder
 import com.cheesecake.common.ui.navigator.NavigatorHost
 import com.cheesecake.common.ui.navigator.state.DefaultStateManager
 import com.cheesecake.common.ui.navigator.state.IStateManager
+import com.cheesecake.common.ui.state.UIStateManagerImpl
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.module.Module
@@ -18,7 +20,10 @@ fun appModule(navigationController: UINavigationController): Module = module {
     single<IStateManager> { DefaultStateManager() }
     single { DefaultStateManager() }
     single { SignUpViewModel(get(), get()) }
-    single { LoginViewModel(get(), get()) }
+    single {
+        val stateStrategy = UIStateManagerImpl(get(), LoginState.KEY, LoginState.serializer())
+        LoginViewModel(get(), stateStrategy)
+    }
     single { VerificationViewModel(get(), get(), get()) }
     single<NavigatorHost> { IOSNavigatorHost(navigationController, get()) }
     single { EventStateHolder() }

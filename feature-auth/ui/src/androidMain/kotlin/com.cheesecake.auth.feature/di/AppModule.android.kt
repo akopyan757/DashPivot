@@ -2,6 +2,7 @@ package com.cheesecake.auth.feature.di
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavHostController
+import com.cheesecake.auth.feature.login.LoginState
 import com.cheesecake.auth.feature.login.LoginViewModel
 import com.cheesecake.auth.feature.navigation.AndroidNavigatorHost
 import com.cheesecake.auth.feature.navigation.AuthSerializers
@@ -14,6 +15,7 @@ import com.cheesecake.common.ui.navigator.NavigatorHost
 import com.cheesecake.common.ui.navigator.state.AndroidStateManager
 import com.cheesecake.common.ui.navigator.state.IKClassSerializers
 import com.cheesecake.common.ui.navigator.state.IStateManager
+import com.cheesecake.common.ui.state.UIStateManagerImpl
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.component.KoinComponent
 import org.koin.core.context.GlobalContext.get
@@ -34,7 +36,10 @@ fun screenModule(navController: NavHostController): Module = module {
         }
         scoped<IStateManager> { AndroidStateManager(get(), get()) }
         viewModel { SignUpViewModel(get(), get()) }
-        viewModel { LoginViewModel(get(), get()) }
+        viewModel {
+            val stateStrategy = UIStateManagerImpl(get(), LoginState.KEY, LoginState.serializer())
+            LoginViewModel(get(), stateStrategy)
+        }
         viewModel { VerificationViewModel(get(), get(), get()) }
     }
 

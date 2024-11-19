@@ -22,13 +22,14 @@ actual fun App() {
     val scope: Scope? = getKoin().getScopeOrNull("MainActivityScope")
     val navigatorHost: NavigatorHost? = scope?.get()
 
-    navigatorHost?.let {
-        val toast: ToastMessage? by it.navigator.toastMessage.collectAsState()
+    if (navigatorHost != null) {
+        val toast: ToastMessage by navigatorHost.navigator.toastMessage.collectAsState(ToastMessage.Idle)
+
         Box(modifier = Modifier.fillMaxSize().padding(WindowInsets.ime.asPaddingValues())) {
             navigatorHost.Screen()
             ToastSurface(
                 modifier = Modifier.align(BiasAlignment(0.0f, 0.75f)),
-                toastMessage = toast ?: ToastMessage.Idle,
+                toastMessage = toast,
                 onReset = { navigatorHost.navigator.dismissToastMessage() }
             )
         }

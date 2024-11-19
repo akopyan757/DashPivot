@@ -10,57 +10,43 @@ import com.cheesecake.common.auth.utils.formatPasswordErrors
 import com.cheesecake.common.auth.utils.isValidEmail
 import com.cheesecake.common.auth.utils.isValidPassword
 import com.cheesecake.common.auth.utils.validatePassword
-import com.cheesecake.common.ui.navigator.state.IStateManager
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.cheesecake.common.ui.state.UIState
+import com.cheesecake.common.ui.state.UIStateManager
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 class LoginViewModel(
     private val loginUseCase: LoginUseCase,
-    private val stateManager: IStateManager,
+    private val stateStrategy: UIStateManager<LoginState>,
 ): ViewModel() {
 
-    private val _loginState = MutableStateFlow(
-        stateManager.getSerializableState(LoginState.KEY, LoginState.serializer())
-                ?: LoginState()
-    )
-    val loginState: StateFlow<LoginState> get() = _loginState
+    val loginState: StateFlow<LoginState> get() = stateStrategy.state
 
-    init {
-        viewModelScope.launch {
-            _loginState.collect {
-                stateManager.setSerializableState(LoginState.KEY, it, LoginState.serializer())
-            }
+    fun onEmailChanged(email: String) {
+        stateStrategy.update {
+            val error = logicState as? LoginLogicState.Error
+            copy(
+                formData = formData.copy(email = email),
+                logicState = error?.copy(emailErrorMessage = null) ?: logicState
+            )
         }
     }
 
-    fun onEmailChanged(email: String) {
-        val logicState = _loginState.value.logicState
-        val errorState = logicState as? LoginLogicState.Error
-        val newLogicState = errorState?.copy(emailErrorMessage = null) ?: logicState
-
-        _loginState.value = _loginState.value.copy(
-            formData = _loginState.value.formData.copy(email = email),
-            logicState = newLogicState
-        )
-    }
-
     fun onPasswordChanged(password: String) {
-        val logicState = _loginState.value.logicState
-        val errorState = logicState as? LoginLogicState.Error
-        val newLogicState = errorState?.copy(passwordMessage = null) ?: logicState
-
-        _loginState.value = _loginState.value.copy(
-            formData = _loginState.value.formData.copy(password = password),
-            logicState = newLogicState
-        )
+        stateStrategy.update {
+            val errorState = logicState as? LoginLogicState.Error
+            copy(
+                formData = formData.copy(password = password),
+                logicState = errorState?.copy(passwordMessage = null) ?: logicState
+            )
+        }
     }
 
     fun changePasswordVisibleChanged(isPasswordVisible: Boolean) {
-        _loginState.value = _loginState.value.copy(
-            formData = _loginState.value.formData.copy(passwordVisible = isPasswordVisible)
-        )
+        stateStrategy.update {
+            copy(formData = formData.copy(passwordVisible = isPasswordVisible))
+        }
     }
 
     fun login(email: String, password: String) {
@@ -93,23 +79,25 @@ class LoginViewModel(
             errorState.passwordMessage != null
 
         if (hasError) {
-            _loginState.value = _loginState.value.copy(logicState = errorState)
+            stateStrategy.update { copy(logicState = errorState) }
         } else {
-            _loginState.value = _loginState.value.copy(logicState = LoginLogicState.Loading)
-
+            stateStrategy.update { copy(logicState = LoginLogicState.Loading) }
             viewModelScope.launch {
                 loginUseCase(email, password).collect { result ->
                     when (result) {
                         is ApiResult.Success -> {
-                            _loginState.value = _loginState.value.copy(
-                                logicState = LoginLogicState.Success(result.data)
-                            )
+                            stateStrategy.update {
+                                copy(
+                                    formData = LoginFormData(), // Clear form data
+                                    logicState = LoginLogicState.Success(result.data)
+                                )
+                            }
                         }
 
                         is ApiResult.Error -> {
-                            _loginState.value = _loginState.value.copy(
-                                logicState = LoginLogicState.Error(result.error)
-                            )
+                            stateStrategy.update {
+                                copy(logicState = LoginLogicState.Error(result.error))
+                            }
                         }
                     }
                 }
@@ -124,7 +112,7 @@ class LoginViewModel(
 data class LoginState(
     val formData: LoginFormData = LoginFormData(),
     val logicState: LoginLogicState = LoginLogicState.Idle
-) {
+): UIState {
     companion object {
         val KEY = LoginState::class.simpleName.orEmpty()
     }
