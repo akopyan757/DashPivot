@@ -6,7 +6,8 @@ import com.cheesecake.common.auth.model.login.LoginError
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterError
 import com.cheesecake.common.auth.model.registration.RegisterRequest
-import com.cheesecake.common.auth.model.resendCode.ResendCodeError
+import com.cheesecake.common.auth.model.sendCode.SendCodeType
+import com.cheesecake.common.auth.model.sendCode.SendCodeError
 import com.cheesecake.common.auth.model.verefication.VerificationError
 import com.cheesecake.common.auth.service.UserService
 import com.cheesecake.common.auth.utils.isValidEmail
@@ -16,7 +17,6 @@ import com.cheesecake.server.auth.route.mail.IEmailService
 import com.cheesecake.server.auth.route.utils.IPasswordHasher
 import com.cheesecake.server.auth.route.utils.ITokenGenerator
 import com.cheesecake.server.auth.route.utils.IVerifyCodeGenerator
-import org.jetbrains.exposed.sql.transactions.transaction
 
 internal class UserRepository(
     private val emailService: IEmailService,
@@ -80,17 +80,17 @@ internal class UserRepository(
     }
 
 
-    override suspend fun resendCode(email: String): ApiResult<String, ResendCodeError> {
+    override suspend fun sendVerificationCode(email: String, type: SendCodeType): ApiResult<String, SendCodeError> {
         val user = userSource.findUserByEmail(email) ?: run {
-            return ApiResult.Error(ResendCodeError.USER_NOT_FOUND)
+            return ApiResult.Error(SendCodeError.USER_NOT_FOUND)
         }
 
         if (userSource.isEmailTakenAndVerified(email)) {
-            return ApiResult.Error(ResendCodeError.EMAIL_ALREADY_VERIFIED)
+            return ApiResult.Error(SendCodeError.EMAIL_ALREADY_VERIFIED)
         }
 
         if (!userSource.canSendVerificationCode(email)) {
-            return ApiResult.Error(ResendCodeError.TOO_MANY_REQUESTS)
+            return ApiResult.Error(SendCodeError.TOO_MANY_REQUESTS)
         }
 
         val verificationCode = verifyCodeGenerator.generateVerificationCode(Config.VERIFICATION_CODE_COUNT)
@@ -99,7 +99,7 @@ internal class UserRepository(
         userSource.updateVerificationCode(user.id, hashedVerificationCode)
 
         if (!emailService.sendVerificationEmail(email, verificationCode)) {
-            return ApiResult.Error(ResendCodeError.EMAIL_SENDING_FAILED)
+            return ApiResult.Error(SendCodeError.EMAIL_SENDING_FAILED)
         }
 
         return ApiResult.Success("Verification code sent successfully")

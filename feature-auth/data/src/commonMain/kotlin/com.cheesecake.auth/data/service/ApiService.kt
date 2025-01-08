@@ -2,12 +2,13 @@ package com.cheesecake.auth.data.service
 
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterRequest
+import com.cheesecake.common.auth.model.sendCode.SendCodeType
 import io.ktor.client.statement.HttpResponse
 
 
 interface ApiService {
     suspend fun registerUser(request: RegisterRequest): HttpResponse
     suspend fun verificationCode(email: String, code: String): HttpResponse
-    suspend fun resendCode(email: String): HttpResponse
+    suspend fun sendVerificationCode(email: String, type: SendCodeType): HttpResponse
     suspend fun loginUser(request: LoginRequest): HttpResponse
 }

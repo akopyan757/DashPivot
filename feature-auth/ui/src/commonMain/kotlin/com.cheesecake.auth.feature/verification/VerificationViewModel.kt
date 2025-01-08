@@ -2,7 +2,7 @@ package com.cheesecake.auth.feature.verification
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cheesecake.auth.feature.domain.usecase.ResendCodeUseCase
+import com.cheesecake.auth.feature.domain.usecase.ResendVerificationRegisterCodeUseCase
 import com.cheesecake.auth.feature.domain.usecase.VerificationUseCase
 import com.cheesecake.auth.feature.login.LoginState
 import com.cheesecake.auth.feature.registration.SignUpState
@@ -16,7 +16,7 @@ import kotlinx.serialization.Serializable
 
 class VerificationViewModel(
     private val verificationUseCase: VerificationUseCase,
-    private val resendCodeUseCase: ResendCodeUseCase,
+    private val resendVerificationRegisterCodeUseCase: ResendVerificationRegisterCodeUseCase,
     private val stateManager: UIStateManager<VerificationState>,
     private val loginStateManager: UIStateManager<LoginState>,
     private val signUpState: UIStateManager<SignUpState>,
@@ -48,7 +48,7 @@ class VerificationViewModel(
     fun resendCode(email: String) {
         stateManager.update { copy(formData = VerificationFormData(isResendLoading = true)) }
         viewModelScope.launch {
-            resendCodeUseCase(email).collect { result ->
+            resendVerificationRegisterCodeUseCase(email).collect { result ->
                 when (result) {
                     is ApiResult.Success<String> -> {
                         resetTimer()

@@ -1,9 +1,9 @@
-package com.cheesecake.common.auth.model.resendCode
+package com.cheesecake.common.auth.model.sendCode
 
 import com.cheesecake.common.api.ApiError
 import com.cheesecake.common.auth.config.Config
 
-enum class ResendCodeError(override val message: String): ApiError {
+enum class SendCodeError(override val message: String): ApiError {
     USER_NOT_FOUND("User not found for resend code"),
     EMAIL_ALREADY_VERIFIED("Email already verified"),
     TOO_MANY_REQUESTS("Please wait ${Config.VERIFICATION_CODE_SENDING_DELAY_SEC.toInt()} seconds since the last registration request."),
@@ -11,8 +11,8 @@ enum class ResendCodeError(override val message: String): ApiError {
     UNKNOWN("Unknown error");
 
     companion object {
-        fun fromMessage(message: String): ResendCodeError {
-            return ResendCodeError.entries.find { it.message == message } ?: UNKNOWN
+        fun fromMessage(message: String): SendCodeError {
+            return SendCodeError.entries.find { it.message == message } ?: UNKNOWN
         }
     }
 }
