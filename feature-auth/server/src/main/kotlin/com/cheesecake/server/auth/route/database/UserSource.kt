@@ -3,6 +3,7 @@ package com.cheesecake.server.auth.route.database
 import com.cheesecake.common.auth.config.Config.VERIFICATION_CODE_SENDING_DELAY_SEC
 import com.cheesecake.common.auth.model.User
 import com.cheesecake.common.auth.model.UserVerify
+import com.cheesecake.common.auth.model.sendCode.SendCodeType
 import com.cheesecake.server.auth.route.common.dateFormatter
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -19,9 +20,13 @@ import java.time.temporal.ChronoUnit
 
 interface IUserSource {
     fun isEmailTakenAndVerified(email: String): Boolean
-    fun canSendVerificationCode(email: String): Boolean
+    fun canSendVerificationCode(email: String, sendCodeType: SendCodeType): Boolean
 
-    fun updateVerificationCode(id: Int, hashedVerificationCode: String)
+    fun updateVerificationCode(
+        id: Int,
+        hashedVerificationCode: String,
+        sendCodeType: SendCodeType
+    )
 
     fun verifyEmail(id: Int)
     fun createUser(
@@ -33,7 +38,7 @@ interface IUserSource {
     ): User
 
     fun findUserByEmail(email: String): User?
-    fun findUserForVerification(email: String): UserVerify?
+    fun findUserForVerification(email: String, sendCodeType: SendCodeType): UserVerify?
 }
 
 class UserSource: IUserSource {
@@ -45,8 +50,8 @@ class UserSource: IUserSource {
         }
     }
 
-    override fun canSendVerificationCode(email: String): Boolean {
-       findUserForVerification(email)?.let { userVerify ->
+    override fun canSendVerificationCode(email: String, sendCodeType: SendCodeType): Boolean {
+       findUserForVerification(email, sendCodeType)?.let { userVerify ->
             val now = LocalDateTime.now()
             val lastSentTime = userVerify.createdAt?.let { dateTime ->
                 LocalDateTime.parse(dateTime, dateFormatter)
@@ -58,11 +63,16 @@ class UserSource: IUserSource {
         return true
     }
 
-    override fun updateVerificationCode(id: Int, hashedVerificationCode: String) {
+    override fun updateVerificationCode(
+        id: Int,
+        hashedVerificationCode: String,
+        sendCodeType: SendCodeType,
+    ) {
         transaction {
             VerificationCodes.update({ VerificationCodes.userId eq id }) {
                 it[createdAt] = CurrentDateTime
                 it[code] = hashedVerificationCode
+                it[operationType] = sendCodeType.type
             }
         }
     }
@@ -99,6 +109,7 @@ class UserSource: IUserSource {
                         VerificationCodes.insert {
                             it[userId] = existingUser[Users.id]
                             it[code] = hashedVerificationCode
+                            it[operationType] = SendCodeType.REGISTRATION.type
                             if (createdDateTime != null) {
                                 it[createdAt] = createdDateTime
                             } else {
@@ -123,6 +134,7 @@ class UserSource: IUserSource {
                     VerificationCodes.insert {
                         it[userId] = id
                         it[code] = hashedVerificationCode
+                        it[operationType] = SendCodeType.REGISTRATION.type
                         if (createdDateTime != null) {
                             it[createdAt] = createdDateTime
                         } else {
@@ -146,14 +158,21 @@ class UserSource: IUserSource {
         }
     }
 
-    override fun findUserForVerification(email: String): UserVerify? {
+    override fun findUserForVerification(email: String, sendCodeType: SendCodeType): UserVerify? {
         return transaction {
             val columns = listOf(
-                Users.id, Users.email, VerificationCodes.code, VerificationCodes.createdAt
+                Users.id,
+                Users.email,
+                VerificationCodes.code,
+                VerificationCodes.createdAt,
+                VerificationCodes.operationType,
             )
             (Users leftJoin VerificationCodes)
                 .select(columns)
-                .where { Users.email eq email }
+                .where {
+                    (Users.email eq email) and
+                    (VerificationCodes.operationType eq sendCodeType.type)
+                }
                 .singleOrNull()
                 ?.let {
                     UserVerify(

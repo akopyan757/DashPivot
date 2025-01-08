@@ -12,6 +12,6 @@ import com.cheesecake.common.auth.model.verefication.VerificationError
 interface UserService {
     suspend fun registerUser(registerRequest: RegisterRequest): ApiResult<String, RegisterError>
     suspend fun verifyEmailByCode(email: String, code: String?): ApiResult<String, VerificationError>
-    suspend fun sendVerificationCode(email: String, type: SendCodeType): ApiResult<String, SendCodeError>
+    suspend fun sendVerificationCode(email: String, operationType: SendCodeType): ApiResult<String, SendCodeError>
     suspend fun loginUser(loginRequest: LoginRequest): ApiResult<String, LoginError>
 }

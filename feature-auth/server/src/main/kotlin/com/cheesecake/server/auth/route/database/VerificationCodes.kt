@@ -9,4 +9,5 @@ object VerificationCodes : Table("verification_codes") {
     val userId = reference("user_id", Users.id, onDelete = ReferenceOption.CASCADE).uniqueIndex()
     val code = varchar("code", 255)
     val createdAt = datetime("created_at").defaultExpression(CurrentDateTime)
+    val operationType = varchar("operation_type", 20)
 }

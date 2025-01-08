@@ -38,7 +38,7 @@ internal class UserRepository(
             return ApiResult.Error(RegisterError.INVALID_PASSWORD)
         }
 
-        if (!userSource.canSendVerificationCode(registerRequest.email)) {
+        if (!userSource.canSendVerificationCode(registerRequest.email, SendCodeType.REGISTRATION)) {
             return ApiResult.Error(RegisterError.TOO_MANY_REQUESTS)
         }
 
@@ -62,7 +62,7 @@ internal class UserRepository(
             return ApiResult.Error(VerificationError.EMPTY_CODE_ERROR)
         }
 
-        val user = userSource.findUserForVerification(email)
+        val user = userSource.findUserForVerification(email, SendCodeType.REGISTRATION)
             ?: return ApiResult.Error(VerificationError.USER_NOT_FOUND)
 
         val userCode = user.verificationHashedCode
@@ -80,23 +80,28 @@ internal class UserRepository(
     }
 
 
-    override suspend fun sendVerificationCode(email: String, type: SendCodeType): ApiResult<String, SendCodeError> {
+    override suspend fun sendVerificationCode(email: String, operationType: SendCodeType): ApiResult<String, SendCodeError> {
         val user = userSource.findUserByEmail(email) ?: run {
             return ApiResult.Error(SendCodeError.USER_NOT_FOUND)
         }
 
-        if (userSource.isEmailTakenAndVerified(email)) {
+        val isUserVerified = userSource.isEmailTakenAndVerified(email)
+        if (!isUserVerified && !operationType.isRegistration) {
+            return ApiResult.Error(SendCodeError.USER_NOT_VERIFIED)
+        }
+
+        if (isUserVerified && operationType.isRegistration) {
             return ApiResult.Error(SendCodeError.EMAIL_ALREADY_VERIFIED)
         }
 
-        if (!userSource.canSendVerificationCode(email)) {
+        if (!userSource.canSendVerificationCode(email, operationType)) {
             return ApiResult.Error(SendCodeError.TOO_MANY_REQUESTS)
         }
 
         val verificationCode = verifyCodeGenerator.generateVerificationCode(Config.VERIFICATION_CODE_COUNT)
         val hashedVerificationCode = passwordHasher.hashPassword(verificationCode)
 
-        userSource.updateVerificationCode(user.id, hashedVerificationCode)
+        userSource.updateVerificationCode(user.id, hashedVerificationCode, operationType)
 
         if (!emailService.sendVerificationEmail(email, verificationCode)) {
             return ApiResult.Error(SendCodeError.EMAIL_SENDING_FAILED)

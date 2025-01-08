@@ -48,9 +48,12 @@ class UserRemoteDataSource(private val apiService: ApiService): IUserRemoteDataS
         }
     }
 
-    override suspend fun sendVerificationCode(email: String, type: SendCodeType): ApiResult<String, SendCodeError> {
+    override suspend fun sendVerificationCode(
+        email: String,
+        operationType: SendCodeType
+    ): ApiResult<String, SendCodeError> {
         return try {
-            val response = apiService.sendVerificationCode(email, type)
+            val response = apiService.sendVerificationCode(email, operationType)
             val statusCode = response.status.value
             if (HttpStatusCode.fromValue(statusCode).isSuccess()) {
                 ApiResult.Success(response.bodyAsText())
