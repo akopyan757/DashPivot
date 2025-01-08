@@ -10,6 +10,7 @@ data class User(
 data class UserVerify(
     val id: Int,
     val email: String,
+    val passwordHash: String?,
     val verificationHashedCode: String?,
     val createdAt: String?,
 )

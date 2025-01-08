@@ -7,4 +7,5 @@ enum class EndPoint(val path: String) {
     LOGIN("/api/$SERVER_VERSION/login"),
     CONFIRM_EMAIL_BY_CODE("/api/$SERVER_VERSION/verify-code"),
     RESEND_CODE("/api/$SERVER_VERSION/resend-code"),
+    CHANGE_PASSWORD("/api/$SERVER_VERSION/reset-password"),
 }

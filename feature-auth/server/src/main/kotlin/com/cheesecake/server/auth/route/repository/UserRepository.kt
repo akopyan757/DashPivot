@@ -2,6 +2,7 @@ package com.cheesecake.server.auth.route.repository
 
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.config.Config
+import com.cheesecake.common.auth.model.changePassword.ChangePasswordError
 import com.cheesecake.common.auth.model.login.LoginError
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterError
@@ -17,6 +18,7 @@ import com.cheesecake.server.auth.route.mail.IEmailService
 import com.cheesecake.server.auth.route.utils.IPasswordHasher
 import com.cheesecake.server.auth.route.utils.ITokenGenerator
 import com.cheesecake.server.auth.route.utils.IVerifyCodeGenerator
+import com.cheesecake.server.auth.route.utils.PasswordHasher
 
 internal class UserRepository(
     private val emailService: IEmailService,
@@ -50,7 +52,9 @@ internal class UserRepository(
             registerRequest.email, hashedPassword, isVerified = false, hashedVerificationCode
         )
 
-        if (!emailService.sendVerificationEmail(registerRequest.email, verificationCode)) {
+        if (!emailService.sendVerificationEmail(
+            registerRequest.email, verificationCode, SendCodeType.REGISTRATION
+        )) {
             return ApiResult.Error(RegisterError.VERIFICATION_LETTER_SENDING_ERROR)
         }
 
@@ -103,11 +107,42 @@ internal class UserRepository(
 
         userSource.updateVerificationCode(user.id, hashedVerificationCode, operationType)
 
-        if (!emailService.sendVerificationEmail(email, verificationCode)) {
+        if (!emailService.sendVerificationEmail(email, verificationCode, operationType)) {
             return ApiResult.Error(SendCodeError.EMAIL_SENDING_FAILED)
         }
 
         return ApiResult.Success("Verification code sent successfully")
+    }
+
+    override suspend fun changePassword(
+        email: String,
+        code: String,
+        newHashedPassword: String
+    ): ApiResult<String, ChangePasswordError> {
+        val user = userSource.findUserForVerification(email, SendCodeType.RESET_PASSWORD)
+            ?: run { return ApiResult.Error(ChangePasswordError.USER_NOT_FOUND) }
+
+        if (!userSource.isEmailTakenAndVerified(email)) {
+            return ApiResult.Error(ChangePasswordError.USER_NOT_VERIFIED)
+        }
+
+        val userCode = user.verificationHashedCode
+        if (userCode.isNullOrBlank()) {
+            return ApiResult.Error(ChangePasswordError.VERIFICATION_CODE_NOT_FOUND)
+        }
+
+        if (!passwordHasher.verifyPassword(code, userCode)) {
+            return ApiResult.Error(ChangePasswordError.EXPIRED_CODE)
+        }
+
+        if (user.passwordHash == newHashedPassword) {
+            return ApiResult.Error(ChangePasswordError.SAME_PASSWORD)
+        }
+
+        userSource.changePassword(user.id, newHashedPassword)
+
+        return ApiResult.Success("User registered successfully")
+
     }
 
     override suspend fun loginUser(loginRequest: LoginRequest): ApiResult<String, LoginError> {

@@ -1,5 +1,6 @@
 package com.cheesecake.server.auth.route.mail
 
+import com.cheesecake.common.auth.model.sendCode.SendCodeType
 import javax.mail.Authenticator
 import javax.mail.Message
 import javax.mail.MessagingException
@@ -32,10 +33,17 @@ internal class EmailService: IEmailService {
         })
     }
 
-    override fun sendVerificationEmail(email: String, code: String): Boolean {
-        val subject = "Email Verification"
+    override fun sendVerificationEmail(
+        email: String,
+        code: String,
+        sendCodeType: SendCodeType
+    ): Boolean {
+        val subject = when (sendCodeType) {
+            SendCodeType.REGISTRATION -> "Registration Verification"
+            SendCodeType.RESET_PASSWORD -> "Reset Password Verification"
+        }
         val body = """
-             Please verify your email address by entering the following verification code:
+             Please verify your account by entering the following verification code:
              $code
         """.trimIndent()
 

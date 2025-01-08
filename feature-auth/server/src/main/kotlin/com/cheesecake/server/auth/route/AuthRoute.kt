@@ -3,6 +3,7 @@ package com.cheesecake.server.auth.route
 import com.cheesecake.common.api.ApiError
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.api.EndPoint
+import com.cheesecake.common.auth.model.changePassword.ChangePasswordRequest
 import com.cheesecake.common.auth.model.login.LoginError
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterError
@@ -50,6 +51,19 @@ fun Route.authRoute(di: DI) {
         val userRepository: UserService by di.instance()
         val result = userRepository.sendVerificationCode(
             sendCodeRequest.email, sendCodeRequest.requestCodeType
+        )
+        when (result) {
+            is ApiResult.Success -> call.respond(HttpStatusCode.OK, result.data)
+            is ApiResult.Error -> handleError(result)
+        }
+    }
+    post(EndPoint.CHANGE_PASSWORD.path) {
+        val changePasswordRequest = call.receive<ChangePasswordRequest>()
+        val userRepository: UserService by di.instance()
+        val result = userRepository.changePassword(
+            changePasswordRequest.email,
+            changePasswordRequest.code,
+            changePasswordRequest.newHashedPassword,
         )
         when (result) {
             is ApiResult.Success -> call.respond(HttpStatusCode.OK, result.data)

@@ -37,6 +37,8 @@ interface IUserSource {
         createdDateTime: LocalDateTime? = null, // Current
     ): User
 
+    fun changePassword(id: Int, hashedPassword: String)
+
     fun findUserByEmail(email: String): User?
     fun findUserForVerification(email: String, sendCodeType: SendCodeType): UserVerify?
 }
@@ -150,6 +152,18 @@ class UserSource: IUserSource {
         }
     }
 
+    override fun changePassword(id: Int, hashedPassword: String) {
+        return transaction {
+            Users.update({ Users.id eq id }) {
+                it[passwordHash] = hashedPassword
+            }
+            VerificationCodes.deleteWhere {
+                (userId eq id) and
+                (operationType eq SendCodeType.RESET_PASSWORD.type)
+            }
+        }
+    }
+
     override fun findUserByEmail(email: String): User? {
         return transaction {
             Users.selectAll().where { Users.email eq email }
@@ -178,6 +192,7 @@ class UserSource: IUserSource {
                     UserVerify(
                         id = it[Users.id],
                         email = it[Users.email],
+                        passwordHash = it[Users.passwordHash],
                         verificationHashedCode = it[VerificationCodes.code],
                         createdAt = it[VerificationCodes.createdAt].format(dateFormatter)
                     )
