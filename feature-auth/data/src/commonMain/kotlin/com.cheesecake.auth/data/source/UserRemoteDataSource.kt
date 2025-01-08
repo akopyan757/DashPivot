@@ -2,6 +2,7 @@ package com.cheesecake.auth.data.source
 
 import com.cheesecake.auth.data.service.ApiService
 import com.cheesecake.common.api.ApiResult
+import com.cheesecake.common.auth.model.changePassword.ChangePasswordError
 import com.cheesecake.common.auth.model.login.LoginError
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterError
@@ -79,5 +80,13 @@ class UserRemoteDataSource(private val apiService: ApiService): IUserRemoteDataS
             e.printStackTrace()
             ApiResult.Error(LoginError.UNKNOWN)
         }
+    }
+
+    override suspend fun changePassword(
+        email: String,
+        code: String,
+        newHashedPassword: String
+    ): ApiResult<String, ChangePasswordError> {
+        TODO("Change password by code not implemented")
     }
 }
