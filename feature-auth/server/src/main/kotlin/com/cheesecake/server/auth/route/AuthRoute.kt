@@ -3,6 +3,7 @@ package com.cheesecake.server.auth.route
 import com.cheesecake.common.api.ApiError
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.api.EndPoint
+import com.cheesecake.common.auth.model.changePassword.ChangePasswordError
 import com.cheesecake.common.auth.model.changePassword.ChangePasswordRequest
 import com.cheesecake.common.auth.model.login.LoginError
 import com.cheesecake.common.auth.model.login.LoginRequest
@@ -100,5 +101,11 @@ private suspend fun <E : ApiError> PipelineContext<Unit, ApplicationCall>.handle
         SendCodeError.EMAIL_ALREADY_VERIFIED -> call.respond(HttpStatusCode.Conflict, error.message)
         SendCodeError.TOO_MANY_REQUESTS -> call.respond(HttpStatusCode.TooManyRequests, error.message)
         SendCodeError.EMAIL_SENDING_FAILED -> call.respond(HttpStatusCode.InternalServerError, error.message)
+        ChangePasswordError.USER_NOT_FOUND -> call.respond(HttpStatusCode.NotFound, error.message)
+        ChangePasswordError.SAME_PASSWORD -> call.respond(HttpStatusCode.Conflict, error.message)
+        ChangePasswordError.EXPIRED_CODE -> call.respond(HttpStatusCode.Unauthorized, error.message)
+        ChangePasswordError.USER_NOT_VERIFIED -> call.respond(HttpStatusCode.Unauthorized, error.message)
+        ChangePasswordError.VERIFICATION_CODE_NOT_FOUND -> call.respond(HttpStatusCode.BadRequest, error.message)
+        ChangePasswordError.UNKNOWN -> call.respond(HttpStatusCode.InternalServerError, error.message)
     }
 }
