@@ -177,6 +177,7 @@ class UserSource: IUserSource {
             val columns = listOf(
                 Users.id,
                 Users.email,
+                Users.passwordHash,
                 VerificationCodes.code,
                 VerificationCodes.createdAt,
                 VerificationCodes.operationType,
