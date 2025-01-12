@@ -22,10 +22,10 @@ interface IUserSource {
     fun isEmailTakenAndVerified(email: String): Boolean
     fun canSendVerificationCode(email: String, sendCodeType: SendCodeType): Boolean
 
-    fun updateVerificationCode(
-        id: Int,
+    fun insertAndDeleteVerificationCode(
+        userId: Int,
         hashedVerificationCode: String,
-        sendCodeType: SendCodeType
+        sendCodeType: SendCodeType,
     )
 
     fun verifyEmail(id: Int)
@@ -65,13 +65,18 @@ class UserSource: IUserSource {
         return true
     }
 
-    override fun updateVerificationCode(
-        id: Int,
+    override fun insertAndDeleteVerificationCode(
+        userId: Int,
         hashedVerificationCode: String,
-        sendCodeType: SendCodeType,
+        sendCodeType: SendCodeType
     ) {
         transaction {
-            VerificationCodes.update({ VerificationCodes.userId eq id }) {
+            VerificationCodes.deleteWhere {
+                (VerificationCodes.userId eq userId) and
+                (operationType eq sendCodeType.type)
+            }
+            VerificationCodes.insert {
+                it[VerificationCodes.userId] = userId
                 it[createdAt] = CurrentDateTime
                 it[code] = hashedVerificationCode
                 it[operationType] = sendCodeType.type

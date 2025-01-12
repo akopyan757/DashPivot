@@ -105,7 +105,7 @@ internal class UserRepository(
         val verificationCode = verifyCodeGenerator.generateVerificationCode(Config.VERIFICATION_CODE_COUNT)
         val hashedVerificationCode = passwordHasher.hashPassword(verificationCode)
 
-        userSource.updateVerificationCode(user.id, hashedVerificationCode, operationType)
+        userSource.insertAndDeleteVerificationCode(user.id, hashedVerificationCode, operationType)
 
         if (!emailService.sendVerificationEmail(email, verificationCode, operationType)) {
             return ApiResult.Error(SendCodeError.EMAIL_SENDING_FAILED)
