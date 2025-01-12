@@ -3,8 +3,8 @@ package com.cheesecake.server.auth.route
 import com.cheesecake.common.api.ApiError
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.api.EndPoint
-import com.cheesecake.common.auth.model.changePassword.ChangePasswordError
-import com.cheesecake.common.auth.model.changePassword.ChangePasswordRequest
+import com.cheesecake.common.auth.model.changePassword.ResetPasswordError
+import com.cheesecake.common.auth.model.changePassword.ResetPasswordRequest
 import com.cheesecake.common.auth.model.login.LoginError
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterError
@@ -35,7 +35,7 @@ fun Route.authRoute(di: DI) {
             is ApiResult.Error -> handleError(result)
         }
     }
-    post(EndPoint.CONFIRM_EMAIL_BY_CODE.path) {
+    post(EndPoint.REGISTER_CONFIRM.path) {
         val verificationRequest = call.receive<VerificationRequest>()
         val userRepository: UserService by di.instance()
 
@@ -47,26 +47,35 @@ fun Route.authRoute(di: DI) {
             is ApiResult.Error -> handleError(result)
         }
     }
-    post(EndPoint.RESEND_CODE.path) {
+    post(EndPoint.REGISTER_RESEND_CODE.path) {
         val sendCodeRequest = call.receive<SendCodeRequest>()
         val userRepository: UserService by di.instance()
-        val result = userRepository.sendVerificationCode(
-            sendCodeRequest.email, sendCodeRequest.requestCodeType
+        val email = sendCodeRequest.email
+
+        when (val result = userRepository.sendVerificationCode(email)) {
+            is ApiResult.Success -> call.respond(HttpStatusCode.OK, result.data)
+            is ApiResult.Error -> handleError(result)
+        }
+    }
+    post(EndPoint.RESET_PASSWORD.path) {
+        val resetPasswordRequest = call.receive<ResetPasswordRequest>()
+        val userRepository: UserService by di.instance()
+        val result = userRepository.resetPassword(
+            resetPasswordRequest.email,
+            resetPasswordRequest.code,
+            resetPasswordRequest.password,
         )
         when (result) {
             is ApiResult.Success -> call.respond(HttpStatusCode.OK, result.data)
             is ApiResult.Error -> handleError(result)
         }
     }
-    post(EndPoint.CHANGE_PASSWORD.path) {
-        val changePasswordRequest = call.receive<ChangePasswordRequest>()
+    post(EndPoint.RESET_PASSWORD_SEND_CODE.path) {
+        val sendCodeRequest = call.receive<SendCodeRequest>()
         val userRepository: UserService by di.instance()
-        val result = userRepository.changePassword(
-            changePasswordRequest.email,
-            changePasswordRequest.code,
-            changePasswordRequest.newHashedPassword,
-        )
-        when (result) {
+        val email = sendCodeRequest.email
+
+        when (val result = userRepository.sendPasswordCode(email)) {
             is ApiResult.Success -> call.respond(HttpStatusCode.OK, result.data)
             is ApiResult.Error -> handleError(result)
         }
@@ -101,11 +110,11 @@ private suspend fun <E : ApiError> PipelineContext<Unit, ApplicationCall>.handle
         SendCodeError.EMAIL_ALREADY_VERIFIED -> call.respond(HttpStatusCode.Conflict, error.message)
         SendCodeError.TOO_MANY_REQUESTS -> call.respond(HttpStatusCode.TooManyRequests, error.message)
         SendCodeError.EMAIL_SENDING_FAILED -> call.respond(HttpStatusCode.InternalServerError, error.message)
-        ChangePasswordError.USER_NOT_FOUND -> call.respond(HttpStatusCode.NotFound, error.message)
-        ChangePasswordError.SAME_PASSWORD -> call.respond(HttpStatusCode.Conflict, error.message)
-        ChangePasswordError.EXPIRED_CODE -> call.respond(HttpStatusCode.Unauthorized, error.message)
-        ChangePasswordError.USER_NOT_VERIFIED -> call.respond(HttpStatusCode.Unauthorized, error.message)
-        ChangePasswordError.VERIFICATION_CODE_NOT_FOUND -> call.respond(HttpStatusCode.BadRequest, error.message)
-        ChangePasswordError.UNKNOWN -> call.respond(HttpStatusCode.InternalServerError, error.message)
+        ResetPasswordError.USER_NOT_FOUND -> call.respond(HttpStatusCode.NotFound, error.message)
+        ResetPasswordError.SAME_PASSWORD -> call.respond(HttpStatusCode.Conflict, error.message)
+        ResetPasswordError.EXPIRED_CODE -> call.respond(HttpStatusCode.Unauthorized, error.message)
+        ResetPasswordError.USER_NOT_VERIFIED -> call.respond(HttpStatusCode.Unauthorized, error.message)
+        ResetPasswordError.VERIFICATION_CODE_NOT_FOUND -> call.respond(HttpStatusCode.BadRequest, error.message)
+        ResetPasswordError.UNKNOWN -> call.respond(HttpStatusCode.InternalServerError, error.message)
     }
 }

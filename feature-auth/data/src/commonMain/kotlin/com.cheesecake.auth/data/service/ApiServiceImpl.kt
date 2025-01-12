@@ -2,6 +2,7 @@ package com.cheesecake.auth.data.service
 
 import com.cheesecake.common.api.BASE_URL
 import com.cheesecake.common.auth.api.EndPoint
+import com.cheesecake.common.auth.model.changePassword.ResetPasswordRequest
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterRequest
 import com.cheesecake.common.auth.model.sendCode.SendCodeType
@@ -27,17 +28,35 @@ class ApiServiceImpl(private val client: HttpClient) : ApiService {
 
     override suspend fun verificationCode(email: String, code: String): HttpResponse {
         return client.post {
-            url("$BASE_URL${EndPoint.CONFIRM_EMAIL_BY_CODE.path}")
+            url("$BASE_URL${EndPoint.REGISTER_CONFIRM.path}")
             contentType(ContentType.Application.Json)
             setBody(VerificationRequest(email, code))
         }
     }
 
-    override suspend fun sendVerificationCode(email: String, type: SendCodeType): HttpResponse {
+    override suspend fun sendVerificationCode(email: String): HttpResponse {
         return client.post {
-            url("$BASE_URL${EndPoint.RESEND_CODE.path}")
+            url("$BASE_URL${EndPoint.REGISTER_RESEND_CODE.path}")
             contentType(ContentType.Application.Json)
-            setBody(SendCodeRequest(email, SendCodeType.REGISTRATION))
+            setBody(SendCodeRequest(email))
+        }
+    }
+
+    override suspend fun sendPasswordCode(email: String): HttpResponse {
+        return client.post {
+            url("$BASE_URL${EndPoint.RESET_PASSWORD_SEND_CODE.path}")
+            contentType(ContentType.Application.Json)
+            setBody(SendCodeRequest(email))
+        }
+    }
+
+    override suspend fun resetPassword(
+        email: String, code: String, newPassword: String
+    ): HttpResponse {
+        return client.post {
+            url("$BASE_URL${EndPoint.RESET_PASSWORD.path}")
+            contentType(ContentType.Application.Json)
+            setBody(ResetPasswordRequest(email, code, newPassword))
         }
     }
 
