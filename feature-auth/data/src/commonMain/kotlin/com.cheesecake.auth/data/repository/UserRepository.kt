@@ -33,7 +33,7 @@ class UserRepository(
         email: String,
         sendCodeType: SendCodeType,
     ): Flow<ApiResult<String, SendCodeError>> = flow {
-        emit(userRemoteDataSource.sendVerificationCode(email, sendCodeType))
+        emit(userRemoteDataSource.sendVerificationCode(email))
     }.flowOn(Dispatchers.IO)
 
     override suspend fun loginUser(
