@@ -38,6 +38,8 @@ kotlin {
             implementation(libs.androidx.ui.tooling.preview)
             implementation(libs.androidx.ui.tooling)
             implementation(compose.components.uiToolingPreview)
+            implementation(compose.foundation)
+            implementation(compose.material)
             implementation(libs.koin.android)
             implementation(libs.koin.android.compose)
             implementation(libs.koin.core)

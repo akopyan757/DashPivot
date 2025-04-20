@@ -1,4 +1,4 @@
-package com.cheesecake.dashpivot
+package com.cheesecake.auth.feature
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -17,7 +17,7 @@ import com.cheesecake.common.ui.toast.ToastSurface
 
 
 @Composable
-actual fun App() {
+actual fun AuthApp() {
     val navigatorHost = JvmKoinComponent().getNavigatorHost()
     val toast: ToastMessage by navigatorHost.navigator.toastMessage.collectAsState()
 

@@ -1,9 +1,9 @@
-package com.cheesecake.dashpivot
+package com.cheesecake.auth.feature
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,7 +18,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.context.loadKoinModules
 import org.koin.core.qualifier.named
 
-class MainActivity : ComponentActivity(), KoinComponent {
+class AuthActivity : ComponentActivity(), KoinComponent {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +52,7 @@ fun MainContent() {
 
     if (isLoaded) {
         MaterialTheme {
-            App()
+            AuthApp()
         }
     }
 }
@@ -61,6 +61,6 @@ fun MainContent() {
 @Composable
 fun AppAndroidPreview() {
     MaterialTheme {
-        App()
+        AuthApp()
     }
 }
