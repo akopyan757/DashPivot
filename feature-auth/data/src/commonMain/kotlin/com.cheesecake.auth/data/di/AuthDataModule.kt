@@ -7,6 +7,7 @@ import com.cheesecake.auth.data.service.ApiServiceImpl
 import com.cheesecake.auth.data.source.IUserRemoteDataSource
 import com.cheesecake.auth.data.source.UserRemoteDataSource
 import com.cheesecake.auth.feature.domain.repository.IUserRepository
+import com.cheesecake.common.api.RequestHandler
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
@@ -23,7 +24,8 @@ val authDataModule = module {
             }
         }
     }
+    single<RequestHandler>{ RequestHandler() }
     single<ApiService> { ApiServiceImpl(get()) }
-    single<IUserRemoteDataSource> { UserRemoteDataSource(get()) }
+    single<IUserRemoteDataSource> { UserRemoteDataSource(get(), get()) }
     single<IUserRepository> { UserRepository(get()) }
 }

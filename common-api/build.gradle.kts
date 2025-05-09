@@ -19,6 +19,12 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_17)
         }
     }
+    sourceSets {
+        commonMain.dependencies {
+            implementation(libs.koin.core)
+            implementation(libs.ktor.client.core)
+        }
+    }
 }
 
 android {
