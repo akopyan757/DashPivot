@@ -6,6 +6,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
+import io.ktor.util.reflect.typeInfo
 
 class RequestHandler {
 
@@ -20,7 +21,8 @@ class RequestHandler {
             val statusCode = httpResponse.status.value
             val method = httpResponse.request.method.value
             val path = httpResponse.request.url.encodedPathAndQuery
-            val body = httpResponse.body<ApiResponse<T>>()
+            val typeInfo = typeInfo<ApiResponse<T>>()
+            val body = httpResponse.body<ApiResponse<T>>(typeInfo)
             if (HttpStatusCode.fromValue(statusCode).isSuccess() && body.code == 200 && body.data != null) {
                 Log.info(TAG, "Response: Success: method=$method, path=$path, body=$body")
                 ApiResult.Success(onSuccess(body.data))

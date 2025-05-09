@@ -1,6 +1,5 @@
 package com.cheesecake.common.auth.service
 
-import com.cheesecake.common.api.ApiError
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.model.error.AuthError
 import com.cheesecake.common.auth.model.login.LoginRequest

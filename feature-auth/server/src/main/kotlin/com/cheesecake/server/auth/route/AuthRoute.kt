@@ -3,6 +3,7 @@ package com.cheesecake.server.auth.route
 import com.cheesecake.common.api.ApiError
 import com.cheesecake.common.api.ApiResponse
 import com.cheesecake.common.api.ApiResult
+import com.cheesecake.common.api.Log
 import com.cheesecake.common.auth.api.EndPoint
 import com.cheesecake.common.auth.model.changePassword.ResetPasswordRequest
 import com.cheesecake.common.auth.model.login.LoginRequest
@@ -18,6 +19,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import io.ktor.util.pipeline.PipelineContext
+import io.ktor.util.reflect.typeInfo
 import org.kodein.di.DI
 import org.kodein.di.instance
 
@@ -73,11 +75,13 @@ private suspend fun <T> PipelineContext<Unit, ApplicationCall>.handleResult(
 private suspend fun <T> PipelineContext<Unit, ApplicationCall>.handleSuccess(
     result: ApiResult.Success<T>
 ) {
-    call.respond(HttpStatusCode.OK, ApiResponse(
+    val response = ApiResponse(
         code = HttpStatusCode.OK.value,
         message = HttpStatusCode.OK.description,
         data = result.data,
-    ))
+    )
+    val typeInfo = typeInfo<ApiResponse<T>>()
+    call.respond(HttpStatusCode.OK, response, typeInfo)
 }
 
 private suspend fun <E : ApiError> PipelineContext<Unit, ApplicationCall>.handleError(
