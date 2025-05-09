@@ -7,6 +7,7 @@ import com.cheesecake.common.api.RequestHandler
 import com.cheesecake.common.auth.model.error.AuthError
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterRequest
+import com.cheesecake.common.auth.model.registration.RegisterResponse
 import com.cheesecake.common.auth.model.sendCode.SendCodeRequest
 
 class UserRemoteDataSource(
@@ -14,7 +15,7 @@ class UserRemoteDataSource(
     private val requestHandler: RequestHandler,
 ): IUserRemoteDataSource {
 
-    override suspend fun registerUser(registerRequest: RegisterRequest): ApiResult<String, AuthError> {
+    override suspend fun registerUser(registerRequest: RegisterRequest): ApiResult<RegisterResponse, AuthError> {
         return requestHandler.execute(
             request = { apiService.registerUser(registerRequest) },
             onError = ::errorFromCode,
