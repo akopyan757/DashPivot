@@ -91,8 +91,15 @@ internal class UserRepository(
             return ApiResult.Error(SendCodeError.USER_NOT_FOUND)
         }
 
-        if (userSource.isEmailTakenAndVerified(email)) {
-            return ApiResult.Error(SendCodeError.EMAIL_ALREADY_VERIFIED)
+        val isVerified = userSource.isEmailTakenAndVerified(email)
+        if (operationType == SendCodeType.REGISTRATION) {
+            if (isVerified) {
+                return ApiResult.Error(SendCodeError.EMAIL_ALREADY_VERIFIED)
+            }
+        } else if (operationType == SendCodeType.RESET_PASSWORD) {
+            if (!isVerified) {
+                return ApiResult.Error(SendCodeError.USER_NOT_VERIFIED)
+            }
         }
 
         if (!userSource.canSendVerificationCode(email, operationType)) {
