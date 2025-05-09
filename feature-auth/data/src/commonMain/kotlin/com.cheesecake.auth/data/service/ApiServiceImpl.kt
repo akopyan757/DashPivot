@@ -5,7 +5,6 @@ import com.cheesecake.common.auth.api.EndPoint
 import com.cheesecake.common.auth.model.changePassword.ResetPasswordRequest
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterRequest
-import com.cheesecake.common.auth.model.sendCode.SendCodeType
 import com.cheesecake.common.auth.model.sendCode.SendCodeRequest
 import com.cheesecake.common.auth.model.verefication.VerificationRequest
 import io.ktor.client.HttpClient
@@ -34,19 +33,11 @@ class ApiServiceImpl(private val client: HttpClient) : ApiService {
         }
     }
 
-    override suspend fun sendVerificationCode(email: String): HttpResponse {
+    override suspend fun sendCode(request: SendCodeRequest): HttpResponse {
         return client.post {
-            url("$BASE_URL${EndPoint.REGISTER_RESEND_CODE.path}")
+            url("$BASE_URL${EndPoint.SEND_CODE.path}")
             contentType(ContentType.Application.Json)
-            setBody(SendCodeRequest(email))
-        }
-    }
-
-    override suspend fun sendPasswordCode(email: String): HttpResponse {
-        return client.post {
-            url("$BASE_URL${EndPoint.RESET_PASSWORD_SEND_CODE.path}")
-            contentType(ContentType.Application.Json)
-            setBody(SendCodeRequest(email))
+            setBody(request)
         }
     }
 

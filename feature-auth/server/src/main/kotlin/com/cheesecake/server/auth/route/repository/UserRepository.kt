@@ -8,6 +8,7 @@ import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterError
 import com.cheesecake.common.auth.model.registration.RegisterRequest
 import com.cheesecake.common.auth.model.sendCode.SendCodeError
+import com.cheesecake.common.auth.model.sendCode.SendCodeRequest
 import com.cheesecake.common.auth.model.sendCode.SendCodeType
 import com.cheesecake.common.auth.model.verefication.VerificationError
 import com.cheesecake.common.auth.service.UserService
@@ -83,8 +84,9 @@ internal class UserRepository(
     }
 
 
-    override suspend fun sendVerificationCode(email: String): ApiResult<String, SendCodeError> {
-        val operationType = SendCodeType.REGISTRATION
+    override suspend fun sendCode(request: SendCodeRequest): ApiResult<String, SendCodeError> {
+        val email = request.email
+        val operationType = request.type
         val user = userSource.findUserByEmail(email) ?: run {
             return ApiResult.Error(SendCodeError.USER_NOT_FOUND)
         }
@@ -108,35 +110,7 @@ internal class UserRepository(
             return ApiResult.Error(SendCodeError.EMAIL_SENDING_FAILED)
         }
 
-        return ApiResult.Success("Verification code sent successfully")
-    }
-
-    override suspend fun sendPasswordCode(email: String): ApiResult<String, SendCodeError> {
-        val operationType = SendCodeType.RESET_PASSWORD
-        val user = userSource.findUserByEmail(email) ?: run {
-            return ApiResult.Error(SendCodeError.USER_NOT_FOUND)
-        }
-
-        if (!userSource.isEmailTakenAndVerified(email)) {
-            return ApiResult.Error(SendCodeError.USER_NOT_VERIFIED)
-        }
-
-        if (!userSource.canSendVerificationCode(email, operationType)) {
-            return ApiResult.Error(SendCodeError.TOO_MANY_REQUESTS)
-        }
-
-        val verificationCode = verifyCodeGenerator.generateVerificationCode(
-            Config.VERIFICATION_CODE_COUNT
-        )
-
-        val hashedVerificationCode = passwordHasher.hashPassword(verificationCode)
-        userSource.insertAndDeleteVerificationCode(user.id, hashedVerificationCode, operationType)
-
-        if (!emailService.sendVerificationEmail(email, verificationCode, operationType)) {
-            return ApiResult.Error(SendCodeError.EMAIL_SENDING_FAILED)
-        }
-
-        return ApiResult.Success("Code for password change sent successfully")
+        return ApiResult.Success("Code sent successfully")
     }
 
     override suspend fun resetPassword(

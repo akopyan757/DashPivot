@@ -7,8 +7,8 @@ import com.cheesecake.common.auth.model.login.LoginError
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterRequest
 import com.cheesecake.common.auth.model.sendCode.SendCodeError
+import com.cheesecake.common.auth.model.sendCode.SendCodeRequest
 import com.cheesecake.common.auth.model.sendCode.SendCodeType
-import com.cheesecake.common.auth.model.verefication.VerificationError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
@@ -25,7 +25,7 @@ class UserRepository(
         emit(userRemoteDataSource.registerUser(RegisterRequest(email, password)))
     }.flowOn(Dispatchers.IO)
 
-    override suspend fun verifyEmailByCode(email: String, code: String): Flow<ApiResult<String, VerificationError>> = flow {
+    override suspend fun verifyEmailByCode(email: String, code: String) = flow {
         emit(userRemoteDataSource.verifyEmailByCode(email, code))
     }.flowOn(Dispatchers.IO)
 
@@ -33,7 +33,7 @@ class UserRepository(
         email: String,
         sendCodeType: SendCodeType,
     ): Flow<ApiResult<String, SendCodeError>> = flow {
-        emit(userRemoteDataSource.sendVerificationCode(email))
+        emit(userRemoteDataSource.sendCode(SendCodeRequest(email, sendCodeType)))
     }.flowOn(Dispatchers.IO)
 
     override suspend fun loginUser(

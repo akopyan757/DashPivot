@@ -47,12 +47,11 @@ fun Route.authRoute(di: DI) {
             is ApiResult.Error -> handleError(result)
         }
     }
-    post(EndPoint.REGISTER_RESEND_CODE.path) {
+    post(EndPoint.SEND_CODE.path) {
         val sendCodeRequest = call.receive<SendCodeRequest>()
         val userRepository: UserService by di.instance()
-        val email = sendCodeRequest.email
 
-        when (val result = userRepository.sendVerificationCode(email)) {
+        when (val result = userRepository.sendCode(sendCodeRequest)) {
             is ApiResult.Success -> call.respond(HttpStatusCode.OK, result.data)
             is ApiResult.Error -> handleError(result)
         }
@@ -66,16 +65,6 @@ fun Route.authRoute(di: DI) {
             resetPasswordRequest.password,
         )
         when (result) {
-            is ApiResult.Success -> call.respond(HttpStatusCode.OK, result.data)
-            is ApiResult.Error -> handleError(result)
-        }
-    }
-    post(EndPoint.RESET_PASSWORD_SEND_CODE.path) {
-        val sendCodeRequest = call.receive<SendCodeRequest>()
-        val userRepository: UserService by di.instance()
-        val email = sendCodeRequest.email
-
-        when (val result = userRepository.sendPasswordCode(email)) {
             is ApiResult.Success -> call.respond(HttpStatusCode.OK, result.data)
             is ApiResult.Error -> handleError(result)
         }

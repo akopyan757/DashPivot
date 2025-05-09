@@ -4,5 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SendCodeRequest(
-    val email: String
+    val email: String,
+    val type: SendCodeType,
 )

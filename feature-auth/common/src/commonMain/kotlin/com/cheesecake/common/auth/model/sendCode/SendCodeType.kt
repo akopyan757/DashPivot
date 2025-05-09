@@ -12,8 +12,6 @@ import kotlinx.serialization.encoding.Encoder
 enum class SendCodeType(val type: String) {
     REGISTRATION("registration"),
     RESET_PASSWORD("reset_password");
-
-    val isRegistration get() = this == REGISTRATION
 }
 
 private object RequestCodeTypeSerializer : KSerializer<SendCodeType> {

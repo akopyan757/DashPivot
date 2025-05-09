@@ -9,6 +9,7 @@ import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterError
 import com.cheesecake.common.auth.model.registration.RegisterRequest
 import com.cheesecake.common.auth.model.sendCode.SendCodeError
+import com.cheesecake.common.auth.model.sendCode.SendCodeRequest
 import com.cheesecake.common.auth.model.verefication.VerificationError
 
 class UserRemoteDataSource(
@@ -35,17 +36,9 @@ class UserRemoteDataSource(
         )
     }
 
-    override suspend fun sendVerificationCode(email: String): ApiResult<String, SendCodeError> {
+    override suspend fun sendCode(request: SendCodeRequest): ApiResult<String, SendCodeError> {
         return requestHandler.execute(
-            request = { apiService.sendVerificationCode(email) },
-            onSuccess = { it },
-            onError = { SendCodeError.fromMessage(it) }
-        )
-    }
-
-    override suspend fun sendPasswordCode(email: String): ApiResult<String, SendCodeError> {
-        return requestHandler.execute(
-            request = { apiService.sendPasswordCode(email) },
+            request = { apiService.sendCode(request) },
             onSuccess = { it },
             onError = { SendCodeError.fromMessage(it) }
         )
