@@ -31,7 +31,7 @@ jobs:
         run: ./gradlew :composeApp:assembleRelease
 
       - name: Upload Android APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: android-apk
           path: composeApp/build/outputs/apk/release/*.apk
@@ -56,7 +56,7 @@ jobs:
         run: ./gradlew :composeApp:package
 
       - name: Upload Desktop Build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: desktop-build
           path: composeApp/build/compose/binaries/main/dmg/*.dmg
