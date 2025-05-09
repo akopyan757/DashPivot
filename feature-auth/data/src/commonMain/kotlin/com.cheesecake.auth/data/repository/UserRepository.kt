@@ -3,10 +3,9 @@ package com.cheesecake.auth.data.repository
 import com.cheesecake.auth.data.source.IUserRemoteDataSource
 import com.cheesecake.auth.feature.domain.repository.IUserRepository
 import com.cheesecake.common.api.ApiResult
-import com.cheesecake.common.auth.model.login.LoginError
+import com.cheesecake.common.auth.model.error.AuthError
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterRequest
-import com.cheesecake.common.auth.model.sendCode.SendCodeError
 import com.cheesecake.common.auth.model.sendCode.SendCodeRequest
 import com.cheesecake.common.auth.model.sendCode.SendCodeType
 import kotlinx.coroutines.Dispatchers
@@ -32,14 +31,14 @@ class UserRepository(
     override suspend fun sendVerificationCode(
         email: String,
         sendCodeType: SendCodeType,
-    ): Flow<ApiResult<String, SendCodeError>> = flow {
+    ): Flow<ApiResult<String, AuthError>> = flow {
         emit(userRemoteDataSource.sendCode(SendCodeRequest(email, sendCodeType)))
     }.flowOn(Dispatchers.IO)
 
     override suspend fun loginUser(
         email: String,
         password: String
-    ): Flow<ApiResult<String, LoginError>> = flow {
+    ): Flow<ApiResult<String, AuthError>> = flow {
         emit(userRemoteDataSource.loginUser(LoginRequest(email, password)))
     }.flowOn(Dispatchers.IO)
 }

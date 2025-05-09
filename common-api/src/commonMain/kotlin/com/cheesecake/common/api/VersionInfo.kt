@@ -1,6 +1,6 @@
 package com.cheesecake.common.api
 
 object VersionInfo {
-    const val CLIENT_VERSION = "v0.2.22"
-    const val SERVER_VERSION = "v0.2.31"
+    const val CLIENT_VERSION = "v0.2.23"
+    const val SERVER_VERSION = "v0.2.32"
 }

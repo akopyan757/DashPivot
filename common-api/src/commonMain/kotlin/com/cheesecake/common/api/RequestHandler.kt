@@ -8,10 +8,11 @@ import io.ktor.http.isSuccess
 
 class RequestHandler {
 
-    suspend fun <T, E: ApiError> execute(
+    suspend fun <T, E : ApiError> execute(
         request: suspend () -> HttpResponse,
         onSuccess: suspend (body: String) -> T,
-        onError: suspend (body: String) -> E,
+        onError: suspend (code: HttpStatusCode, body: String) -> E,
+        onException: suspend (exception: Exception) -> E
     ): ApiResult<T, E> {
         return try {
             val httpResponse = request()
@@ -25,11 +26,11 @@ class RequestHandler {
             } else {
                 httpResponse.bodyAsText()
                 Log.debug(TAG, "Response Error: method=$method, path=$path, code=$statusCode")
-                ApiResult.Error(onError(httpResponse.bodyAsText()))
+                ApiResult.Error(onError(httpResponse.status, httpResponse.bodyAsText()))
             }
         } catch (e: Exception) {
             Log.error(TAG, e)
-            ApiResult.Error(onError(e.message ?: "Unknown error"))
+            ApiResult.Error(onException(e))
         }
     }
 

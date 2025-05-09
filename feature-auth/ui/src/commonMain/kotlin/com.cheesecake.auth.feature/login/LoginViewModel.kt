@@ -4,8 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cheesecake.auth.feature.domain.usecase.LoginUseCase
 import com.cheesecake.common.api.ApiResult
-import com.cheesecake.common.auth.model.login.LoginError
-import com.cheesecake.common.auth.model.registration.RegisterError
+import com.cheesecake.common.auth.model.error.AuthError
 import com.cheesecake.common.auth.utils.formatPasswordErrors
 import com.cheesecake.common.auth.utils.isValidEmail
 import com.cheesecake.common.auth.utils.isValidPassword
@@ -54,24 +53,24 @@ class LoginViewModel(
 
         if (email.isBlank()) {
             errorState = errorState.copy(
-                emailErrorMessage = RegisterError.EMPTY_EMAIL_ERROR.message
+                emailErrorMessage = AuthError.EMPTY_EMAIL_ERROR.message
             )
         } else if (!isValidEmail(email)) {
             errorState = errorState.copy(
-                emailErrorMessage = RegisterError.INVALID_EMAIL_FORMAT.message
+                emailErrorMessage = AuthError.INVALID_EMAIL_FORMAT.message
             )
         }
 
         if (password.isBlank()) {
             errorState = errorState.copy(
-                passwordMessage = RegisterError.EMPTY_PASSWORD_ERROR.message
+                passwordMessage = AuthError.EMPTY_PASSWORD_ERROR.message
             )
         } else if (!isValidPassword(password)) {
             val passwordErrors = validatePassword(password)
             errorState = if (passwordErrors.isNotEmpty()) {
                 errorState.copy(passwordMessage = formatPasswordErrors(passwordErrors))
             } else {
-                errorState.copy(passwordMessage = RegisterError.INVALID_PASSWORD.message)
+                errorState.copy(passwordMessage = AuthError.INVALID_PASSWORD.message)
             }
         }
 
@@ -131,7 +130,7 @@ sealed class LoginLogicState {
     @Serializable data object Loading : LoginLogicState()
     @Serializable data class Success(val message: String) : LoginLogicState()
     @Serializable data class Error(
-        val error: LoginError? = null,
+        val error: AuthError? = null,
         val emailErrorMessage: String? = null,
         val passwordMessage: String? = null,
     ) : LoginLogicState()

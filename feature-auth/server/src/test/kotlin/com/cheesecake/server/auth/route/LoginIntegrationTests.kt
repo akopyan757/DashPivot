@@ -1,7 +1,7 @@
 package com.cheesecake.server.auth.route
 
 import com.cheesecake.common.api.ApiResult
-import com.cheesecake.common.auth.model.login.LoginError
+import com.cheesecake.common.auth.model.error.AuthError
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.service.UserService
 import com.cheesecake.server.auth.route.common.TestConstants
@@ -77,7 +77,7 @@ class LoginIntegrationTests {
         val result = userService.loginUser(loginRequest)
 
         assertTrue(result is ApiResult.Error)
-        assertEquals(LoginError.USER_NOT_FOUND, result.error)
+        assertEquals(AuthError.USER_NOT_FOUND, result.error)
     }
 
     @Test
@@ -92,7 +92,7 @@ class LoginIntegrationTests {
         val result = userService.loginUser(loginRequest)
 
         assertTrue(result is ApiResult.Error)
-        assertEquals(LoginError.INVALID_PASSWORD, result.error)
+        assertEquals(AuthError.INVALID_PASSWORD, result.error)
     }
 
     @Test
@@ -118,6 +118,6 @@ class LoginIntegrationTests {
         val result = userService.loginUser(loginRequest)
 
         assertTrue(result is ApiResult.Error)
-        assertEquals(LoginError.EMAIL_NOT_VERIFIED, result.error)
+        assertEquals(AuthError.EMAIL_NOT_VERIFIED, result.error)
     }
 }

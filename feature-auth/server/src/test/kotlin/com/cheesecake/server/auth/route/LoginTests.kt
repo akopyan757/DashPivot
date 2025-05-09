@@ -2,7 +2,7 @@ package com.cheesecake.server.auth.route
 
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.model.User
-import com.cheesecake.common.auth.model.login.LoginError
+import com.cheesecake.common.auth.model.error.AuthError
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.service.UserService
 import com.cheesecake.server.auth.route.common.TestConstants
@@ -58,7 +58,7 @@ class LoginTests {
 
         val result = userService.loginUser(loginRequest)
 
-        assertEquals(ApiResult.Error(LoginError.USER_NOT_FOUND), result)
+        assertEquals(ApiResult.Error(AuthError.USER_NOT_FOUND), result)
         verify(exactly = 1) { TestConstants.userSource.findUserByEmail(loginRequest.email) }
         confirmVerified(TestConstants.passwordHasher, TestConstants.tokenGenerator, TestConstants.emailService, TestConstants.verifyCodeGenerator)
     }
@@ -73,7 +73,7 @@ class LoginTests {
 
         val result = userService.loginUser(loginRequest)
 
-        assertEquals(ApiResult.Error(LoginError.INVALID_PASSWORD), result)
+        assertEquals(ApiResult.Error(AuthError.INVALID_PASSWORD), result)
         verify(exactly = 1) { TestConstants.userSource.findUserByEmail(loginRequest.email) }
         verify(exactly = 1) { TestConstants.passwordHasher.verifyPassword(loginRequest.password, TestConstants.HASHED_PASSWORD) }
         confirmVerified(TestConstants.tokenGenerator, TestConstants.emailService, TestConstants.verifyCodeGenerator)
@@ -88,7 +88,7 @@ class LoginTests {
 
         val result = userService.loginUser(loginRequest)
 
-        assertEquals(ApiResult.Error(LoginError.EMAIL_NOT_VERIFIED), result)
+        assertEquals(ApiResult.Error(AuthError.EMAIL_NOT_VERIFIED), result)
         verify(exactly = 1) { TestConstants.userSource.findUserByEmail(loginRequest.email) }
         verify(exactly = 1) { TestConstants.passwordHasher.verifyPassword(loginRequest.password, TestConstants.HASHED_PASSWORD) }
         confirmVerified(TestConstants.tokenGenerator, TestConstants.emailService, TestConstants.verifyCodeGenerator)

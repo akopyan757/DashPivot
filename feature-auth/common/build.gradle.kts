@@ -23,6 +23,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(projects.commonApi)
+            implementation(libs.ktor.client.core)
             implementation(libs.kotlinx.serialization.core)
         }
         androidUnitTest.dependencies {

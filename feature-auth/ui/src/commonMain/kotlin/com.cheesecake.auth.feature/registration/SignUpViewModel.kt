@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cheesecake.auth.feature.domain.usecase.RegisterUseCase
 import com.cheesecake.common.api.ApiResult
-import com.cheesecake.common.auth.model.registration.RegisterError
+import com.cheesecake.common.auth.model.error.AuthError
 import com.cheesecake.common.auth.utils.formatPasswordErrors
 import com.cheesecake.common.auth.utils.isValidEmail
 import com.cheesecake.common.auth.utils.isValidPassword
@@ -79,30 +79,30 @@ class SignUpViewModel(
 
         if (email.isBlank()) {
             errorState = errorState.copy(
-                emailErrorMessage = RegisterError.EMPTY_EMAIL_ERROR.message
+                emailErrorMessage = AuthError.EMPTY_EMAIL_ERROR.message
             )
         } else if (!isValidEmail(email)) {
             errorState = errorState.copy(
-                emailErrorMessage = RegisterError.INVALID_EMAIL_FORMAT.message
+                emailErrorMessage = AuthError.INVALID_EMAIL_FORMAT.message
             )
         }
 
         if (password.isBlank()) {
             errorState = errorState.copy(
-                passwordMessage = RegisterError.EMPTY_PASSWORD_ERROR.message
+                passwordMessage = AuthError.EMPTY_PASSWORD_ERROR.message
             )
         } else if (!isValidPassword(password)) {
             val passwordErrors = validatePassword(password)
             errorState = if (passwordErrors.isNotEmpty()) {
                 errorState.copy(passwordMessage = formatPasswordErrors(passwordErrors))
             } else {
-                errorState.copy(passwordMessage = RegisterError.INVALID_PASSWORD.message)
+                errorState.copy(passwordMessage = AuthError.INVALID_PASSWORD.message)
             }
         }
 
         if (password != confirmPassword) {
             errorState = errorState.copy(
-                confirmPasswordMessage = RegisterError.PASSWORD_MATCH.message
+                confirmPasswordMessage = AuthError.PASSWORD_MATCH.message
             )
         }
 
@@ -160,7 +160,7 @@ sealed class SignUpLogicState {
     @Serializable data object Loading : SignUpLogicState()
     @Serializable data class Success(val message: String) : SignUpLogicState()
     @Serializable data class Error(
-        val error: RegisterError? = null,
+        val error: AuthError? = null,
         val emailErrorMessage: String? = null,
         val passwordMessage: String? = null,
         val confirmPasswordMessage: String? = null,

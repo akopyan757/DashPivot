@@ -3,15 +3,10 @@ package com.cheesecake.server.auth.route
 import com.cheesecake.common.api.ApiError
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.api.EndPoint
-import com.cheesecake.common.auth.model.changePassword.ResetPasswordError
 import com.cheesecake.common.auth.model.changePassword.ResetPasswordRequest
-import com.cheesecake.common.auth.model.login.LoginError
 import com.cheesecake.common.auth.model.login.LoginRequest
-import com.cheesecake.common.auth.model.registration.RegisterError
 import com.cheesecake.common.auth.model.registration.RegisterRequest
-import com.cheesecake.common.auth.model.sendCode.SendCodeError
 import com.cheesecake.common.auth.model.sendCode.SendCodeRequest
-import com.cheesecake.common.auth.model.verefication.VerificationError
 import com.cheesecake.common.auth.model.verefication.VerificationRequest
 import com.cheesecake.common.auth.service.UserService
 import io.ktor.http.HttpStatusCode
@@ -80,30 +75,8 @@ fun Route.authRoute(di: DI) {
     }
 }
 
-private suspend fun <E : ApiError> PipelineContext<Unit, ApplicationCall>.handleError(result: ApiResult.Error<E>) {
-    when (val error = result.error) {
-        RegisterError.EMAIL_TAKEN -> call.respond(HttpStatusCode.Conflict, error.message)
-        RegisterError.INVALID_PASSWORD -> call.respond(HttpStatusCode.BadRequest, error.message)
-        RegisterError.INVALID_EMAIL_FORMAT -> call.respond(HttpStatusCode.BadRequest, error.message)
-        RegisterError.TOKEN_MISSING -> call.respond(HttpStatusCode.BadRequest, error.message)
-        RegisterError.UNKNOWN -> call.respond(HttpStatusCode.InternalServerError, error.message)
-        RegisterError.TOO_MANY_REQUESTS -> call.respond(HttpStatusCode.TooManyRequests, error.message)
-        VerificationError.EMPTY_CODE_ERROR -> call.respond(HttpStatusCode.BadRequest, error.message)
-        VerificationError.EXPIRED_CODE -> call.respond(HttpStatusCode.Unauthorized, error.message)
-        VerificationError.UNKNOWN -> call.respond(HttpStatusCode.InternalServerError, error.message)
-        LoginError.USER_NOT_FOUND -> call.respond(HttpStatusCode.NotFound, error.message)
-        LoginError.INVALID_PASSWORD -> call.respond(HttpStatusCode.BadRequest, error.message)
-        LoginError.EMAIL_NOT_VERIFIED -> call.respond(HttpStatusCode.Unauthorized, error.message)
-        LoginError.UNKNOWN -> call.respond(HttpStatusCode.InternalServerError, error.message)
-        SendCodeError.USER_NOT_FOUND -> call.respond(HttpStatusCode.NotFound, error.message)
-        SendCodeError.EMAIL_ALREADY_VERIFIED -> call.respond(HttpStatusCode.Conflict, error.message)
-        SendCodeError.TOO_MANY_REQUESTS -> call.respond(HttpStatusCode.TooManyRequests, error.message)
-        SendCodeError.EMAIL_SENDING_FAILED -> call.respond(HttpStatusCode.InternalServerError, error.message)
-        ResetPasswordError.USER_NOT_FOUND -> call.respond(HttpStatusCode.NotFound, error.message)
-        ResetPasswordError.SAME_PASSWORD -> call.respond(HttpStatusCode.Conflict, error.message)
-        ResetPasswordError.EXPIRED_CODE -> call.respond(HttpStatusCode.Unauthorized, error.message)
-        ResetPasswordError.USER_NOT_VERIFIED -> call.respond(HttpStatusCode.Unauthorized, error.message)
-        ResetPasswordError.VERIFICATION_CODE_NOT_FOUND -> call.respond(HttpStatusCode.BadRequest, error.message)
-        ResetPasswordError.UNKNOWN -> call.respond(HttpStatusCode.InternalServerError, error.message)
-    }
+private suspend fun <E : ApiError> PipelineContext<Unit, ApplicationCall>.handleError(
+    result: ApiResult.Error<E>
+) {
+    call.respond(HttpStatusCode.fromValue(result.error.code), result.error.message)
 }

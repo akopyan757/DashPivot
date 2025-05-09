@@ -5,7 +5,6 @@ import com.cheesecake.auth.data.repository.UserRepository
 import com.cheesecake.auth.feature.registration.SignUpLogicState
 import com.cheesecake.auth.feature.registration.SignUpViewModel
 import com.cheesecake.common.api.ApiResult
-import com.cheesecake.common.auth.model.registration.RegisterError
 import io.mockk.coEvery
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
