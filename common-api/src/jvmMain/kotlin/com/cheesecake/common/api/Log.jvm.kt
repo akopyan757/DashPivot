@@ -2,7 +2,7 @@
 
 package com.cheesecake.common.api
 
-object Log {
+actual object Log {
     actual fun info(tag: String, message: String) {
         println("INFO: [$tag] $message")
     }
