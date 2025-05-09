@@ -4,7 +4,7 @@ package com.cheesecake.common.api
 
 import platform.Foundation.NSLog
 
-object Log {
+actual object Log {
     actual fun info(tag: String, message: String) {
         NSLog("INFO: [$tag] $message")
     }

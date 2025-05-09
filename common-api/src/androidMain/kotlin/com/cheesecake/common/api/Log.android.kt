@@ -4,7 +4,7 @@ package com.cheesecake.common.api
 
 import android.util.Log
 
-object Log {
+actual object Log {
     actual fun info(tag: String, message: String) {
         Log.i(tag, message)
     }
