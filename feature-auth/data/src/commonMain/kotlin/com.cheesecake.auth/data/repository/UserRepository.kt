@@ -19,7 +19,7 @@ class UserRepository(
 ): IUserRepository {
     override suspend fun registerUser(
         email: String,
-        password: String
+        password: String,
     ) = flow {
         emit(userRemoteDataSource.registerUser(RegisterRequest(email, password)))
     }.flowOn(Dispatchers.IO)

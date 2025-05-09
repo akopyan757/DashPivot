@@ -5,6 +5,7 @@ import com.cheesecake.common.auth.config.Config
 import com.cheesecake.common.auth.model.error.AuthError
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterRequest
+import com.cheesecake.common.auth.model.registration.RegisterResponse
 import com.cheesecake.common.auth.model.sendCode.SendCodeRequest
 import com.cheesecake.common.auth.model.sendCode.SendCodeType
 import com.cheesecake.common.auth.service.UserService
@@ -23,7 +24,7 @@ internal class UserRepository(
     private val tokenGenerator: ITokenGenerator,
     private val userSource: IUserSource,
 ): UserService {
-    override suspend fun registerUser(registerRequest: RegisterRequest): ApiResult<String, AuthError> {
+    override suspend fun registerUser(registerRequest: RegisterRequest): ApiResult<RegisterResponse, AuthError> {
         if (userSource.isEmailTakenAndVerified(registerRequest.email)) {
             return ApiResult.Error(AuthError.EMAIL_TAKEN)
         }
@@ -54,7 +55,7 @@ internal class UserRepository(
             return ApiResult.Error(AuthError.VERIFICATION_LETTER_SENDING_ERROR)
         }
 
-        return ApiResult.Success("User registered successfully")
+        return ApiResult.Success(RegisterResponse(registerRequest.email))
     }
 
     override suspend fun verifyEmailByCode(email: String, code: String): ApiResult<String, AuthError> {

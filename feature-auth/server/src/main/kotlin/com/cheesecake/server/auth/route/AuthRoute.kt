@@ -80,8 +80,7 @@ private suspend fun <T> PipelineContext<Unit, ApplicationCall>.handleSuccess(
         message = HttpStatusCode.OK.description,
         data = result.data,
     )
-    val typeInfo = typeInfo<ApiResponse<T>>()
-    call.respond(HttpStatusCode.OK, response, typeInfo)
+    call.respond(HttpStatusCode.OK, response)
 }
 
 private suspend fun <E : ApiError> PipelineContext<Unit, ApplicationCall>.handleError(
