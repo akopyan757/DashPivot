@@ -1,5 +1,6 @@
 package com.cheesecake.common.api
 
+import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
@@ -10,8 +11,8 @@ class RequestHandler {
 
     suspend fun <T, E : ApiError> execute(
         request: suspend () -> HttpResponse,
-        onSuccess: suspend (body: String) -> T,
-        onError: suspend (code: HttpStatusCode, body: String) -> E,
+        onSuccess: suspend (body: T) -> T = { it },
+        onError: suspend (code: Int, body: String) -> E,
         onException: suspend (exception: Exception) -> E
     ): ApiResult<T, E> {
         return try {
@@ -19,14 +20,14 @@ class RequestHandler {
             val statusCode = httpResponse.status.value
             val method = httpResponse.request.method.value
             val path = httpResponse.request.url.encodedPathAndQuery
-            if (HttpStatusCode.fromValue(statusCode).isSuccess()) {
-                val body = httpResponse.bodyAsText()
+            val body = httpResponse.body<ApiResponse<T>>()
+            if (HttpStatusCode.fromValue(statusCode).isSuccess() && body.code == 200 && body.data != null) {
                 Log.info(TAG, "Response: Success: method=$method, path=$path, body=$body")
-                ApiResult.Success(onSuccess(body))
+                ApiResult.Success(onSuccess(body.data))
             } else {
                 httpResponse.bodyAsText()
                 Log.debug(TAG, "Response Error: method=$method, path=$path, code=$statusCode")
-                ApiResult.Error(onError(httpResponse.status, httpResponse.bodyAsText()))
+                ApiResult.Error(onError(body.code, body.message))
             }
         } catch (e: Exception) {
             Log.error(TAG, e)

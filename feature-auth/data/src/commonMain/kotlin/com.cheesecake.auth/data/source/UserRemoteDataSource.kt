@@ -8,7 +8,6 @@ import com.cheesecake.common.auth.model.error.AuthError
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterRequest
 import com.cheesecake.common.auth.model.sendCode.SendCodeRequest
-import io.ktor.http.HttpStatusCode
 
 class UserRemoteDataSource(
     private val apiService: ApiService,
@@ -18,7 +17,6 @@ class UserRemoteDataSource(
     override suspend fun registerUser(registerRequest: RegisterRequest): ApiResult<String, AuthError> {
         return requestHandler.execute(
             request = { apiService.registerUser(registerRequest) },
-            onSuccess = { it },
             onError = ::errorFromCode,
             onException = ::defaultError,
         )
@@ -30,7 +28,6 @@ class UserRemoteDataSource(
     ): ApiResult<String, AuthError> {
         return requestHandler.execute(
             request = { apiService.verificationCode(email, code) },
-            onSuccess = { it },
             onError = ::errorFromCode,
             onException = ::defaultError,
         )
@@ -39,7 +36,6 @@ class UserRemoteDataSource(
     override suspend fun sendCode(request: SendCodeRequest): ApiResult<String, AuthError> {
         return requestHandler.execute(
             request = { apiService.sendCode(request) },
-            onSuccess = { it },
             onError = ::errorFromCode,
             onException = ::defaultError,
         )
@@ -52,7 +48,6 @@ class UserRemoteDataSource(
     ): ApiResult<String, AuthError> {
         return requestHandler.execute(
             request = { apiService.resetPassword(email, code, newPassword) },
-            onSuccess = { it },
             onError = ::errorFromCode,
             onException = ::defaultError,
         )
@@ -61,14 +56,13 @@ class UserRemoteDataSource(
     override suspend fun loginUser(loginRequest: LoginRequest): ApiResult<String, AuthError> {
         return requestHandler.execute(
             request = { apiService.loginUser(loginRequest) },
-            onSuccess = { it },
             onError = ::errorFromCode,
             onException = ::defaultError,
         )
     }
 
-    private inline fun errorFromCode(code: HttpStatusCode, body: String): AuthError {
-        return enumValues<AuthError>().firstOrNull { it.code == code.value && it.message == body }
+    private inline fun errorFromCode(code: Int, body: String): AuthError {
+        return enumValues<AuthError>().firstOrNull { it.code == code && it.message == body }
             ?: AuthError.UNKNOWN
     }
 

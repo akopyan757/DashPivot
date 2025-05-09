@@ -11,6 +11,5 @@ interface ApiService {
     suspend fun verificationCode(email: String, code: String): HttpResponse
     suspend fun sendCode(request: SendCodeRequest): HttpResponse
     suspend fun resetPassword(email: String, code: String, newPassword: String): HttpResponse
-
     suspend fun loginUser(request: LoginRequest): HttpResponse
 }

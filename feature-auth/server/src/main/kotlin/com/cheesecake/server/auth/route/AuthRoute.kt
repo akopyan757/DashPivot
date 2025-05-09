@@ -1,6 +1,7 @@
 package com.cheesecake.server.auth.route
 
 import com.cheesecake.common.api.ApiError
+import com.cheesecake.common.api.ApiResponse
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.api.EndPoint
 import com.cheesecake.common.auth.model.changePassword.ResetPasswordRequest
@@ -24,32 +25,23 @@ fun Route.authRoute(di: DI) {
     post(EndPoint.REGISTER.path) {
         val registerRequest = call.receive<RegisterRequest>()
         val userRepository: UserService by di.instance()
-
-        when (val result = userRepository.registerUser(registerRequest)) {
-            is ApiResult.Success -> call.respond(HttpStatusCode.Created, result.data)
-            is ApiResult.Error -> handleError(result)
-        }
+        val result = userRepository.registerUser(registerRequest)
+        handleResult(result)
     }
     post(EndPoint.REGISTER_CONFIRM.path) {
         val verificationRequest = call.receive<VerificationRequest>()
         val userRepository: UserService by di.instance()
-
-        when (val result = userRepository.verifyEmailByCode(
+        val result = userRepository.verifyEmailByCode(
             email = verificationRequest.email,
-            code = verificationRequest.code)
-        ) {
-            is ApiResult.Success -> call.respond(HttpStatusCode.OK, result.data)
-            is ApiResult.Error -> handleError(result)
-        }
+            code = verificationRequest.code,
+        )
+        handleResult(result)
     }
     post(EndPoint.SEND_CODE.path) {
         val sendCodeRequest = call.receive<SendCodeRequest>()
         val userRepository: UserService by di.instance()
-
-        when (val result = userRepository.sendCode(sendCodeRequest)) {
-            is ApiResult.Success -> call.respond(HttpStatusCode.OK, result.data)
-            is ApiResult.Error -> handleError(result)
-        }
+        val result = userRepository.sendCode(sendCodeRequest)
+        handleResult(result)
     }
     post(EndPoint.RESET_PASSWORD.path) {
         val resetPasswordRequest = call.receive<ResetPasswordRequest>()
@@ -59,24 +51,40 @@ fun Route.authRoute(di: DI) {
             resetPasswordRequest.code,
             resetPasswordRequest.password,
         )
-        when (result) {
-            is ApiResult.Success -> call.respond(HttpStatusCode.OK, result.data)
-            is ApiResult.Error -> handleError(result)
-        }
+        handleResult(result)
     }
     post(EndPoint.LOGIN.path) {
         val loginRequest = call.receive<LoginRequest>()
         val userRepository: UserService by di.instance()
-
-        when (val result = userRepository.loginUser(loginRequest)) {
-            is ApiResult.Success -> call.respond(HttpStatusCode.OK, result.data)
-            is ApiResult.Error -> handleError(result)
-        }
+        val result = userRepository.loginUser(loginRequest)
+        handleResult(result)
     }
+}
+
+private suspend fun <T> PipelineContext<Unit, ApplicationCall>.handleResult(
+    result: ApiResult<T, ApiError>
+) {
+    when (result) {
+        is ApiResult.Success -> handleSuccess(result)
+        is ApiResult.Error -> handleError(result)
+    }
+}
+
+private suspend fun <T> PipelineContext<Unit, ApplicationCall>.handleSuccess(
+    result: ApiResult.Success<T>
+) {
+    call.respond(HttpStatusCode.OK, ApiResponse(
+        code = HttpStatusCode.OK.value,
+        message = HttpStatusCode.OK.description,
+        data = result.data,
+    ))
 }
 
 private suspend fun <E : ApiError> PipelineContext<Unit, ApplicationCall>.handleError(
     result: ApiResult.Error<E>
 ) {
-    call.respond(HttpStatusCode.fromValue(result.error.code), result.error.message)
+    call.respond(HttpStatusCode.fromValue(result.error.code), ApiResponse<Nothing>(
+        code = result.error.code,
+        message = result.error.message,
+    ))
 }
