@@ -3,7 +3,6 @@ package com.cheesecake.server.auth.route
 import com.cheesecake.common.api.ApiError
 import com.cheesecake.common.api.ApiResponse
 import com.cheesecake.common.api.ApiResult
-import com.cheesecake.common.api.Log
 import com.cheesecake.common.auth.api.EndPoint
 import com.cheesecake.common.auth.model.changePassword.ResetPasswordRequest
 import com.cheesecake.common.auth.model.login.LoginRequest
@@ -80,14 +79,16 @@ private suspend fun <T> PipelineContext<Unit, ApplicationCall>.handleSuccess(
         message = HttpStatusCode.OK.description,
         data = result.data,
     )
-    call.respond(HttpStatusCode.OK, response)
+    val typeInfo = typeInfo<ApiResponse<T>>()
+    call.respond(HttpStatusCode.OK, response, typeInfo)
 }
 
 private suspend fun <E : ApiError> PipelineContext<Unit, ApplicationCall>.handleError(
     result: ApiResult.Error<E>
 ) {
+    val typeInfo = typeInfo<ApiResponse<Nothing>>()
     call.respond(HttpStatusCode.fromValue(result.error.code), ApiResponse<Nothing>(
         code = result.error.code,
         message = result.error.message,
-    ))
+    ), typeInfo)
 }
