@@ -6,12 +6,10 @@ import io.ktor.server.application.install
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import kotlinx.serialization.json.Json
 
-private val ApiJson = Json {
-    encodeDefaults = false
-}
-
 fun Application.serverJson() {
     install(ContentNegotiation) {
-        json(ApiJson)
+        json(Json {
+            encodeDefaults = true
+        })
     }
 }
