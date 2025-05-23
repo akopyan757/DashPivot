@@ -119,7 +119,7 @@ class SignUpViewModel(
                     when (result) {
                         is ApiResult.Success -> {
                             stateManager.update {
-                                copy(logicState = SignUpLogicState.Success(result.data))
+                                copy(logicState = SignUpLogicState.Success(result.data.email))
                             }
                         }
 

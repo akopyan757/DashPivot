@@ -9,6 +9,7 @@ import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterRequest
 import com.cheesecake.common.auth.model.registration.RegisterResponse
 import com.cheesecake.common.auth.model.sendCode.SendCodeRequest
+import kotlinx.serialization.builtins.serializer
 
 class UserRemoteDataSource(
     private val apiService: ApiService,
@@ -18,6 +19,7 @@ class UserRemoteDataSource(
     override suspend fun registerUser(registerRequest: RegisterRequest): ApiResult<RegisterResponse, AuthError> {
         return requestHandler.execute(
             request = { apiService.registerUser(registerRequest) },
+            serializer = RegisterResponse.serializer(),
             onError = ::errorFromCode,
             onException = ::defaultError,
         )
@@ -29,6 +31,7 @@ class UserRemoteDataSource(
     ): ApiResult<String, AuthError> {
         return requestHandler.execute(
             request = { apiService.verificationCode(email, code) },
+            serializer = String.serializer(),
             onError = ::errorFromCode,
             onException = ::defaultError,
         )
@@ -37,6 +40,7 @@ class UserRemoteDataSource(
     override suspend fun sendCode(request: SendCodeRequest): ApiResult<String, AuthError> {
         return requestHandler.execute(
             request = { apiService.sendCode(request) },
+            serializer = String.serializer(),
             onError = ::errorFromCode,
             onException = ::defaultError,
         )
@@ -49,6 +53,7 @@ class UserRemoteDataSource(
     ): ApiResult<String, AuthError> {
         return requestHandler.execute(
             request = { apiService.resetPassword(email, code, newPassword) },
+            serializer = String.serializer(),
             onError = ::errorFromCode,
             onException = ::defaultError,
         )
@@ -57,6 +62,7 @@ class UserRemoteDataSource(
     override suspend fun loginUser(loginRequest: LoginRequest): ApiResult<String, AuthError> {
         return requestHandler.execute(
             request = { apiService.loginUser(loginRequest) },
+            serializer = String.serializer(),
             onError = ::errorFromCode,
             onException = ::defaultError,
         )
