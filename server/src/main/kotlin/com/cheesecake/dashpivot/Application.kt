@@ -6,11 +6,13 @@ import com.cheesecake.dashpivot.database.connectToDatabase
 import com.cheesecake.dashpivot.di.serverDI
 import com.cheesecake.dashpivot.json.serverJson
 import com.cheesecake.server.auth.route.authRoute
-import io.ktor.server.application.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
+import io.ktor.server.application.Application
+import io.ktor.server.application.call
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.netty.Netty
 import io.ktor.server.response.respondText
-import io.ktor.server.routing.*
+import io.ktor.server.routing.get
+import io.ktor.server.routing.routing
 
 val PORT = System.getenv("PORT")?.toInt() ?: SERVER_PORT
 
@@ -26,6 +28,8 @@ fun Application.module() {
 
     routing {
         authRoute(di)
-        get("/") { call.respondText("Hello, server!\nVersion: ${VersionInfo.SERVER_VERSION}") }
+        get("/") {
+            call.respondText("Hello, server!\nVersion: ${VersionInfo.SERVER_VERSION}")
+        }
     }
 }

@@ -9,7 +9,8 @@ fun connectToDatabase() {
     val matchResult = regex.find(databaseUrl)
 
     if (databaseUrl != null && matchResult != null) {
-        val (username, password, hostname, port, databaseName) = matchResult.destructured
+        val (username, password, hostname, port, databaseName)
+            = matchResult.destructured
 
         val jdbcUrl = "jdbc:postgresql://$hostname:$port/$databaseName"
 

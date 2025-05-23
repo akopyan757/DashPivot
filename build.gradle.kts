@@ -15,12 +15,17 @@ tasks.register("buildAndRunDockerCompose") {
     description = "Builds the project and runs Docker Compose"
 
     doLast {
-        // Сначала выполняем сборку сервера
         exec {
+            workingDir = rootDir
             commandLine("sh", "-c", "./gradlew server:build")
+            isIgnoreExitValue = false
         }
         exec {
+            workingDir = rootDir
             commandLine("sh", "-c", "docker-compose up --build")
+            isIgnoreExitValue = false
+            standardOutput = System.out
+            errorOutput = System.err
         }
     }
 }

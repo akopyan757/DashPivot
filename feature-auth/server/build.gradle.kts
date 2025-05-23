@@ -2,6 +2,7 @@ plugins {
     id("java-library")
     id("org.jetbrains.kotlinx.kover") version "0.6.1"
     alias(libs.plugins.kotlinJvm)
+    alias(libs.plugins.serialization)
 }
 
 kotlin {
@@ -20,6 +21,8 @@ java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
     }
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 dependencies {
@@ -33,6 +36,7 @@ dependencies {
     implementation(libs.kodein.di.ktor)
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.serialization.json)
     implementation(libs.javax.mail)
     implementation(libs.mindrotJbcrypt)
     implementation(projects.featureAuth.common)
