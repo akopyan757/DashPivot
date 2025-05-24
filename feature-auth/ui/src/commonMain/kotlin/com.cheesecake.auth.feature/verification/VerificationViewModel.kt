@@ -6,12 +6,13 @@ import com.cheesecake.auth.feature.domain.usecase.ResendVerificationRegisterCode
 import com.cheesecake.auth.feature.domain.usecase.VerificationUseCase
 import com.cheesecake.auth.feature.login.LoginState
 import com.cheesecake.auth.feature.registration.SignUpState
-import com.cheesecake.common.api.ApiResult
+import com.cheesecake.common.api.fold
 import com.cheesecake.common.auth.config.Config
 import com.cheesecake.common.ui.state.UIState
 import com.cheesecake.common.ui.state.UIStateManager
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.Serializable
 
 class VerificationViewModel(
@@ -26,40 +27,30 @@ class VerificationViewModel(
 
     fun verifyToken(email: String, code: String) {
         stateManager.update { copy(logicState = VerificationLogicState.Loading) }
-        viewModelScope.launch {
-            verificationUseCase(email, code).collect { result ->
-                stateManager.update {
-                    when (result) {
-                        is ApiResult.Success<*> -> {
-                            loginStateManager.clear()
-                            signUpState.clear()
-                            copy(logicState = VerificationLogicState.Success)
-                        }
-                        is ApiResult.Error<*> -> copy(
-                            logicState = VerificationLogicState.Error(result.error.message)
-                        )
-                        else -> copy(logicState = VerificationLogicState.Idle)
+        verificationUseCase(email, code).onEach { result ->
+            result.fold(
+                onSuccess = {
+                    loginStateManager.clear()
+                    signUpState.clear()
+                    stateManager.update {
+                        copy(logicState = VerificationLogicState.Success)
                     }
-                }
-            }
-        }
+                },
+                onError = {
+                    stateManager.update {
+                        copy(logicState = VerificationLogicState.Error(it.message))
+                    }
+                },
+            )
+        }.launchIn(viewModelScope)
     }
 
     fun resendCode(email: String) {
         stateManager.update { copy(formData = VerificationFormData(isResendLoading = true)) }
-        viewModelScope.launch {
-            resendVerificationRegisterCodeUseCase(email).collect { result ->
-                when (result) {
-                    is ApiResult.Success<String> -> {
-                        resetTimer()
-                    }
 
-                    is ApiResult.Error -> {
-
-                    }
-                }
-            }
-        }
+        resendVerificationRegisterCodeUseCase(email).onEach { result ->
+            result.fold(onSuccess = { resetTimer() })
+        }.launchIn(viewModelScope)
     }
 
     fun resetToIdle() {

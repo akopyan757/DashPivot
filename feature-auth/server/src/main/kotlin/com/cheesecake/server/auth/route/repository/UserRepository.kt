@@ -2,12 +2,14 @@ package com.cheesecake.server.auth.route.repository
 
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.auth.config.Config
+import com.cheesecake.common.auth.model.changePassword.ResetPasswordRequest
 import com.cheesecake.common.auth.model.error.AuthError
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterRequest
 import com.cheesecake.common.auth.model.registration.RegisterResponse
 import com.cheesecake.common.auth.model.sendCode.SendCodeRequest
 import com.cheesecake.common.auth.model.sendCode.SendCodeType
+import com.cheesecake.common.auth.model.verefication.VerificationRequest
 import com.cheesecake.common.auth.service.UserService
 import com.cheesecake.common.auth.utils.isValidEmail
 import com.cheesecake.common.auth.utils.isValidPassword
@@ -58,7 +60,8 @@ internal class UserRepository(
         return ApiResult.Success(RegisterResponse(registerRequest.email))
     }
 
-    override suspend fun verifyEmailByCode(email: String, code: String): ApiResult<String, AuthError> {
+    override suspend fun verifyEmailByCode(verificationRequest: VerificationRequest): ApiResult<String, AuthError> {
+        val (email, code) = verificationRequest
         if (code.isBlank()) {
             return ApiResult.Error(AuthError.EMPTY_CODE_ERROR)
         }
@@ -118,10 +121,9 @@ internal class UserRepository(
     }
 
     override suspend fun resetPassword(
-        email: String,
-        code: String,
-        newPassword: String
+        resetPasswordRequest: ResetPasswordRequest
     ): ApiResult<String, AuthError> {
+        val (email, code, newPassword) = resetPasswordRequest
         val user = userSource.findUserForVerification(email, SendCodeType.RESET_PASSWORD)
             ?: run { return ApiResult.Error(AuthError.USER_NOT_FOUND) }
 
@@ -150,7 +152,6 @@ internal class UserRepository(
         userSource.changePassword(user.id, newHashedPassword)
 
         return ApiResult.Success("Password was changed successfully")
-
     }
 
     override suspend fun loginUser(loginRequest: LoginRequest): ApiResult<String, AuthError> {

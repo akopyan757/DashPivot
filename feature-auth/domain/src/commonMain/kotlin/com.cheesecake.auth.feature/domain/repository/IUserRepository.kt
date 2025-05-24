@@ -7,8 +7,9 @@ import com.cheesecake.common.auth.model.sendCode.SendCodeType
 import kotlinx.coroutines.flow.Flow
 
 interface IUserRepository {
-    suspend fun registerUser(email: String, password: String): Flow<ApiResult<RegisterResponse, AuthError>>
-    suspend fun verifyEmailByCode(email: String, code: String): Flow<ApiResult<String, AuthError>>
-    suspend fun sendVerificationCode(email: String, sendCodeType: SendCodeType): Flow<ApiResult<String, AuthError>>
-    suspend fun loginUser(email: String, password: String): Flow<ApiResult<String, AuthError>>
+    fun registerUser(email: String, password: String): Flow<ApiResult<RegisterResponse, AuthError>>
+    fun verifyEmailByCode(email: String, code: String): Flow<ApiResult<String, AuthError>>
+    fun sendVerificationCode(email: String, sendCodeType: SendCodeType): Flow<ApiResult<String, AuthError>>
+    fun resetPassword(email: String, code: String, password: String): Flow<ApiResult<String, AuthError>>
+    fun loginUser(email: String, password: String): Flow<ApiResult<String, AuthError>>
 }

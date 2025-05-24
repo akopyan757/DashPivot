@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 class LoginUseCase(
     private val userRepository: IUserRepository
 ) {
-    suspend operator fun invoke(email: String, password: String): Flow<ApiResult<String, AuthError>> {
+    operator fun invoke(email: String, password: String): Flow<ApiResult<String, AuthError>> {
         return userRepository.loginUser(email, password)
     }
 }

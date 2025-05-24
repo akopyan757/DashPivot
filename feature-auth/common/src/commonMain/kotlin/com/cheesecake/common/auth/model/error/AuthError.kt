@@ -2,6 +2,7 @@ package com.cheesecake.common.auth.model.error
 
 import com.cheesecake.common.api.ApiError
 import io.ktor.http.HttpStatusCode
+
 enum class AuthError(
     override val code: Int,
     override val message: String

@@ -3,7 +3,8 @@ package com.cheesecake.auth.feature.registration
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cheesecake.auth.feature.domain.usecase.RegisterUseCase
-import com.cheesecake.common.api.ApiResult
+import com.cheesecake.common.api.ApiError
+import com.cheesecake.common.api.fold
 import com.cheesecake.common.auth.model.error.AuthError
 import com.cheesecake.common.auth.utils.formatPasswordErrors
 import com.cheesecake.common.auth.utils.isValidEmail
@@ -12,7 +13,8 @@ import com.cheesecake.common.auth.utils.validatePassword
 import com.cheesecake.common.ui.state.UIState
 import com.cheesecake.common.ui.state.UIStateManager
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.Serializable
 
 class SignUpViewModel(
@@ -114,23 +116,20 @@ class SignUpViewModel(
             stateManager.update { copy(logicState = errorState) }
         } else {
             stateManager.update { copy(logicState = SignUpLogicState.Loading) }
-            viewModelScope.launch {
-                registerUseCase(email, password).collect { result ->
-                    when (result) {
-                        is ApiResult.Success -> {
-                            stateManager.update {
-                                copy(logicState = SignUpLogicState.Success(result.data.email))
-                            }
+            registerUseCase(email, password).onEach { result ->
+                result.fold(
+                    onSuccess = {
+                        stateManager.update {
+                            copy(logicState = SignUpLogicState.Success(it.email))
                         }
-
-                        is ApiResult.Error -> {
-                            stateManager.update {
-                                copy(logicState = SignUpLogicState.Error(result.error))
-                            }
+                    },
+                    onError = {
+                        stateManager.update {
+                            copy(logicState = SignUpLogicState.Error(error = it))
                         }
                     }
-                }
-            }
+                )
+            }.launchIn(viewModelScope)
         }
     }
 }
@@ -160,7 +159,7 @@ sealed class SignUpLogicState {
     @Serializable data object Loading : SignUpLogicState()
     @Serializable data class Success(val message: String) : SignUpLogicState()
     @Serializable data class Error(
-        val error: AuthError? = null,
+        val error: ApiError? = null,
         val emailErrorMessage: String? = null,
         val passwordMessage: String? = null,
         val confirmPasswordMessage: String? = null,

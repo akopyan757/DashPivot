@@ -4,11 +4,13 @@ import com.cheesecake.auth.data.service.ApiService
 import com.cheesecake.common.api.ApiResult
 import com.cheesecake.common.api.Log
 import com.cheesecake.common.api.RequestHandler
+import com.cheesecake.common.auth.model.changePassword.ResetPasswordRequest
 import com.cheesecake.common.auth.model.error.AuthError
 import com.cheesecake.common.auth.model.login.LoginRequest
 import com.cheesecake.common.auth.model.registration.RegisterRequest
 import com.cheesecake.common.auth.model.registration.RegisterResponse
 import com.cheesecake.common.auth.model.sendCode.SendCodeRequest
+import com.cheesecake.common.auth.model.verefication.VerificationRequest
 import kotlinx.serialization.builtins.serializer
 
 class UserRemoteDataSource(
@@ -26,11 +28,10 @@ class UserRemoteDataSource(
     }
 
     override suspend fun verifyEmailByCode(
-        email: String,
-        code: String
+        verificationRequest: VerificationRequest
     ): ApiResult<String, AuthError> {
         return requestHandler.execute(
-            request = { apiService.verificationCode(email, code) },
+            request = { apiService.verificationCode(verificationRequest) },
             serializer = String.serializer(),
             onError = ::errorFromCode,
             onException = ::defaultError,
@@ -47,12 +48,10 @@ class UserRemoteDataSource(
     }
 
     override suspend fun resetPassword(
-        email: String,
-        code: String,
-        newPassword: String
+        resetPasswordRequest: ResetPasswordRequest
     ): ApiResult<String, AuthError> {
         return requestHandler.execute(
-            request = { apiService.resetPassword(email, code, newPassword) },
+            request = { apiService.resetPassword(resetPasswordRequest) },
             serializer = String.serializer(),
             onError = ::errorFromCode,
             onException = ::defaultError,

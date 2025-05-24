@@ -40,10 +40,7 @@ fun Route.authRoute(di: DI) {
     post(EndPoint.REGISTER_CONFIRM.path) {
         val verificationRequest = call.receive<VerificationRequest>()
         val userRepository: UserService by di.instance()
-        val result = userRepository.verifyEmailByCode(
-            email = verificationRequest.email,
-            code = verificationRequest.code,
-        )
+        val result = userRepository.verifyEmailByCode(verificationRequest)
         handleResult(result, String.serializer())
     }
     post(EndPoint.SEND_CODE.path) {
@@ -55,11 +52,7 @@ fun Route.authRoute(di: DI) {
     post(EndPoint.RESET_PASSWORD.path) {
         val resetPasswordRequest = call.receive<ResetPasswordRequest>()
         val userRepository: UserService by di.instance()
-        val result = userRepository.resetPassword(
-            resetPasswordRequest.email,
-            resetPasswordRequest.code,
-            resetPasswordRequest.password,
-        )
+        val result = userRepository.resetPassword(resetPasswordRequest)
         handleResult(result, String.serializer())
     }
     post(EndPoint.LOGIN.path) {

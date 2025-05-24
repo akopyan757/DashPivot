@@ -3,7 +3,8 @@ package com.cheesecake.auth.feature.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cheesecake.auth.feature.domain.usecase.LoginUseCase
-import com.cheesecake.common.api.ApiResult
+import com.cheesecake.common.api.ApiError
+import com.cheesecake.common.api.fold
 import com.cheesecake.common.auth.model.error.AuthError
 import com.cheesecake.common.auth.utils.formatPasswordErrors
 import com.cheesecake.common.auth.utils.isValidEmail
@@ -12,7 +13,8 @@ import com.cheesecake.common.auth.utils.validatePassword
 import com.cheesecake.common.ui.state.UIState
 import com.cheesecake.common.ui.state.UIStateManager
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.Serializable
 
 class LoginViewModel(
@@ -81,26 +83,20 @@ class LoginViewModel(
             stateStrategy.update { copy(logicState = errorState) }
         } else {
             stateStrategy.update { copy(logicState = LoginLogicState.Loading) }
-            viewModelScope.launch {
-                loginUseCase(email, password).collect { result ->
-                    when (result) {
-                        is ApiResult.Success -> {
-                            stateStrategy.update {
-                                copy(
-                                    formData = LoginFormData(), // Clear form data
-                                    logicState = LoginLogicState.Success(result.data)
-                                )
-                            }
-                        }
-
-                        is ApiResult.Error -> {
-                            stateStrategy.update {
-                                copy(logicState = LoginLogicState.Error(result.error))
-                            }
-                        }
+            loginUseCase(email, password).onEach { result ->
+                result.fold(onSuccess = { data ->
+                    stateStrategy.update {
+                        copy(
+                            formData = LoginFormData(), // Clear form data
+                            logicState = LoginLogicState.Success(data)
+                        )
                     }
-                }
-            }
+                }, onError = { error ->
+                    stateStrategy.update {
+                        copy(logicState = LoginLogicState.Error(error))
+                    }
+                })
+            }.launchIn(viewModelScope)
         }
     }
 }
@@ -130,7 +126,7 @@ sealed class LoginLogicState {
     @Serializable data object Loading : LoginLogicState()
     @Serializable data class Success(val message: String) : LoginLogicState()
     @Serializable data class Error(
-        val error: AuthError? = null,
+        val error: ApiError? = null,
         val emailErrorMessage: String? = null,
         val passwordMessage: String? = null,
     ) : LoginLogicState()

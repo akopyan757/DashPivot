@@ -25,11 +25,11 @@ class ApiServiceImpl(private val client: HttpClient) : ApiService {
         }
     }
 
-    override suspend fun verificationCode(email: String, code: String): HttpResponse {
+    override suspend fun verificationCode(verificationRequest: VerificationRequest): HttpResponse {
         return client.post {
             url("$BASE_URL${EndPoint.REGISTER_CONFIRM.path}")
             contentType(ContentType.Application.Json)
-            setBody(VerificationRequest(email, code))
+            setBody(verificationRequest)
         }
     }
 
@@ -41,13 +41,11 @@ class ApiServiceImpl(private val client: HttpClient) : ApiService {
         }
     }
 
-    override suspend fun resetPassword(
-        email: String, code: String, newPassword: String
-    ): HttpResponse {
+    override suspend fun resetPassword(resetPasswordRequest: ResetPasswordRequest): HttpResponse {
         return client.post {
             url("$BASE_URL${EndPoint.RESET_PASSWORD.path}")
             contentType(ContentType.Application.Json)
-            setBody(ResetPasswordRequest(email, code, newPassword))
+            setBody(resetPasswordRequest)
         }
     }
 
